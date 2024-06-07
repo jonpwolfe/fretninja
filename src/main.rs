@@ -1,8 +1,12 @@
 
 use strum_macros::EnumString;
+use core::fmt::{Result, Display, Formatter};
+
 fn main() {
-    println!("Hello, world!");
+    let i : Instrument = Instrument::new(TypeOfInstrument::GUITAR, TuningStyle::STANDARD, MusicalNote::new("E"), 6 ,25);
+    print!("{}", i);
 }
+
 struct Instrument{
     type_of_instrument : TypeOfInstrument,
     tuning_style : TuningStyle,
@@ -10,36 +14,48 @@ struct Instrument{
     string_count : u8,
     fret_count : u8,
     tuning : Vec<MusicalNote>,
-    notes : Vec<Vec<MusicalNote>>
+    fretboard : Vec<Vec<MusicalNote>>
 }
-impl Instrument {
-    fn new(type_of_instrument: TypeOfInstrument, tuning_style :TuningStyle, root_note :MusicalNote, string_count:u8, fret_count : u8) ->Self{
-        
-        
-    let mut instrument = Instrument{
-        type_of_instrument ,
-        tuning_style : tuning_style.clone(),
-        root_note : root_note.clone(),
-        string_count,
-        fret_count,
-        tuning: Vec::new(),      
-        notes: Vec::new(),
-        };
-    Instrument::calculate_tuning(&mut instrument);
-    Instrument::get_notes(&mut instrument);
-    instrument
+
+impl Display for Instrument {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+       for i in (0..self.string_count as usize).rev(){
+            for j in 0..self.fret_count as usize{
+        write!(f,"{} ", self.fretboard[i][j])?;
     }
-   fn get_notes(instrument : &mut Instrument) {
-        let mut musical_string: Vec<MusicalNote> = Vec::new();
+    write!(f,"\n")?;
+}
+Ok(())
+}
+}
+
+impl Instrument {
+    fn new(type_of_instrument : TypeOfInstrument, tuning_style : TuningStyle, root_note : MusicalNote, string_count : u8, fret_count : u8) -> Self {
+        let mut instrument = Instrument{
+            type_of_instrument ,
+            tuning_style : tuning_style.clone(),
+            root_note : root_note.clone(),
+            string_count,
+            fret_count,
+            tuning: Vec::new(),      
+            fretboard: Vec::new(),
+            };
+        Instrument::calculate_tuning(&mut instrument);
+        Instrument::calculate_notes(&mut instrument);
+        instrument
+    }
+
+   fn calculate_notes(self : &mut Self) {
+        
         let mut notes :Vec<Vec<MusicalNote>> = Vec::new();
-        for i in 0..instrument.string_count as usize{
-            for j in 0..instrument.fret_count{
-                musical_string.push(MusicalNote::number_to_note(MusicalNote::add(&instrument.tuning[i],j)));
+        for i in 0..self.string_count as usize{
+            let mut musical_string: Vec<MusicalNote> = Vec::new();
+            for j in 0..self.fret_count as usize{
+                musical_string.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[i],j.try_into().unwrap())));
            }
          notes.push(musical_string.clone());
-         
         }
-        instrument.notes = notes;
+        self.fretboard = notes;
     }
     fn calculate_tuning(self: &mut Self){
         self.tuning.push(self.root_note.clone());   
@@ -70,6 +86,7 @@ impl Instrument {
                 }
                 _ => todo!(),
             }
+
         }
         TypeOfInstrument::BASS=>{
             match self.tuning_style {
@@ -97,97 +114,133 @@ impl Instrument {
     }
     
 }   
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 struct MusicalNote{
-    note_name : NoteName,
+    name : NoteName,
 }
+
+impl Display for MusicalNote {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+    write!(f,"{}", self.name)?;
+    Ok(())
+    }
+}
+
 impl MusicalNote{
-    fn generate_note() -> Self{
-        MusicalNote{note_name : NoteName::G}
+    fn new(name:&str) -> Self{
+        match name{
+        "A"=> MusicalNote{name : NoteName::A},
+        "Asharp" => MusicalNote{name : NoteName::Asharp},
+        "B" => MusicalNote{name : NoteName::B},
+        "C" => MusicalNote{name : NoteName::C},
+        "Csharp" => MusicalNote{name : NoteName::Csharp},
+        "D" => MusicalNote{name : NoteName::D},
+        "Dsharp" => MusicalNote{name : NoteName::Dsharp},
+        "E" => MusicalNote{name : NoteName::E},
+        "F" => MusicalNote{name : NoteName::F},
+        "Fsharp" => MusicalNote{name : NoteName::Fsharp},
+        "G" => MusicalNote{name : NoteName::G},
+        "Gsharp" => MusicalNote{name : NoteName::Gsharp},
+        _ => MusicalNote{name : NoteName::C},
+      }  
     }
     
 fn number_to_note(number: u8) -> MusicalNote{
-    match number {
+    match number %12 {
        
-        1=> MusicalNote{note_name : NoteName::A},
-        2=> MusicalNote{note_name : NoteName::ASharp},
-        3=> MusicalNote{note_name : NoteName::B},
-        4=> MusicalNote{note_name : NoteName::C},
-        5=> MusicalNote{note_name : NoteName::CSharp},
-        6=> MusicalNote{note_name : NoteName::D},
-        7=> MusicalNote{note_name : NoteName::DSharp},
-        8=> MusicalNote{note_name : NoteName::E},
-        9=> MusicalNote{note_name : NoteName::F},
-        10=> MusicalNote{note_name : NoteName::FSharp},
-        11=> MusicalNote{note_name : NoteName::G},
-        12=> MusicalNote{note_name : NoteName::GSharp},
-        _ => MusicalNote{note_name : NoteName::A},
-    }
+        0 => MusicalNote{name : NoteName::A},
+        1 => MusicalNote{name : NoteName::Asharp},
+        2 => MusicalNote{name : NoteName::B},
+        3 => MusicalNote{name : NoteName::C},
+        4 => MusicalNote{name : NoteName::Csharp},
+        5 => MusicalNote{name : NoteName::D},
+        6 => MusicalNote{name : NoteName::Dsharp},
+        7 => MusicalNote{name : NoteName::E},
+        8 => MusicalNote{name : NoteName::F},
+        9 => MusicalNote{name : NoteName::Fsharp},
+        10 => MusicalNote{name : NoteName::G},
+        11 => MusicalNote{name : NoteName::Gsharp},
+        _ => MusicalNote{name : NoteName::A},
+        }
     }
  fn note_to_number(note:&MusicalNote) -> u8{
-    match note.note_name {
-               NoteName::A=>1,
-        NoteName::ASharp=>2,
-        NoteName::B=>3,
-         NoteName::C=>4,
-        NoteName::CSharp=>5,
-        NoteName::D=>6,
-        NoteName::DSharp=>7,
-         NoteName::E=>8,
-         NoteName::F=>9,
-         NoteName::FSharp=>10,
-          NoteName::G => 11,
-        NoteName::GSharp=>12,
+    match note.name {
+        NoteName::A => 0,
+        NoteName::Asharp => 1,
+        NoteName::B => 2,
+        NoteName::C => 3,
+        NoteName::Csharp => 4,
+        NoteName::D => 5,
+        NoteName::Dsharp => 6,
+        NoteName::E => 7,
+        NoteName::F => 8,
+        NoteName::Fsharp => 9,
+        NoteName::G => 10,
+        NoteName::Gsharp => 11,
     }
 }
   fn find_note(open_note : &MusicalNote, fret: u8) -> MusicalNote{
-   let a = MusicalNote::number_to_note(MusicalNote::add(&open_note, fret));
-    a
+   MusicalNote::number_to_note(MusicalNote::add(&open_note, fret))
  }
 fn add(note: &MusicalNote, fret: u8) -> u8 {
-    if MusicalNote::note_to_number(&note) + fret == 36 {
-        return MusicalNote::note_to_number(&note);
-    } else if fret == 0 {
-        return MusicalNote::note_to_number(&note);
-    } else if MusicalNote::note_to_number(&note) + fret <= 12 {
-        return MusicalNote::note_to_number(&note) + fret;
-    } else if (MusicalNote::note_to_number(&note) + fret) % 12 != 0 {
-        return (MusicalNote::note_to_number(&note) + fret) % 12;
-    } else if MusicalNote::note_to_number(&note) + fret == 24 {
-        return MusicalNote::note_to_number(&note) - 12;
-    }
-
-    // You might want to handle other cases or add a default return value here
-    panic!("Unhandled case");
+    let n = MusicalNote::note_to_number(&note);
+      if n + fret % 12 != 0 {
+            return n + fret;
+        } 
+        else {
+            return n;
+        }
 }
- }
+
+
+}
   #[derive(EnumString,PartialEq, Clone, Debug)]
     pub enum NoteName {
         #[strum(serialize = "A")]
         A,
         #[strum(serialize = "A#")]
-        ASharp,
+        Asharp,
         #[strum(serialize = "B")]
         B,
         #[strum(serialize = "C")]
         C,
         #[strum(serialize = "C#")]
-        CSharp,
+        Csharp,
         #[strum(serialize = "D")]
         D,
         #[strum(serialize = "D#")]
-        DSharp,
+        Dsharp,
         #[strum(serialize = "E")]
         E,
         #[strum(serialize = "F")]
         F,
         #[strum(serialize = "F#")]
-        FSharp,
+        Fsharp,
         #[strum(serialize = "G")]
         G,
         #[strum(serialize = "G#")]
-        GSharp,
+        Gsharp,
     }
+    impl Display for NoteName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+        let s = match self {
+            NoteName::A => "A",
+            NoteName::Asharp => "A#",
+            NoteName::B => "B",
+            NoteName::C => "C",
+            NoteName::Csharp => "C#",
+            NoteName::D => "D",
+            NoteName::Dsharp => "D#",
+            NoteName::E => "E",
+            NoteName::F => "F",
+            NoteName::Fsharp => "F#",
+            NoteName::G => "G",
+            NoteName::Gsharp => "G#",
+        };
+        write!(f, "{}", s)?;
+        Ok(())
+    }
+}
     #[derive(EnumString,PartialEq, Clone, Debug)]
     enum TuningStyle{
     #[strum(serialize = "Open")]

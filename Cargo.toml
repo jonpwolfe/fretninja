@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 strum = "0.25.0"
 strum_macros = "0.25.3"
-iced = "0.12.1"
+#dioxus = "0.5.1"

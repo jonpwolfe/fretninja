@@ -185,7 +185,7 @@ fn add(start_note: &MusicalNote, to_add: u8) -> (u8, u8) {
     let (note, octave) = MusicalNote::note_to_number(&start_note);
     let mut octave = octave;
     let mut num = note+to_add;
-      while num > 12 {
+      while num >= 12 {
             num=num-12;
             octave=octave+1;
         }

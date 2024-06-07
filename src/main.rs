@@ -3,7 +3,7 @@ use strum_macros::EnumString;
 use core::fmt::{Result, Display, Formatter};
 
 fn main() {
-    let i : Instrument = Instrument::new(TypeOfInstrument::GUITAR, TuningStyle::STANDARD, MusicalNote::new("E"), 6 ,25);
+    let i : Instrument = Instrument::new(TypeOfInstrument::GUITAR, TuningStyle::STANDARD, MusicalNote::new("E",4), 6 ,25);
     print!("{}", i);
 }
 
@@ -51,7 +51,7 @@ impl Instrument {
         for i in 0..self.string_count as usize{
             let mut musical_string: Vec<MusicalNote> = Vec::new();
             for j in 0..self.fret_count as usize{
-                musical_string.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[i],j.try_into().unwrap())));
+                musical_string.push(MusicalNote::find_note(&self.tuning[i],j.try_into().unwrap()));
            }
          notes.push(musical_string.clone());
         }
@@ -64,10 +64,10 @@ impl Instrument {
             match self.tuning_style{
              TuningStyle::STANDARD =>{
                 self.tuning.push(MusicalNote::find_note(&self.tuning[0], 5));
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[1], 5)));
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[2], 5)));
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[3], 4)));
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[4], 5)));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[3], 4));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[4], 5));
                 }
             TuningStyle::DROP => {
                 self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
@@ -77,11 +77,10 @@ impl Instrument {
                 self.tuning.push(MusicalNote::find_note(&self.tuning[4], 5));
                 }
             TuningStyle::OPEN  => {
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[0], 7)));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
                 self.tuning.push(self.tuning[0].clone());
-                self.tuning.push(MusicalNote::number_to_note(
-                    MusicalNote::add(&self.tuning[0], 16)));
-                self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[3], 3)));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
+                self.tuning.push(MusicalNote::find_note(&self.tuning[3], 3));
                 self.tuning.push(self.tuning[0].clone());
                 }
                 _ => todo!(),
@@ -92,8 +91,8 @@ impl Instrument {
             match self.tuning_style {
                 TuningStyle::STANDARD=>{
                     self.tuning.push(MusicalNote::find_note(&self.tuning[0], 5));
-                    self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[1], 5)));
-                    self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[2], 5)));
+                    self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
+                    self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
                     }
                 TuningStyle::DROP => {
                     self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
@@ -101,10 +100,9 @@ impl Instrument {
                     self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
                     }
                 TuningStyle::OPEN => {
-                    self.tuning.push(MusicalNote::number_to_note(MusicalNote::add(&self.tuning[0], 7)));
+                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
                     self.tuning.push(self.tuning[0].clone());
-                    self.tuning.push(MusicalNote::number_to_note(
-                        MusicalNote::add(&self.tuning[0], 16)));
+                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
                      }
                      _ => todo!(),
                 }
@@ -117,79 +115,81 @@ impl Instrument {
 #[derive(Clone, Debug)]
 struct MusicalNote{
     name : NoteName,
+    octave : u8,
 }
 
 impl Display for MusicalNote {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result{
-    write!(f,"{}", self.name)?;
+    write!(f,"{}{}", self.name,self.octave)?;
     Ok(())
     }
 }
 
 impl MusicalNote{
-    fn new(name:&str) -> Self{
+    fn new(name:&str, octave:u8) -> Self{
         match name{
-        "A"=> MusicalNote{name : NoteName::A},
-        "Asharp" => MusicalNote{name : NoteName::Asharp},
-        "B" => MusicalNote{name : NoteName::B},
-        "C" => MusicalNote{name : NoteName::C},
-        "Csharp" => MusicalNote{name : NoteName::Csharp},
-        "D" => MusicalNote{name : NoteName::D},
-        "Dsharp" => MusicalNote{name : NoteName::Dsharp},
-        "E" => MusicalNote{name : NoteName::E},
-        "F" => MusicalNote{name : NoteName::F},
-        "Fsharp" => MusicalNote{name : NoteName::Fsharp},
-        "G" => MusicalNote{name : NoteName::G},
-        "Gsharp" => MusicalNote{name : NoteName::Gsharp},
-        _ => MusicalNote{name : NoteName::C},
+        "A"=> MusicalNote{name : NoteName::A, octave},
+        "Asharp" => MusicalNote{name : NoteName::Asharp, octave},
+        "B" => MusicalNote{name : NoteName::B, octave},
+        "C" => MusicalNote{name : NoteName::C, octave},
+        "Csharp" => MusicalNote{name : NoteName::Csharp, octave},
+        "D" => MusicalNote{name : NoteName::D, octave},
+        "Dsharp" => MusicalNote{name : NoteName::Dsharp, octave},
+        "E" => MusicalNote{name : NoteName::E, octave},
+        "F" => MusicalNote{name : NoteName::F, octave},
+        "Fsharp" => MusicalNote{name : NoteName::Fsharp, octave},
+        "G" => MusicalNote{name : NoteName::G, octave},
+        "Gsharp" => MusicalNote{name : NoteName::Gsharp, octave},
+        _ => MusicalNote{name : NoteName::C, octave},
       }  
     }
     
-fn number_to_note(number: u8) -> MusicalNote{
-    match number %12 {
-       
-        0 => MusicalNote{name : NoteName::A},
-        1 => MusicalNote{name : NoteName::Asharp},
-        2 => MusicalNote{name : NoteName::B},
-        3 => MusicalNote{name : NoteName::C},
-        4 => MusicalNote{name : NoteName::Csharp},
-        5 => MusicalNote{name : NoteName::D},
-        6 => MusicalNote{name : NoteName::Dsharp},
-        7 => MusicalNote{name : NoteName::E},
-        8 => MusicalNote{name : NoteName::F},
-        9 => MusicalNote{name : NoteName::Fsharp},
-        10 => MusicalNote{name : NoteName::G},
-        11 => MusicalNote{name : NoteName::Gsharp},
-        _ => MusicalNote{name : NoteName::A},
+fn number_to_note(number: u8, octave :u8) -> MusicalNote{
+     match number{
+        1 => MusicalNote{name : NoteName::C,octave},
+        2 => MusicalNote{name : NoteName::Csharp,octave},
+        3 => MusicalNote{name : NoteName::D,octave},
+        4 => MusicalNote{name : NoteName::Dsharp,octave},
+        5 => MusicalNote{name : NoteName::E,octave},
+        6 => MusicalNote{name : NoteName::F,octave},
+        7 => MusicalNote{name : NoteName::Fsharp,octave},
+        8 => MusicalNote{name : NoteName::G,octave},
+        9 => MusicalNote{name : NoteName::Gsharp,octave},
+        10 => MusicalNote{name : NoteName::A,octave},
+        11 => MusicalNote{name : NoteName::Asharp,octave},
+        12 => MusicalNote{name : NoteName::B,octave},
+        _ => MusicalNote{name : NoteName::A,octave},
         }
     }
- fn note_to_number(note:&MusicalNote) -> u8{
+ fn note_to_number(note:&MusicalNote) -> (u8, u8){
     match note.name {
-        NoteName::A => 0,
-        NoteName::Asharp => 1,
-        NoteName::B => 2,
-        NoteName::C => 3,
-        NoteName::Csharp => 4,
-        NoteName::D => 5,
-        NoteName::Dsharp => 6,
-        NoteName::E => 7,
-        NoteName::F => 8,
-        NoteName::Fsharp => 9,
-        NoteName::G => 10,
-        NoteName::Gsharp => 11,
+        NoteName::C => (1,note.octave),
+        NoteName::Csharp => (2,note.octave),
+        NoteName::D => (3,note.octave),
+        NoteName::Dsharp => (4,note.octave),
+        NoteName::E => (5,note.octave),
+        NoteName::F => (6,note.octave),
+        NoteName::Fsharp => (7,note.octave),
+        NoteName::G => (8,note.octave),
+        NoteName::Gsharp => (9,note.octave),
+        NoteName::A => (10,note.octave),
+        NoteName::Asharp => (11,note.octave),
+        NoteName::B => (12,note.octave),
     }
 }
   fn find_note(open_note : &MusicalNote, fret: u8) -> MusicalNote{
-   MusicalNote::number_to_note(MusicalNote::add(&open_note, fret))
+   let (x,y) = MusicalNote::add(&open_note, fret);
+   MusicalNote::number_to_note(x,y)
  }
-fn add(note: &MusicalNote, fret: u8) -> u8 {
-    let n = MusicalNote::note_to_number(&note);
-      if n + fret % 12 != 0 {
-            return n + fret;
-        } 
-        else {
-            return n;
+fn add(start_note: &MusicalNote, to_add: u8) -> (u8, u8) {
+    let (note, octave) = MusicalNote::note_to_number(&start_note);
+    let mut octave = octave;
+    let mut num = note+to_add;
+      while num > 12 {
+            num=num-12;
+            octave=octave+1;
         }
+            return (num, octave)
 }
 
 

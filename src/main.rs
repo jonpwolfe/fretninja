@@ -78,10 +78,10 @@ impl Instrument {
                 }
             TuningStyle::OPEN  => {
                 self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                self.tuning.push(self.tuning[0].clone());
+                self.tuning.push(MusicalNote::find_note(&self.tuning[0],12));
                 self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
                 self.tuning.push(MusicalNote::find_note(&self.tuning[3], 3));
-                self.tuning.push(self.tuning[0].clone());
+                self.tuning.push(MusicalNote::find_note(&self.tuning[0],24));
                 }
                 _ => todo!(),
             }
@@ -101,7 +101,7 @@ impl Instrument {
                     }
                 TuningStyle::OPEN => {
                     self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(self.tuning[0].clone());
+                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 12));
                     self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
                      }
                      _ => todo!(),

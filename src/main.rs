@@ -6,6 +6,8 @@ fn main() {
     let s : Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
     print!("{}", s.pattern);
     print!("{}", s);
+    let c : Chord = Chord::new(&Note::new("D"), &ChordDef::new_major());
+    print!("{}", c);
 }
 
 struct Instrument {
@@ -400,12 +402,8 @@ impl Note {
             _ => Note::C
         }
     }
-}
-
-impl Display for Note {
-
-    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
-        let s = match self {
+    fn get_name(self : &Self) -> &str {
+        match self {
             Note::A => "A",
             Note::Asharp => "A♯",
             Note::B => "B",
@@ -418,7 +416,14 @@ impl Display for Note {
             Note::Fsharp => "F♯",
             Note::G => "G",
             Note::Gsharp => "G♯"
-        };
+        }
+    }
+}
+
+impl Display for Note {
+
+    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
+        let s = Note::get_name(&self);
         write!(f, "{}", s)?;
         Ok(())
     }
@@ -799,16 +804,47 @@ enum Accidental {
     Flat,
     None
 }
-
+impl Display for Accidental {
+    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
+        match self { 
+            Accidental::Sharp => write!(f, "♯")?,
+            Accidental::Flat => write!(f, "♭")?,
+            Accidental::None => write!(f, "")?,
+        }
+        Ok(())
+    }
+}
 #[derive(PartialEq, Clone, Debug)]
 struct Interval {
     accidental : Accidental,
     interval : u8
 }
+
+impl Display for Interval {
+
+    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
+            write!(f, "{}{}", self.accidental, self.interval)?;
+            Ok(())
+    }
+
+}
 #[derive(PartialEq, Clone, Debug)]
 struct ChordDef {
     name : String,
+    naming_convention : String,
     intervals : Vec<Interval>,
+}
+
+impl Display for ChordDef {
+    
+    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
+        write!(f, "{} chord: ", self.name)?;
+        for interval in &self.intervals {
+            write!(f, "{} ", interval)?;
+        };
+        write!(f, "\n")?;
+        Ok(())
+    }
 }
 
 impl ChordDef {
@@ -827,8 +863,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 5 
         });
-        ChordDef{ 
-            name:"".to_string(), 
+        ChordDef{
+            name : "Major".to_string(), 
+            naming_convention : "".to_string(), 
             intervals 
         }
     }
@@ -848,8 +885,9 @@ impl ChordDef {
             interval : 5 
         });
         ChordDef {
-         name:"m".to_string(), 
-         intervals 
+            name : "Minor".to_string(),       
+            naming_convention : "m".to_string(), 
+            intervals 
         }
     }
 
@@ -868,8 +906,9 @@ impl ChordDef {
             interval : 5
         });
         ChordDef {
-         name:"dim".to_string(), 
-         intervals 
+            name : "Diminished".to_string(),
+            naming_convention : "dim".to_string(), 
+            intervals 
         }
     }
 
@@ -888,8 +927,9 @@ impl ChordDef {
             interval : 5
         });
         ChordDef {
-         name:"aug".to_string(), 
-         intervals 
+            name : "Augmented".to_string(),
+            naming_convention : "aug".to_string(), 
+            intervals 
         }
     }
 
@@ -908,7 +948,8 @@ impl ChordDef {
             interval : 5 
         });
         ChordDef { 
-            name:"sus2".to_string(), 
+            name : "Suspended 2nd".to_string(),
+            naming_convention : "sus2".to_string(), 
             intervals 
         }
     }
@@ -928,7 +969,8 @@ impl ChordDef {
             interval : 5 
         });
         ChordDef { 
-            name:"sus4".to_string(), 
+            name : "Suspended 4th".to_string(),
+            naming_convention : "sus4".to_string(), 
             intervals 
         }
     }
@@ -943,8 +985,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 5 
         });
-        ChordDef { 
-            name:"5".to_string(), 
+        ChordDef {
+            name : "Power".to_string(), 
+            naming_convention : "5".to_string(), 
             intervals 
         }
     }
@@ -968,7 +1011,8 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"maj7".to_string(), 
+            name : "Major 7th".to_string(),
+            naming_convention : "maj7".to_string(), 
             intervals 
         }
     }
@@ -992,7 +1036,8 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"m7".to_string(), 
+            name : "Minor 7th".to_string(),
+            naming_convention : "m7".to_string(), 
             intervals 
         }
     }
@@ -1015,8 +1060,9 @@ impl ChordDef {
             accidental : Accidental::Flat, 
             interval : 7 
         });
-        ChordDef { 
-            name:"7".to_string(), 
+        ChordDef {
+            name : "Dominant 7th".to_string(), 
+            naming_convention : "7".to_string(), 
             intervals 
         }
     }
@@ -1040,7 +1086,8 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"m(Maj7)".to_string(), 
+            name : "Minor Major 7th".to_string(),
+            naming_convention : "m(Maj7)".to_string(), 
             intervals 
         }
     }
@@ -1064,7 +1111,8 @@ impl ChordDef {
             interval : 6 
         });
         ChordDef { 
-            name:"6".to_string(), 
+            name : "6th".to_string(),
+            naming_convention : "6".to_string(), 
             intervals 
         }
     }
@@ -1088,7 +1136,8 @@ impl ChordDef {
             interval : 6 
         });
         ChordDef { 
-            name:"m6".to_string(), 
+            name : "Minor 6th".to_string(),
+            naming_convention : "m6".to_string(), 
             intervals 
         }
     }
@@ -1114,8 +1163,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 9 
         });
-        ChordDef { 
-            name:"9".to_string(), 
+        ChordDef {
+            name : "9th".to_string(), 
+            naming_convention : "9".to_string(), 
             intervals 
         }
     }
@@ -1142,8 +1192,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 9 
         });
-        ChordDef { 
-            name:"m9".to_string(), 
+        ChordDef {
+            name : "Minor 9th".to_string(), 
+            naming_convention : "m9".to_string(), 
             intervals 
         }
     }
@@ -1167,7 +1218,8 @@ impl ChordDef {
             interval : 9 
         });
         ChordDef { 
-            name:"add9".to_string(), 
+            name : "Add 9th".to_string(),
+            naming_convention : "add9".to_string(), 
             intervals 
         }
     }
@@ -1191,7 +1243,8 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"7sus4".to_string(), 
+            name : "7th Suspended 4th".to_string(),
+            naming_convention : "7sus4".to_string(), 
             intervals 
         }
     }
@@ -1214,8 +1267,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 6 
         });
-        ChordDef { 
-            name:"dim7".to_string(), 
+        ChordDef {
+            name : "Diminished 7th".to_string(), 
+            naming_convention : "dim7".to_string(), 
             intervals 
         }
     }
@@ -1238,8 +1292,9 @@ impl ChordDef {
             accidental : Accidental::Flat, 
             interval : 7 
         });
-        ChordDef { 
-            name:"7♭5".to_string(), 
+        ChordDef {
+            name : "Half Diminished".to_string(), 
+            naming_convention : "7♭5".to_string(), 
             intervals 
         }
     }
@@ -1262,8 +1317,9 @@ impl ChordDef {
             accidental : Accidental::Flat, 
             interval : 7 
         });
-        ChordDef { 
-            name:"+7".to_string(), 
+        ChordDef {
+            name : "Plus 7th".to_string(), 
+            naming_convention : "+7".to_string(), 
             intervals 
         }
     }
@@ -1295,7 +1351,8 @@ impl ChordDef {
             interval : 11 
         });
         ChordDef { 
-            name:"m11".to_string(), 
+            name : "Minor 11th".to_string(),
+            naming_convention : "m11".to_string(), 
             intervals 
         }
     }
@@ -1318,8 +1375,9 @@ impl ChordDef {
             accidental : Accidental::None, 
             interval : 7 
         });
-        ChordDef { 
-            name:"Maj7♯5".to_string(), 
+        ChordDef {
+            name : "Augmented Major 7th".to_string(), 
+            naming_convention : "Maj7♯5".to_string(), 
             intervals 
         }
     }
@@ -1346,8 +1404,9 @@ impl ChordDef {
             accidental : Accidental::Flat, 
             interval : 9 
         });
-        ChordDef { 
-            name:"7♭9".to_string(), 
+        ChordDef {
+            name : "Dominant 7th Flat 9th".to_string(), 
+            naming_convention : "7♭9".to_string(), 
             intervals 
         }
     }
@@ -1374,8 +1433,9 @@ impl ChordDef {
             accidental : Accidental::Sharp, 
             interval : 9 
         });
-        ChordDef { 
-            name:"7♯5♯9".to_string(), 
+        ChordDef {
+            name : "Altered Dominant 7th".to_string(), 
+            naming_convention : "7♯5♯9".to_string(), 
             intervals 
         }
     }
@@ -1385,5 +1445,46 @@ impl ChordDef {
 struct Chord {
     definition : ChordDef,
     notes : Vec<Note>,
-    name : String
+    name : String,
+    short_name : String,
+}
+
+impl Display for Chord {
+    
+    fn fmt(&self, f : &mut Formatter<'_>) -> Result {
+        write!(f, "{} chord: ", self.name)?;
+        for note in &self.notes {
+            write!(f, "{} ", note)?;
+        };
+        write!(f, "\n")?;
+        Ok(())
+    }
+}
+
+impl Chord {
+    fn new(root_note : &Note, definition : &ChordDef) -> Self {
+        let scale : Scale = Scale::new(&root_note, &ScaleDef::new_major());
+        let mut notes : Vec<Note> = Vec::new();
+        for interval in &definition.intervals {
+            if interval.accidental == Accidental::None {
+                notes.push(scale.notes[interval.interval as usize].clone());
+            }
+            if interval.accidental == Accidental::Flat {
+                let mut note : Note = scale.notes[interval.interval as usize].clone();
+                note = Note::down_step(&note, &Step::new_half());
+                notes.push(note);
+            }
+             if interval.accidental == Accidental::Sharp {
+                let mut note : Note = scale.notes[interval.interval as usize].clone();
+                note = Note::up_step(&note, &Step::new_half());
+                notes.push(note);
+            }
+        }
+        Chord {
+            definition : definition.clone(),
+            notes,
+            name : Note::get_name(&root_note).to_owned() + " " + &definition.name,
+            short_name : Note::get_name(&root_note).to_owned() + &definition.naming_convention
+        }
+    }
 }

@@ -377,17 +377,17 @@ impl Display for Note {
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
         let s = match self {
             Note::A => "A",
-            Note::Asharp => "A#",
+            Note::Asharp => "A♯",
             Note::B => "B",
             Note::C => "C",
-            Note::Csharp => "C#",
+            Note::Csharp => "C♯",
             Note::D => "D",
-            Note::Dsharp => "D#",
+            Note::Dsharp => "D♯",
             Note::E => "E",
             Note::F => "F",
-            Note::Fsharp => "F#",
+            Note::Fsharp => "F♯",
             Note::G => "G",
-            Note::Gsharp => "G#"
+            Note::Gsharp => "G♯"
         };
         write!(f, "{}", s)?;
         Ok(())
@@ -1289,7 +1289,7 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"Maj7#5".to_string(), 
+            name:"Maj7♯5".to_string(), 
             intervals 
         }
     }
@@ -1345,7 +1345,7 @@ impl ChordDef {
             interval : 9 
         });
         ChordDef { 
-            name:"7#5#9".to_string(), 
+            name:"7♯5♯9".to_string(), 
             intervals 
         }
     }

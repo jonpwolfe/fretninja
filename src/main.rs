@@ -270,25 +270,25 @@ impl PitchedNote {
     }
 
     fn add(start_note : &PitchedNote, to_add : u8) -> (u8, u8) {
-        let (note_num, octave) = PitchedNote::pitched_note_to_number(&start_note);
+        let (note_number, octave) = PitchedNote::pitched_note_to_number(&start_note);
         let mut octave = octave;
-        let mut num = note_num + to_add;
-        while num >= 12 {
-            num = num - 12;
+        let mut number = note_number + to_add;
+        while number >= 12 {
+            number = number - 12;
             octave = octave + 1;
         }
-        (num, octave)
+        (number, octave)
     }
 
     fn minus(start_note : &PitchedNote, to_add : u8) -> (u8, u8) {
-        let (note_num, octave) = PitchedNote::pitched_note_to_number(&start_note);
+        let (note_number, octave) = PitchedNote::pitched_note_to_number(&start_note);
         let mut octave = octave;
-        let mut num = note_num - to_add;
-        while num < 0 {
-            num = num + 12;
+        let mut number = note_number - to_add;
+        while number < 0 {
+            number = number + 12;
             octave = octave - 1;
         }
-        (num, octave)
+        (number, octave)
     }
 }
 
@@ -329,41 +329,41 @@ impl Note {
     }
 
     fn up_step(start_note : &Note, step : &Step) -> Note {
-        let num = Note::add(start_note, step);
-        Note::number_to_note(num)
+        let number = Note::add(start_note, step);
+        Note::number_to_note(number)
     }
 
     fn down_step(start_note : &Note, step : &Step) -> Note {
-        let num = Note::minus(start_note, step);
-        Note::number_to_note(num)
+        let number = Note::minus(start_note, step);
+        Note::number_to_note(number)
     }
 
     fn add(start_note : &Note, step : &Step) -> u8 {
-        let note = Note::note_to_number(start_note);
+        let note_number = Note::note_to_number(start_note);
         let to_add = match step {
             Step::Whole(step_value) => step_value.value,
             Step::Half(step_value) => step_value.value,
             Step::OneAndAHalf(step_value) => step_value.value,
         };
-        let mut num = note + to_add;
-        while num >= 12 {
-            num = num - 12;
+        let mut number = note_number + to_add;
+        while number >= 12 {
+            number = number - 12;
         }
-        num
+        number
     }
 
     fn minus(start_note : &Note, step : &Step) -> u8 {
-        let note = Note::note_to_number(start_note);
+        let note_number = Note::note_to_number(start_note);
         let to_add = match step {
             Step::Whole(step_value) => step_value.value,
             Step::Half(step_value) => step_value.value,
             Step::OneAndAHalf(step_value) => step_value.value,
         };
-        let mut num = note - to_add;
-        while num < 0 {
-            num = num + 12;
+        let mut number = note_number - to_add;
+        while number < 0 {
+            number = number + 12;
         }
-        num
+        number
     }
 
     fn note_to_number(note : &Note) -> u8 {

@@ -41,8 +41,8 @@ impl Instrument {
             root_note : root_note.clone(),
             string_count,
             fret_count : fret_count + 1,
-            tuning: Vec::new(),      
-            fretboard: Vec::new()
+            tuning : Vec::new(),      
+            fretboard : Vec::new()
             };
         Instrument::calculate_tuning(&mut instrument);
         Instrument::calculate_notes(&mut instrument);

@@ -322,6 +322,11 @@ impl Note {
         Note::number_to_note(num)
     }
 
+    fn down_step(start_note : &Note, step : &Step) -> Note {
+        let num = Note::minus(start_note, step);
+        Note::number_to_note(num)
+    }
+
     fn add(start_note : &Note, step : &Step) -> u8 {
         let note = Note::note_to_number(start_note);
         let to_add = match step {
@@ -332,6 +337,20 @@ impl Note {
         let mut num = note + to_add;
         while num >= 12 {
             num = num - 12;
+        }
+        num
+    }
+
+    fn minus(start_note : &Note, step : &Step) -> u8 {
+        let note = Note::note_to_number(start_note);
+        let to_add = match step {
+            Step::Whole(step_value) => step_value.value,
+            Step::Half(step_value) => step_value.value,
+            Step::OneAndAHalf(step_value) => step_value.value,
+        };
+        let mut num = note - to_add;
+        while num < 0 {
+            num = num + 12;
         }
         num
     }

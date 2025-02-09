@@ -1,7 +1,7 @@
 use core::fmt::{Result, Display, Formatter};
 
 fn main() {
-    let i : Instrument = Instrument::new(InstrumentType::Guitar, TuningType::Standard, PitchedNote::new("E",4), 6 ,25);
+    let i : Instrument = Instrument::new(InstrumentType::Guitar, TuningType::Standard, PitchedNote::new("E", 4), 6, 25);
     print!("{}", i);
     let s : Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
     print!("{}", s.pattern);
@@ -21,21 +21,21 @@ struct Instrument {
 impl Display for Instrument {
 
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
-       for i in (0..self.string_count).rev(){
-            for j in 0..self.fret_count{
-                write!(f,"{} ", self.fretboard[i][j])?;
+       for i in (0..self.string_count).rev() {
+            for j in 0..self.fret_count {
+                write!(f, "{} ", self.fretboard[i][j])?;
             }
-            write!(f,"\n")?;
-            }
+            write!(f, "\n")?;
+        }
         Ok(())
-         }
+    }
 }
 
 impl Instrument {
 
     fn new(instrument_type : InstrumentType, tuning_type : TuningType,
      root_note : PitchedNote, string_count : usize, fret_count : usize) -> Self {
-        let mut instrument = Instrument{
+        let mut instrument = Instrument {
             instrument_type,
             tuning_type : tuning_type.clone(),
             root_note : root_note.clone(),
@@ -50,14 +50,13 @@ impl Instrument {
     }
 
    fn calculate_notes(self : &mut Self) {
-        
         let mut notes :Vec<Vec<PitchedNote>> = Vec::new();
-        for i in 0..self.string_count{
+        for i in 0..self.string_count {
             let mut musical_string: Vec<PitchedNote> = Vec::new();
-            for j in 0..self.fret_count{
-                musical_string.push(PitchedNote::find_note(&self.tuning[i],j.try_into().unwrap()));
-           }
-         notes.push(musical_string.clone());
+            for j in 0..self.fret_count {
+                musical_string.push(PitchedNote::find_note(&self.tuning[i], j.try_into().unwrap()));
+            }
+            notes.push(musical_string.clone());
         }
         self.fretboard = notes;
     }
@@ -65,52 +64,51 @@ impl Instrument {
     fn calculate_tuning(self : &mut Self) {
         self.tuning.push(self.root_note.clone());   
         match self.instrument_type {
-        InstrumentType::Guitar=>{
-            match self.tuning_type{
-             TuningType::Standard =>{
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
+            InstrumentType::Guitar => {
+                match self.tuning_type {
+                    TuningType::Standard => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
+                    }
+                    TuningType::Drop => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
+                    }
+                    TuningType::Open  => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[3], 3));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 24));
+                    }
+                    _ => todo!(),
                 }
-            TuningType::Drop => {
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
-                }
-            TuningType::Open  => {
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 3));
-                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 24));
-                }
-                _ => todo!(),
+
             }
-
-        }
-
-        InstrumentType::Bass=>{
-            match self.tuning_type {
-                TuningType::Standard => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+            InstrumentType::Bass=>{
+                match self.tuning_type {
+                    TuningType::Standard => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                     }
-                TuningType::Drop => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                    TuningType::Drop => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                     }
-                TuningType::Open => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
-                     }
-                     _ => todo!(),
+                    TuningType::Open => {
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
+                        self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
+                    }
+                    _ => todo!(),
                 }
             }
             _ => todo!(),
@@ -127,7 +125,7 @@ struct PitchedNote {
 
 impl Display for PitchedNote {
     fn fmt(&self, f : &mut Formatter<'_>) -> Result{
-    write!(f,"{}{}", self.note, self.octave)?;
+    write!(f, "{}{}", self.note, self.octave)?;
     Ok(())
     }
 }
@@ -265,17 +263,17 @@ impl PitchedNote {
     }
 
     fn find_note(open_note : &PitchedNote, fret : u8) -> PitchedNote {
-        let (x,y) = PitchedNote::add(&open_note, fret);
-        PitchedNote::number_to_pitched_note(x,y)
+        let (x, y) = PitchedNote::add(&open_note, fret);
+        PitchedNote::number_to_pitched_note(x, y)
     }
 
     fn add(start_note : &PitchedNote, to_add : u8) -> (u8, u8) {
         let (note_num, octave) = PitchedNote::pitched_note_to_number(&start_note);
         let mut octave = octave;
-        let mut num = note_num+to_add;
+        let mut num = note_num + to_add;
         while num >= 12 {
-            num=num-12;
-            octave=octave+1;
+            num = num - 12;
+            octave = octave + 1;
         }
         (num, octave)
     }
@@ -301,20 +299,20 @@ impl Note {
 
     fn new(name : &str) -> Self {
         match name {
-        "A" => Note::A, 
-        "Asharp" =>  Note::Asharp,
-        "B" => Note::B, 
-        "C" => Note::C,
-        "Csharp" =>  Note::Csharp,
-        "D" => Note::D,
-        "Dsharp" => Note::Dsharp,
-        "E" => Note::E,
-        "F" => Note::F,
-        "Fsharp" => Note::Fsharp, 
-        "G" =>Note::G,
-        "Gsharp" => Note::Gsharp,
-        _ => Note::C
-      }  
+            "A" => Note::A, 
+            "Asharp" =>  Note::Asharp,
+            "B" => Note::B, 
+            "C" => Note::C,
+            "Csharp" =>  Note::Csharp,
+            "D" => Note::D,
+            "Dsharp" => Note::Dsharp,
+            "E" => Note::E,
+            "F" => Note::F,
+            "Fsharp" => Note::Fsharp, 
+            "G" =>Note::G,
+            "Gsharp" => Note::Gsharp,
+            _ => Note::C
+        }  
     }
 
     fn up_step(start_note : &Note, step : &Step) -> Note {
@@ -413,7 +411,7 @@ enum InstrumentType {
 
 #[derive(PartialEq, Clone,  Debug)]
 struct StepValue {
-    step : u8,
+    step : u8
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -450,7 +448,7 @@ impl Display for Step {
             Step::Half(_step_value) =>  "H".to_string(),
             Step::OneAndAHalf(_step_value) => "3/2".to_string(),
         };
-        write!(f, "{}",s)?;
+        write!(f, "{}", s)?;
         Ok(())
     }
 }
@@ -726,7 +724,7 @@ impl Display for ScaleDef {
         for step in &self.steps { 
         write!(f, "{} ", step)?;
         };
-        write!(f,"\n")?;
+        write!(f, "\n")?;
         Ok(())
     }
 }
@@ -754,11 +752,11 @@ impl Scale {
 impl Display for Scale {
     
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
-        write!(f, "{} {} scale: ",self.notes[0], self.pattern.name)?;
+        write!(f, "{} {} scale: ", self.notes[0], self.pattern.name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         };
-        write!(f,"\n")?;
+        write!(f, "\n")?;
         Ok(())
     }
 }

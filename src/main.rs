@@ -246,18 +246,18 @@ fn number_to_pitched_note(note_number: u8, octave :u8) -> PitchedNote{
 
  fn pitched_note_to_number(pitched_note:&PitchedNote) -> (u8, u8){
     match pitched_note.note {
-        Note::C => (0,pitched_note.octave),
-        Note::Csharp => (1,pitched_note.octave),
-        Note::D => (2,pitched_note.octave),
-        Note::Dsharp => (3,pitched_note.octave),
-        Note::E => (4,pitched_note.octave),
-        Note::F => (5,pitched_note.octave),
-        Note::Fsharp => (6,pitched_note.octave),
-        Note::G => (7,pitched_note.octave),
-        Note::Gsharp => (8,pitched_note.octave),
-        Note::A => (9,pitched_note.octave),
-        Note::Asharp => (10,pitched_note.octave),
-        Note::B => (11,pitched_note.octave)
+        Note::C => (0, pitched_note.octave),
+        Note::Csharp => (1, pitched_note.octave),
+        Note::D => (2, pitched_note.octave),
+        Note::Dsharp => (3, pitched_note.octave),
+        Note::E => (4, pitched_note.octave),
+        Note::F => (5, pitched_note.octave),
+        Note::Fsharp => (6, pitched_note.octave),
+        Note::G => (7, pitched_note.octave),
+        Note::Gsharp => (8, pitched_note.octave),
+        Note::A => (9, pitched_note.octave),
+        Note::Asharp => (10, pitched_note.octave),
+        Note::B => (11, pitched_note.octave)
     }
 }
 

@@ -1,44 +1,46 @@
-
-use strum_macros::EnumString;
 use core::fmt::{Result, Display, Formatter};
 
 fn main() {
-    let i : Instrument = Instrument::new(TypeOfInstrument::GUITAR, TuningStyle::STANDARD, MusicalNote::new("E",4), 6 ,25);
+    let i : Instrument = Instrument::new(InstrumentType::Guitar, TuningType::Standard, PitchedNote::new("E",4), 6 ,25);
     print!("{}", i);
+    let s : Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
+    print!("{}", s.pattern);
+    print!("{}", s);
 }
 
 struct Instrument{
-    type_of_instrument : TypeOfInstrument,
-    tuning_style : TuningStyle,
-    root_note : MusicalNote,
-    string_count : u8,
-    fret_count : u8,
-    tuning : Vec<MusicalNote>,
-    fretboard : Vec<Vec<MusicalNote>>
+    instrument_type : InstrumentType,
+    tuning_type : TuningType,
+    root_note : PitchedNote,
+    string_count : usize,
+    fret_count : usize,
+    tuning : Vec<PitchedNote>,
+    fretboard : Vec<Vec<PitchedNote>>
 }
 
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result{
-       for i in (0..self.string_count as usize).rev(){
-            for j in 0..self.fret_count as usize{
-        write!(f,"{} ", self.fretboard[i][j])?;
-    }
-    write!(f,"\n")?;
-}
-Ok(())
-}
+       for i in (0..self.string_count).rev(){
+            for j in 0..self.fret_count{
+                write!(f,"{} ", self.fretboard[i][j])?;
+            }
+            write!(f,"\n")?;
+            }
+        Ok(())
+         }
 }
 
 impl Instrument {
-    fn new(type_of_instrument : TypeOfInstrument, tuning_style : TuningStyle, root_note : MusicalNote, string_count : u8, fret_count : u8) -> Self {
+    fn new(instrument_type : InstrumentType, tuning_type : TuningType,
+     root_note : PitchedNote, string_count : usize, fret_count : usize) -> Self {
         let mut instrument = Instrument{
-            type_of_instrument ,
-            tuning_style : tuning_style.clone(),
+            instrument_type,
+            tuning_type : tuning_type.clone(),
             root_note : root_note.clone(),
             string_count,
             fret_count,
             tuning: Vec::new(),      
-            fretboard: Vec::new(),
+            fretboard: Vec::new()
             };
         Instrument::calculate_tuning(&mut instrument);
         Instrument::calculate_notes(&mut instrument);
@@ -47,62 +49,64 @@ impl Instrument {
 
    fn calculate_notes(self : &mut Self) {
         
-        let mut notes :Vec<Vec<MusicalNote>> = Vec::new();
-        for i in 0..self.string_count as usize{
-            let mut musical_string: Vec<MusicalNote> = Vec::new();
-            for j in 0..self.fret_count as usize{
-                musical_string.push(MusicalNote::find_note(&self.tuning[i],j.try_into().unwrap()));
+        let mut notes :Vec<Vec<PitchedNote>> = Vec::new();
+        for i in 0..self.string_count{
+            let mut musical_string: Vec<PitchedNote> = Vec::new();
+            for j in 0..self.fret_count{
+                musical_string.push(PitchedNote::find_note(&self.tuning[i],j.try_into().unwrap()));
            }
          notes.push(musical_string.clone());
         }
         self.fretboard = notes;
     }
+
     fn calculate_tuning(self: &mut Self){
         self.tuning.push(self.root_note.clone());   
-        match self.type_of_instrument {
-        TypeOfInstrument::GUITAR=>{
-            match self.tuning_style{
-             TuningStyle::STANDARD =>{
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 5));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[3], 4));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[4], 5));
+        match self.instrument_type {
+        InstrumentType::Guitar=>{
+            match self.tuning_type{
+             TuningType::Standard =>{
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
                 }
-            TuningStyle::DROP => {
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[3], 4));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[4], 5));
+            TuningType::Drop => {
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
                 }
-            TuningStyle::OPEN  => {
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0],12));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[3], 3));
-                self.tuning.push(MusicalNote::find_note(&self.tuning[0],24));
+            TuningType::Open  => {
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0],12));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[3], 3));
+                self.tuning.push(PitchedNote::find_note(&self.tuning[0],24));
                 }
                 _ => todo!(),
             }
 
         }
-        TypeOfInstrument::BASS=>{
-            match self.tuning_style {
-                TuningStyle::STANDARD=>{
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 5));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
+
+        InstrumentType::Bass=>{
+            match self.tuning_type {
+                TuningType::Standard=>{
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                     }
-                TuningStyle::DROP => {
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[2], 5));
+                TuningType::Drop => {
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                     }
-                TuningStyle::OPEN => {
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 12));
-                    self.tuning.push(MusicalNote::find_note(&self.tuning[0], 16));
+                TuningType::Open => {
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
+                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
                      }
                      _ => todo!(),
                 }
@@ -112,159 +116,1215 @@ impl Instrument {
     }
     
 }   
+
 #[derive(Clone, Debug)]
-struct MusicalNote{
-    name : NoteName,
-    octave : u8,
+struct PitchedNote{
+    note : Note,
+    octave : u8
 }
 
-impl Display for MusicalNote {
+impl Display for PitchedNote {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result{
-    write!(f,"{}{}", self.name,self.octave)?;
+    write!(f,"{}{}", self.note, self.octave)?;
     Ok(())
     }
 }
 
-impl MusicalNote{
-    fn new(name:&str, octave:u8) -> Self{
-        match name{
-        "A"=> MusicalNote{name : NoteName::A, octave},
-        "Asharp" => MusicalNote{name : NoteName::Asharp, octave},
-        "B" => MusicalNote{name : NoteName::B, octave},
-        "C" => MusicalNote{name : NoteName::C, octave},
-        "Csharp" => MusicalNote{name : NoteName::Csharp, octave},
-        "D" => MusicalNote{name : NoteName::D, octave},
-        "Dsharp" => MusicalNote{name : NoteName::Dsharp, octave},
-        "E" => MusicalNote{name : NoteName::E, octave},
-        "F" => MusicalNote{name : NoteName::F, octave},
-        "Fsharp" => MusicalNote{name : NoteName::Fsharp, octave},
-        "G" => MusicalNote{name : NoteName::G, octave},
-        "Gsharp" => MusicalNote{name : NoteName::Gsharp, octave},
-        _ => MusicalNote{name : NoteName::C, octave},
+impl PitchedNote{
+    fn new(note_name:&str, octave:u8) -> Self{
+        match note_name{
+        "A" => PitchedNote{
+            note : Note::A,
+            octave
+        },
+        "Asharp" => PitchedNote{
+            note : Note::Asharp,
+            octave
+        },
+        "B" => PitchedNote{
+            note : Note::B, 
+            octave
+        },
+        "C" => PitchedNote{
+            note : Note::C, 
+            octave
+        },
+        "Csharp" => PitchedNote{
+            note : Note::Csharp, 
+            octave
+        },
+        "D" => PitchedNote{
+            note : Note::D, 
+            octave
+        },
+        "Dsharp" => PitchedNote{
+            note : Note::Dsharp, 
+            octave
+        },
+        "E" => PitchedNote{
+            note : Note::E, 
+            octave
+        },
+        "F" => PitchedNote{
+            note : Note::F, 
+            octave
+        },
+        "Fsharp" => PitchedNote{
+            note : Note::Fsharp, 
+            octave
+        },
+        "G" => PitchedNote{
+            note : Note::G, 
+            octave
+        },
+        "Gsharp" => PitchedNote{
+            note : Note::Gsharp, 
+            octave
+        },
+        _ => PitchedNote{
+            note : Note::C, 
+            octave
+        },
       }  
     }
-    
-fn number_to_note(number: u8, octave :u8) -> MusicalNote{
-     match number{
-        0 => MusicalNote{name : NoteName::C,octave},
-        1 => MusicalNote{name : NoteName::Csharp,octave},
-        2 => MusicalNote{name : NoteName::D,octave},
-        3 => MusicalNote{name : NoteName::Dsharp,octave},
-        4 => MusicalNote{name : NoteName::E,octave},
-        5 => MusicalNote{name : NoteName::F,octave},
-        6 => MusicalNote{name : NoteName::Fsharp,octave},
-        7 => MusicalNote{name : NoteName::G,octave},
-        8 => MusicalNote{name : NoteName::Gsharp,octave},
-        9 => MusicalNote{name : NoteName::A,octave},
-        10 => MusicalNote{name : NoteName::Asharp,octave},
-        11 => MusicalNote{name : NoteName::B,octave},
-        _ => MusicalNote{name : NoteName::A,octave},
+fn number_to_pitched_note(note_number: u8, octave :u8) -> PitchedNote{
+     match note_number{
+        0 => PitchedNote{
+            note : Note::C,
+            octave
+        },
+        1 => PitchedNote{
+            note : Note::Csharp,
+            octave
+        },
+        2 => PitchedNote{
+            note : Note::D,
+            octave
+        },
+        3 => PitchedNote{
+            note : Note::Dsharp,
+            octave
+        },
+        4 => PitchedNote{
+            note : Note::E,
+            octave
+        },
+        5 => PitchedNote{
+            note : Note::F,
+            octave
+        },
+        6 => PitchedNote{
+            note : Note::Fsharp,
+            octave
+        },
+        7 => PitchedNote{
+            note : Note::G,
+            octave
+        },
+        8 => PitchedNote{
+            note : Note::Gsharp,
+            octave
+        },
+        9 => PitchedNote{
+            note : Note::A,
+            octave
+        },
+        10 => PitchedNote{
+            note : Note::Asharp,
+            octave
+        },
+        11 => PitchedNote{
+            note : Note::B,
+            octave
+        },
+        _ => PitchedNote{
+            note : Note::A,
+            octave
+        },
         }
     }
- fn note_to_number(note:&MusicalNote) -> (u8, u8){
-    match note.name {
-        NoteName::C => (0,note.octave),
-        NoteName::Csharp => (1,note.octave),
-        NoteName::D => (2,note.octave),
-        NoteName::Dsharp => (3,note.octave),
-        NoteName::E => (4,note.octave),
-        NoteName::F => (5,note.octave),
-        NoteName::Fsharp => (6,note.octave),
-        NoteName::G => (7,note.octave),
-        NoteName::Gsharp => (8,note.octave),
-        NoteName::A => (9,note.octave),
-        NoteName::Asharp => (10,note.octave),
-        NoteName::B => (11,note.octave),
+
+ fn pitched_note_to_number(pitched_note:&PitchedNote) -> (u8, u8){
+    match pitched_note.note {
+        Note::C => (0,pitched_note.octave),
+        Note::Csharp => (1,pitched_note.octave),
+        Note::D => (2,pitched_note.octave),
+        Note::Dsharp => (3,pitched_note.octave),
+        Note::E => (4,pitched_note.octave),
+        Note::F => (5,pitched_note.octave),
+        Note::Fsharp => (6,pitched_note.octave),
+        Note::G => (7,pitched_note.octave),
+        Note::Gsharp => (8,pitched_note.octave),
+        Note::A => (9,pitched_note.octave),
+        Note::Asharp => (10,pitched_note.octave),
+        Note::B => (11,pitched_note.octave)
     }
 }
-  fn find_note(open_note : &MusicalNote, fret: u8) -> MusicalNote{
-   let (x,y) = MusicalNote::add(&open_note, fret);
-   MusicalNote::number_to_note(x,y)
+
+  fn find_note(open_note : &PitchedNote, fret: u8) -> PitchedNote{
+   let (x,y) = PitchedNote::add(&open_note, fret);
+   PitchedNote::number_to_pitched_note(x,y)
  }
-fn add(start_note: &MusicalNote, to_add: u8) -> (u8, u8) {
-    let (note, octave) = MusicalNote::note_to_number(&start_note);
+
+fn add(start_note: &PitchedNote, to_add: u8) -> (u8, u8) {
+    let (note_num, octave) = PitchedNote::pitched_note_to_number(&start_note);
     let mut octave = octave;
-    let mut num = note+to_add;
+    let mut num = note_num+to_add;
       while num >= 12 {
             num=num-12;
             octave=octave+1;
         }
-            return (num, octave)
+     (num, octave)
 }
 
 
 }
-  #[derive(EnumString,PartialEq, Clone, Debug)]
-    pub enum NoteName {
-        #[strum(serialize = "A")]
-        A,
-        #[strum(serialize = "A#")]
-        Asharp,
-        #[strum(serialize = "B")]
-        B,
-        #[strum(serialize = "C")]
-        C,
-        #[strum(serialize = "C#")]
-        Csharp,
-        #[strum(serialize = "D")]
-        D,
-        #[strum(serialize = "D#")]
-        Dsharp,
-        #[strum(serialize = "E")]
-        E,
-        #[strum(serialize = "F")]
-        F,
-        #[strum(serialize = "F#")]
-        Fsharp,
-        #[strum(serialize = "G")]
-        G,
-        #[strum(serialize = "G#")]
-        Gsharp,
+
+#[derive(PartialEq, Clone, Debug)]
+enum Note {
+    A,
+    Asharp,
+    B,
+    C,
+    Csharp,
+    D,
+    Dsharp,
+    E,
+    F,
+    Fsharp,
+    G,
+    Gsharp
+}
+
+impl Note{
+    fn new(name:&str) -> Self{
+        match name{
+        "A" => Note::A, 
+        "Asharp" =>  Note::Asharp,
+        "B" => Note::B, 
+        "C" => Note::C,
+        "Csharp" =>  Note::Csharp,
+        "D" => Note::D,
+        "Dsharp" => Note::Dsharp,
+        "E" => Note::E,
+        "F" => Note::F,
+        "Fsharp" => Note::Fsharp, 
+        "G" =>Note::G,
+        "Gsharp" => Note::Gsharp,
+        _ => Note::C
+      }  
     }
-    impl Display for NoteName {
+    fn up_step(start_note : &Note, step: &Step) -> Note {
+        let num = Note::add(start_note, step);
+        Note::number_to_note(num)
+    }
+    fn add(start_note: &Note, step: &Step) -> u8 {
+        let note = Note::note_to_number(start_note);
+        let to_add = match step{
+            Step::Whole(step_value) => step_value.step,
+            Step::Half(step_value) => step_value.step,
+            Step::OneAndAHalf(step_value) => step_value.step,
+        };
+        let mut num = note+to_add;
+        while num >= 12 {
+            num=num-12;
+        }
+        num
+    }
+    fn note_to_number(note:&Note) -> u8{
+        match note {
+            Note::C => 0,
+            Note::Csharp => 1,
+            Note::D => 2,
+            Note::Dsharp => 3,
+            Note::E => 4,
+            Note::F => 5,
+            Note::Fsharp => 6,
+            Note::G => 7,
+            Note::Gsharp => 8,
+            Note::A => 9,
+            Note::Asharp => 10,
+            Note::B => 11
+        }
+    }
+    fn number_to_note(number: u8) ->Note{
+        match number{
+            0 => Note::C,
+            1 => Note::Csharp,
+            2 => Note::D,
+            3 => Note::Dsharp,
+            4 => Note::E,
+            5 => Note::F,
+            6 => Note::Fsharp,
+            7 => Note::G,
+            8 => Note::Gsharp,
+            9 => Note::A,
+            10 => Note::Asharp,
+            11 => Note::B,
+            _ => Note::C
+        }
+    }
+}
+
+impl Display for Note {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result{
         let s = match self {
-            NoteName::A => "A",
-            NoteName::Asharp => "A#",
-            NoteName::B => "B",
-            NoteName::C => "C",
-            NoteName::Csharp => "C#",
-            NoteName::D => "D",
-            NoteName::Dsharp => "D#",
-            NoteName::E => "E",
-            NoteName::F => "F",
-            NoteName::Fsharp => "F#",
-            NoteName::G => "G",
-            NoteName::Gsharp => "G#",
+            Note::A => "A",
+            Note::Asharp => "A#",
+            Note::B => "B",
+            Note::C => "C",
+            Note::Csharp => "C#",
+            Note::D => "D",
+            Note::Dsharp => "D#",
+            Note::E => "E",
+            Note::F => "F",
+            Note::Fsharp => "F#",
+            Note::G => "G",
+            Note::Gsharp => "G#"
         };
         write!(f, "{}", s)?;
         Ok(())
     }
 }
-    #[derive(EnumString,PartialEq, Clone, Debug)]
-    enum TuningStyle{
-    #[strum(serialize = "Open")]
-    OPEN,
-    #[strum(serialize = "Drop")]
-    DROP,
-    #[strum(serialize = "Standard")]
-    STANDARD,
-    #[strum(serialize = "Custom")]
-    CUSTOM,
-}
- #[derive(EnumString,PartialEq, Clone, Debug)]
-enum TypeOfInstrument {
-    #[strum(serialize = "Guitar")]
-    GUITAR,
-    #[strum(serialize = "Bass")]
-    BASS,
-    #[strum(serialize = "Mandolin")]
-    MANDOLIN,
-    #[strum(serialize = "Banjo")]
-    BANJO,
-    #[strum(serialize = "Ukelelle")]
-    UKELELLE,
-    #[strum(serialize = "Custom")]
-    CUSTOM,
+
+#[derive(PartialEq, Clone, Debug)]
+enum TuningType{
+    Open,
+    Drop,
+    Standard,
+    Custom
 }
 
+#[derive(PartialEq, Clone, Debug)]
+enum InstrumentType {
+    Guitar,
+    Bass,
+    Mandolin,
+    Banjo,
+    Ukelelle
+}
+
+#[derive(PartialEq, Clone,  Debug)]
+struct StepValue {
+    step : u8,
+}
+
+#[derive(PartialEq, Clone, Debug)]
+enum Step{
+    Whole(StepValue),
+    Half(StepValue),
+    OneAndAHalf(StepValue)
+}
+
+impl Step{
+    fn new_whole() -> Self {
+        Step::Whole(StepValue{ 
+            step : 2
+        })
+    }
+    fn new_half() -> Self {
+        Step::Half(StepValue{
+            step : 1
+        })
+    }
+    fn new_one_and_a_half() -> Self{
+        Step::OneAndAHalf(StepValue{ 
+            step : 3
+        })
+    }
+}
+
+impl Display for Step {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+       let s = match self{
+            Step::Whole(_step_value) => "W".to_string(), 
+            Step::Half(_step_value) =>  "H".to_string(),
+            Step::OneAndAHalf(_step_value) => "3/2".to_string(),
+        };
+        write!(f, "{}",s)?;
+        Ok(())
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct ScaleDef{
+    name : String,
+    steps : Vec<Step>
+}
+
+impl ScaleDef{
+    fn new_major() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Major".to_string(),
+            steps
+        }
+    }
+    fn new_ionian() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Ionian".to_string(),
+            steps
+        }
+    }
+    fn new_dorian() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Dorian".to_string(),
+            steps
+        }
+    }
+    fn new_phrygian() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Phrygian".to_string(),
+            steps
+        }
+    }
+    fn new_lydian() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Lydian".to_string(),
+            steps
+        }
+    }
+    fn new_mixolydian() -> Self {
+        let mut  steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Mixolydian".to_string(),
+            steps
+        }
+    }
+    fn new_aeolian() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Aeolian".to_string(),
+            steps
+        }
+    }
+    fn new_locrian() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Locrian".to_string(),
+            steps
+        }
+    }
+    fn new_natural_minor() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Natural Minor".to_string(),
+            steps
+        }
+    }
+    fn new_harmonic_minor() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Harmonic Minor".to_string(),
+            steps
+        }
+    }
+    fn new_melodic_minor_ascending() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Melodic Minor Ascending".to_string(),
+            steps
+        } 
+    }
+    fn new_melodic_minor_descending() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Melodic Minor Descending".to_string(),
+            steps
+        } 
+    }
+    fn new_chromatic() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        ScaleDef{
+            name : "Chromatic".to_string(),
+            steps
+        } 
+    }
+    fn new_whole_tone() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Whole Tone".to_string(),
+            steps
+        } 
+    }
+    fn new_major_pentatonic() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_one_and_a_half());
+        ScaleDef{
+            name : "Major Pentatonic".to_string(),
+            steps
+        } 
+    }
+    fn new_minor_pentatonic() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Minor Pentatonic".to_string(),
+            steps
+        } 
+    }
+    fn new_blues() -> Self {
+        let mut steps : Vec<Step> = Vec::new();
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_whole());
+        steps.push(Step::new_half());
+        steps.push(Step::new_half());
+        steps.push(Step::new_one_and_a_half());
+        steps.push(Step::new_whole());
+        ScaleDef{
+            name : "Blues".to_string(),
+            steps
+        } 
+    }
+
+}
+
+impl Display for ScaleDef {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+        write!(f, "{} scale: ", self.name)?;
+        for step in &self.steps{ 
+        write!(f, "{} ", step)?;
+        };
+        write!(f,"\n")?;
+        Ok(())
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct Scale {
+    pattern : ScaleDef,
+    notes : Vec<Note>
+}
+
+impl Scale {
+    fn new(note_1 : &Note, pattern : &ScaleDef) -> Self {
+        let mut notes : Vec<Note> = Vec::new();
+        notes.push(note_1.clone());
+        let mut count : usize = 0;
+        for step in &pattern.steps{
+            notes.push(Note::up_step(&notes[count], &step));
+            count = count + 1;
+        }
+        Scale{pattern : pattern.clone(), notes}
+    }
+}
+
+impl Display for Scale {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result{
+        write!(f, "{} {} scale: ",self.notes[0], self.pattern.name)?;
+        for note in &self.notes{
+            write!(f, "{} ", note)?;
+        };
+        write!(f,"\n")?;
+        Ok(())
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+enum Accidental {
+    Sharp,
+    Flat,
+    None
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct Interval {
+    accidental : Accidental,
+    interval : u8
+}
+#[derive(PartialEq, Clone, Debug)]
+struct ChordDef {
+    name : String,
+    intervals : Vec<Interval>,
+}
+
+impl ChordDef {
+
+    fn new_major() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        ChordDef{ 
+            name:"".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        ChordDef{
+         name:"m".to_string(), 
+         intervals 
+        }
+    }
+
+    fn new_diminished() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{
+            accidental : Accidental::None,
+            interval : 1
+        });
+        intervals.push(Interval{
+            accidental : Accidental::Flat,
+            interval : 3
+        });
+        intervals.push(Interval{
+            accidental : Accidental::Flat,
+            interval : 5
+        });
+        ChordDef{
+         name:"dim".to_string(), 
+         intervals 
+        }
+    }
+
+    fn new_augmented() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{
+            accidental : Accidental::None,
+            interval : 1
+        });
+        intervals.push(Interval{
+            accidental : Accidental::None,
+            interval : 3
+        });
+        intervals.push(Interval{
+            accidental : Accidental::Sharp,
+            interval : 5
+        });
+        ChordDef{
+         name:"aug".to_string(), 
+         intervals 
+        }
+    }
+
+    fn new_suspended_second() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 2 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        ChordDef{ 
+            name:"sus2".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_suspended_fourth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 4 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        ChordDef{ 
+            name:"sus4".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_power() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        ChordDef{ 
+            name:"5".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_major_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"maj7".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"m7".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_dominant_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"7".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor_major_7() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"m(Maj7)".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_sixth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 6 
+        });
+        ChordDef{ 
+            name:"6".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor_sixth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 6 
+        });
+        ChordDef{ 
+            name:"m6".to_string(), 
+            intervals 
+        }
+    }
+    fn new_ninth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 9 
+        });
+        ChordDef{ 
+            name:"9".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor_ninth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 9 
+        });
+        ChordDef{ 
+            name:"m9".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_add_ninth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 9 
+        });
+        ChordDef{ 
+            name:"add9".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_seventh_suspended_fourth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 4 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"7sus4".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_dimished_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 6 
+        });
+        ChordDef{ 
+            name:"dim7".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_half_diminished() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"7flat5".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_plus_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Sharp, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"+7".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_minor_eleventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 9 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 11 
+        });
+        ChordDef{ 
+            name:"m11".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_augmented_major_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Sharp, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 7 
+        });
+        ChordDef{ 
+            name:"Maj7#5".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_dominant_seventh_flat_ninth() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 9 
+        });
+        ChordDef{ 
+            name:"7flat9".to_string(), 
+            intervals 
+        }
+    }
+
+    fn new_altered_dominant_seventh() -> Self {
+        let mut intervals : Vec<Interval> = Vec::new();
+        intervals.push(Interval{ 
+            accidental : Accidental::None,
+            interval : 1 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::None, 
+            interval : 3 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Sharp, 
+            interval : 5 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Flat, 
+            interval : 7 
+        });
+        intervals.push(Interval{ 
+            accidental : Accidental::Sharp, 
+            interval : 9 
+        });
+        ChordDef{ 
+            name:"7#5#9".to_string(), 
+            intervals 
+        }
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct Chord {
+    definition : ChordDef,
+    notes : Vec<Note>,
+    name : String
+}

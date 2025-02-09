@@ -327,9 +327,9 @@ impl Note {
             Step::Half(step_value) => step_value.step,
             Step::OneAndAHalf(step_value) => step_value.step,
         };
-        let mut num = note+to_add;
+        let mut num = note + to_add;
         while num >= 12 {
-            num=num-12;
+            num = num - 12;
         }
         num
     }

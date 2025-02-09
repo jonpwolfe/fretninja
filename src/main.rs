@@ -22,7 +22,7 @@ impl Display for Instrument {
 
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
        for i in (0..self.string_count).rev() {
-            for j in 0..self.fret_count + 1 {
+            for j in 0..self.fret_count {
                 write!(f, "{} ", self.fretboard[i][j])?;
             }
             write!(f, "\n")?;
@@ -40,7 +40,7 @@ impl Instrument {
             tuning_type : tuning_type.clone(),
             root_note : root_note.clone(),
             string_count,
-            fret_count,
+            fret_count : fret_count + 1,
             tuning: Vec::new(),      
             fretboard: Vec::new()
             };
@@ -53,7 +53,7 @@ impl Instrument {
         let mut notes :Vec<Vec<PitchedNote>> = Vec::new();
         for i in 0..self.string_count {
             let mut musical_string: Vec<PitchedNote> = Vec::new();
-            for j in 0..self.fret_count + 1 {
+            for j in 0..self.fret_count {
                 musical_string.push(PitchedNote::find_note(&self.tuning[i], j.try_into().unwrap()));
             }
             notes.push(musical_string.clone());

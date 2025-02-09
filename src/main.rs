@@ -72,46 +72,46 @@ impl Instrument {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
-                    }
+                    },
                     TuningType::Drop => {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
-                    }
+                    },
                     TuningType::Open  => {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[3], 3));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 24));
-                    }
-                    _ => todo!(),
+                    },
+                    _ => todo!()
                 }
 
-            }
-            InstrumentType::Bass=>{
+            },
+            InstrumentType::Bass => {
                 match self.tuning_type {
                     TuningType::Standard => {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                    }
+                    },
                     TuningType::Drop => {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                    }
+                    },
                     TuningType::Open => {
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 12));
                         self.tuning.push(PitchedNote::find_note(&self.tuning[0], 16));
-                    }
-                    _ => todo!(),
+                    },
+                    _ => todo!()
                 }
-            }
-            _ => todo!(),
+            },
+            _ => todo!()
         }
     }
     

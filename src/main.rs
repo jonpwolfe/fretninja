@@ -325,9 +325,9 @@ impl Note {
     fn add(start_note : &Note, step : &Step) -> u8 {
         let note = Note::note_to_number(start_note);
         let to_add = match step {
-            Step::Whole(step_value) => step_value.step,
-            Step::Half(step_value) => step_value.step,
-            Step::OneAndAHalf(step_value) => step_value.step,
+            Step::Whole(step_value) => step_value.value,
+            Step::Half(step_value) => step_value.value,
+            Step::OneAndAHalf(step_value) => step_value.value,
         };
         let mut num = note + to_add;
         while num >= 12 {
@@ -413,7 +413,7 @@ enum InstrumentType {
 
 #[derive(PartialEq, Clone,  Debug)]
 struct StepValue {
-    step : u8
+    value : u8
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -427,17 +427,17 @@ impl Step{
 
     fn new_whole() -> Self {
         Step::Whole(StepValue { 
-            step : 2
+            value : 2
         })
     }
     fn new_half() -> Self {
         Step::Half(StepValue {
-            step : 1
+            value : 1
         })
     }
     fn new_one_and_a_half() -> Self {
         Step::OneAndAHalf(StepValue { 
-            step : 3
+            value : 3
         })
     }
 }

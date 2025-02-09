@@ -279,6 +279,17 @@ impl PitchedNote {
         }
         (num, octave)
     }
+
+    fn minus(start_note : &PitchedNote, to_add : u8) -> (u8, u8) {
+        let (note_num, octave) = PitchedNote::pitched_note_to_number(&start_note);
+        let mut octave = octave;
+        let mut num = note_num - to_add;
+        while num < 0 {
+            num = num + 12;
+            octave = octave - 1;
+        }
+        (num, octave)
+    }
 }
 
 #[derive(PartialEq, Clone, Debug)]

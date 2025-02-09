@@ -1,7 +1,7 @@
 use core::fmt::{Result, Display, Formatter};
 
 fn main() {
-    let i : Instrument = Instrument::new(InstrumentType::Guitar, TuningType::Standard, PitchedNote::new("E", 4), 6, 25);
+    let i : Instrument = Instrument::new(InstrumentType::Guitar, TuningType::Standard, PitchedNote::new("E", 4), 6, 24);
     print!("{}", i);
     let s : Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
     print!("{}", s.pattern);
@@ -22,7 +22,7 @@ impl Display for Instrument {
 
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
        for i in (0..self.string_count).rev() {
-            for j in 0..self.fret_count {
+            for j in 0..self.fret_count + 1 {
                 write!(f, "{} ", self.fretboard[i][j])?;
             }
             write!(f, "\n")?;
@@ -53,7 +53,7 @@ impl Instrument {
         let mut notes :Vec<Vec<PitchedNote>> = Vec::new();
         for i in 0..self.string_count {
             let mut musical_string: Vec<PitchedNote> = Vec::new();
-            for j in 0..self.fret_count {
+            for j in 0..self.fret_count + 1 {
                 musical_string.push(PitchedNote::find_note(&self.tuning[i], j.try_into().unwrap()));
             }
             notes.push(musical_string.clone());
@@ -124,7 +124,7 @@ struct PitchedNote {
 }
 
 impl Display for PitchedNote {
-    
+
     fn fmt(&self, f : &mut Formatter<'_>) -> Result{
     write!(f, "{}{}", self.note, self.octave)?;
     Ok(())

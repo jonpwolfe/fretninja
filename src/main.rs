@@ -124,6 +124,7 @@ struct PitchedNote {
 }
 
 impl Display for PitchedNote {
+    
     fn fmt(&self, f : &mut Formatter<'_>) -> Result{
     write!(f, "{}{}", self.note, self.octave)?;
     Ok(())
@@ -131,6 +132,7 @@ impl Display for PitchedNote {
 }
 
 impl PitchedNote {
+
     fn new(note_name : &str, octave : u8) -> Self {
         match note_name {
             "A" => PitchedNote {

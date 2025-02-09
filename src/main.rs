@@ -1209,7 +1209,7 @@ impl ChordDef {
             interval : 7 
         });
         ChordDef { 
-            name:"7\u{266D}5".to_string(), 
+            name:"7♭5".to_string(), 
             intervals 
         }
     }
@@ -1317,7 +1317,7 @@ impl ChordDef {
             interval : 9 
         });
         ChordDef { 
-            name:"7\u{266D}9".to_string(), 
+            name:"7♭9".to_string(), 
             intervals 
         }
     }

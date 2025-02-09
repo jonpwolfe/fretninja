@@ -6,7 +6,7 @@ fn main() {
     let s : Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
     print!("{}", s.pattern);
     print!("{}", s);
-    let c : Chord = Chord::new(&Note::new("D"), &ChordDef::new_major());
+    let c : Chord = Chord::new(&Note::new("D"), &ChordDef::new_minor());
     print!("{}", c.definition);
     print!("{}", c);
 }
@@ -1453,7 +1453,7 @@ struct Chord {
 impl Display for Chord {
     
     fn fmt(&self, f : &mut Formatter<'_>) -> Result {
-        write!(f, "{} chord: ", self.name)?;
+        write!(f, "{} or {} chord: ", self.name, self.short_name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         };

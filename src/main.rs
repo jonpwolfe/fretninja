@@ -7,6 +7,7 @@ fn main() {
     print!("{}", s.pattern);
     print!("{}", s);
     let c : Chord = Chord::new(&Note::new("D"), &ChordDef::new_major());
+    print!("{}", c.definition);
     print!("{}", c);
 }
 
@@ -1462,20 +1463,21 @@ impl Display for Chord {
 }
 
 impl Chord {
+
     fn new(root_note : &Note, definition : &ChordDef) -> Self {
         let scale : Scale = Scale::new(&root_note, &ScaleDef::new_major());
         let mut notes : Vec<Note> = Vec::new();
         for interval in &definition.intervals {
             if interval.accidental == Accidental::None {
-                notes.push(scale.notes[interval.interval as usize].clone());
+                notes.push(scale.notes[(interval.interval - 1) as usize].clone());
             }
             if interval.accidental == Accidental::Flat {
-                let mut note : Note = scale.notes[interval.interval as usize].clone();
+                let mut note : Note = scale.notes[(interval.interval - 1) as usize].clone();
                 note = Note::down_step(&note, &Step::new_half());
                 notes.push(note);
             }
              if interval.accidental == Accidental::Sharp {
-                let mut note : Note = scale.notes[interval.interval as usize].clone();
+                let mut note : Note = scale.notes[(interval.interval - 1) as usize].clone();
                 note = Note::up_step(&note, &Step::new_half());
                 notes.push(note);
             }

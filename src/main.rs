@@ -9,10 +9,16 @@ fn main() {
         24,
     );
     print!("{}", i);
-    let s: Scale = Scale::new(&NotePitch::new(NaturalNote::D, None, 5), &ScaleDef::new_blues());
+    let s: Scale = Scale::new(
+        &NotePitch::new(NaturalNote::D, None, 5),
+        &ScaleDef::new_blues(),
+    );
     print!("{}", s.pattern);
     print!("{}", s);
-    let c: Chord = Chord::new(&NotePitch::new(NaturalNote::D, None, 5), &ChordDef::new_major());
+    let c: Chord = Chord::new(
+        &NotePitch::new(NaturalNote::D, None, 5),
+        &ChordDef::new_major(),
+    );
     print!("{}", c.definition);
     print!("{}", c);
 }
@@ -66,10 +72,7 @@ impl Instrument {
         for i in 0..self.string_count {
             let mut musical_string: Vec<NotePitch> = Vec::new();
             for j in 0..self.fret_count {
-                musical_string.push(NotePitch::find_note(
-                    &self.tuning[i],
-                    j.try_into().unwrap(),
-                ));
+                musical_string.push(NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()));
             }
             notes.push(musical_string.clone());
         }
@@ -96,13 +99,10 @@ impl Instrument {
                 }
                 TuningType::Open => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
-                    self.tuning
-                        .push(NotePitch::find_note(&self.tuning[0], 12));
-                    self.tuning
-                        .push(NotePitch::find_note(&self.tuning[0], 16));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 12));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 16));
                     self.tuning.push(NotePitch::find_note(&self.tuning[3], 3));
-                    self.tuning
-                        .push(NotePitch::find_note(&self.tuning[0], 24));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 24));
                 }
                 _ => todo!(),
             },
@@ -119,10 +119,8 @@ impl Instrument {
                 }
                 TuningType::Open => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
-                    self.tuning
-                        .push(NotePitch::find_note(&self.tuning[0], 12));
-                    self.tuning
-                        .push(NotePitch::find_note(&self.tuning[0], 16));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 12));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 16));
                 }
                 _ => todo!(),
             },
@@ -147,7 +145,7 @@ impl Display for NotePitch {
 
 impl NotePitch {
     fn new(natural_note: NaturalNote, accidental: Option<Accidental>, octave: i8) -> Self {
-        NotePitch{
+        NotePitch {
             natural_note,
             accidental,
             octave,
@@ -155,7 +153,7 @@ impl NotePitch {
     }
 
     fn get_name(self: &Self) -> String {
-        let natural_note = match self.natural_note{
+        let natural_note = match self.natural_note {
             NaturalNote::A => "A".to_string(),
             NaturalNote::B => "B".to_string(),
             NaturalNote::C => "C".to_string(),
@@ -164,12 +162,12 @@ impl NotePitch {
             NaturalNote::F => "F".to_string(),
             NaturalNote::G => "G".to_string(),
         };
-        let accidental = match self.accidental{
+        let accidental = match self.accidental {
             Some(Accidental::Sharp) => "♯".to_string(),
             Some(Accidental::Flat) => "♭".to_string(),
             None => "".to_string(),
         };
-        let name = natural_note+&accidental;
+        let name = natural_note + &accidental;
         name
     }
     fn number_to_note_pitch(note_number: i8, octave: i8) -> NotePitch {
@@ -243,33 +241,43 @@ impl NotePitch {
     }
 
     fn note_pitch_to_number(note_pitch: &NotePitch) -> (i8, i8) {
-         let number :i8 = match note_pitch.natural_note {
-            NaturalNote::C => 0 + match note_pitch.accidental {
-                Some(Accidental::Flat) => -1,
-                Some(Accidental::Sharp) => 1,
-                None => 0,
-        },
-            NaturalNote::D => 2 + match note_pitch.accidental {
-                Some(Accidental::Flat) => -1,
-                Some(Accidental::Sharp) => 1,
-                None => 0,
-        },
+        let number: i8 = match note_pitch.natural_note {
+            NaturalNote::C => {
+                0 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::D => {
+                2 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
             NaturalNote::E => 4,
-            NaturalNote::F => 5 + match note_pitch.accidental {
-                Some(Accidental::Flat) => -1,
-                Some(Accidental::Sharp) => 1,
-                None => 0,
-        },
-            NaturalNote::G => 7 + match note_pitch.accidental {
-                Some(Accidental::Flat) => -1,
-                Some(Accidental::Sharp) => 1,
-                None => 0,
-        },
-            NaturalNote::A => 9 + match note_pitch.accidental {
-                Some(Accidental::Flat) => -1,
-                Some(Accidental::Sharp) => 1,
-                None => 0,
-        },
+            NaturalNote::F => {
+                5 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::G => {
+                7 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::A => {
+                9 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
             NaturalNote::B => 11,
         };
         if number == -1 {
@@ -315,7 +323,7 @@ impl NotePitch {
     fn minus(start_note: &NotePitch, to_subtract: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
-        let mut number :i8 = note_number as i8 - to_subtract;
+        let mut number: i8 = note_number as i8 - to_subtract;
         while number < 0 {
             number = number + 12;
             octave = octave - 1;

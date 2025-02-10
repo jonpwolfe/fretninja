@@ -9,10 +9,10 @@ fn main() {
         24,
     );
     print!("{}", i);
-    let s: Scale = Scale::new(&NotePitch::new(NaturalNote::D, None, 4), &ScaleDef::new_blues());
+    let s: Scale = Scale::new(&NotePitch::new(NaturalNote::D, None, 5), &ScaleDef::new_blues());
     print!("{}", s.pattern);
     print!("{}", s);
-    let c: Chord = Chord::new(&NotePitch::new(NaturalNote::D, None,4), &ChordDef::new_minor());
+    let c: Chord = Chord::new(&NotePitch::new(NaturalNote::D, None, 5), &ChordDef::new_major());
     print!("{}", c.definition);
     print!("{}", c);
 }
@@ -135,7 +135,7 @@ impl Instrument {
 struct NotePitch {
     natural_note: NaturalNote,
     accidental: Option<Accidental>,
-    octave: u8,
+    octave: i8,
 }
 
 impl Display for NotePitch {
@@ -146,7 +146,7 @@ impl Display for NotePitch {
 }
 
 impl NotePitch {
-    fn new(natural_note: NaturalNote, accidental: Option<Accidental>, octave: u8) -> Self {
+    fn new(natural_note: NaturalNote, accidental: Option<Accidental>, octave: i8) -> Self {
         NotePitch{
             natural_note,
             accidental,
@@ -172,7 +172,7 @@ impl NotePitch {
         let name = natural_note+&accidental;
         name
     }
-    fn number_to_note_pitch(note_number: u8, octave: u8) -> NotePitch {
+    fn number_to_note_pitch(note_number: i8, octave: i8) -> NotePitch {
         match note_number {
             0 => NotePitch {
                 natural_note: NaturalNote::C,
@@ -242,7 +242,7 @@ impl NotePitch {
         }
     }
 
-    fn note_pitch_to_number(note_pitch: &NotePitch) -> (u8, u8) {
+    fn note_pitch_to_number(note_pitch: &NotePitch) -> (i8, i8) {
          let number :i8 = match note_pitch.natural_note {
             NaturalNote::C => 0 + match note_pitch.accidental {
                 Some(Accidental::Flat) => -1,
@@ -275,10 +275,10 @@ impl NotePitch {
         if number == -1 {
             return (11, note_pitch.octave - 1);
         }
-        (number as u8, note_pitch.octave)
+        (number, note_pitch.octave)
     }
 
-    fn find_note(open_note: &NotePitch, fret: u8) -> NotePitch {
+    fn find_note(open_note: &NotePitch, fret: i8) -> NotePitch {
         let (x, y) = NotePitch::add(&open_note, fret);
         NotePitch::number_to_note_pitch(x, y)
     }
@@ -301,7 +301,7 @@ impl NotePitch {
         let (number, octave) = NotePitch::minus(start_note, to_add);
         NotePitch::number_to_note_pitch(number, octave)
     }
-    fn add(start_note: &NotePitch, to_add: u8) -> (u8, u8) {
+    fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
         let mut number = note_number + to_add;
@@ -312,10 +312,10 @@ impl NotePitch {
         (number, octave)
     }
 
-    fn minus(start_note: &NotePitch, to_add: u8) -> (u8, u8) {
+    fn minus(start_note: &NotePitch, to_subtract: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
-        let mut number = note_number - to_add;
+        let mut number :i8 = note_number as i8 - to_subtract;
         while number < 0 {
             number = number + 12;
             octave = octave - 1;
@@ -368,7 +368,7 @@ enum InstrumentType {
 
 #[derive(PartialEq, Clone, Debug)]
 struct StepValue {
-    value: u8,
+    value: i8,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -727,7 +727,7 @@ impl Display for Accidental {
 #[derive(PartialEq, Clone, Debug)]
 struct Interval {
     accidental: Option<Accidental>,
-    interval: u8,
+    interval: i8,
 }
 
 impl Display for Interval {

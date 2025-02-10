@@ -244,7 +244,7 @@ impl NotePitch {
         let number: i8 = match note_pitch.natural_note {
             NaturalNote::C => {
                 0 + match note_pitch.accidental {
-                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Flat) => 0,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
@@ -256,10 +256,14 @@ impl NotePitch {
                     None => 0,
                 }
             }
-            NaturalNote::E => 4,
+            NaturalNote::E => 4 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 0,
+                    None => 0,
+                },
             NaturalNote::F => {
                 5 + match note_pitch.accidental {
-                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Flat) => 0,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
@@ -278,7 +282,11 @@ impl NotePitch {
                     None => 0,
                 }
             }
-            NaturalNote::B => 11,
+            NaturalNote::B => 11 + match note_pitch.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 0,
+                    None => 0,
+                },
         };
         if number == -1 {
             return (11, note_pitch.octave - 1);

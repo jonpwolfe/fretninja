@@ -4,20 +4,20 @@ fn main() {
     let i: Instrument = Instrument::new(
         InstrumentType::Guitar,
         TuningType::Standard,
-        NotePitch::new(NaturalNote::E, None, 4),
+        NotePitch::new(&NaturalNote::E, &None, 4),
         6,
         24,
     );
     print!("{}", i);
     let s: Scale = Scale::new(
-        &NotePitch::new(NaturalNote::D, None, 5),
+        &NotePitch::new(&NaturalNote::D, &None, 5),
         &ScaleDef::new_blues(),
     );
     print!("{}", s.pattern);
     print!("{}", s);
     let c: Chord = Chord::new(
-        &NotePitch::new(NaturalNote::D, None, 5),
-        &ChordDef::new_major(),
+        &NotePitch::new(&NaturalNote::D, &None, 5),
+        &ChordDef::new_minor(),
     );
     print!("{}", c.definition);
     print!("{}", c);
@@ -144,10 +144,10 @@ impl Display for NotePitch {
 }
 
 impl NotePitch {
-    fn new(natural_note: NaturalNote, accidental: Option<Accidental>, octave: i8) -> Self {
+    fn new(natural_note: &NaturalNote, accidental: &Option<Accidental>, octave: i8) -> Self {
         NotePitch {
-            natural_note,
-            accidental,
+            natural_note: natural_note.clone(),
+            accidental: accidental.clone(),
             octave,
         }
     }

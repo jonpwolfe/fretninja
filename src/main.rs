@@ -331,7 +331,7 @@ impl NotePitch {
     fn minus(start_note: &NotePitch, to_subtract: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
-        let mut number: i8 = note_number as i8 - to_subtract;
+        let mut number: i8 = note_number - to_subtract;
         while number < 0 {
             number = number + 12;
             octave = octave - 1;

@@ -4,7 +4,7 @@ fn main() {
     let i: Instrument = Instrument::new(
         InstrumentType::Guitar,
         TuningType::Standard,
-        PitchedNote::new("E", 4),
+        NotePitch::new("E", 4),
         6,
         24,
     );
@@ -20,11 +20,11 @@ fn main() {
 struct Instrument {
     instrument_type: InstrumentType,
     tuning_type: TuningType,
-    root_note: PitchedNote,
+    root_note: NotePitch,
     string_count: usize,
     fret_count: usize,
-    tuning: Vec<PitchedNote>,
-    fretboard: Vec<Vec<PitchedNote>>,
+    tuning: Vec<NotePitch>,
+    fretboard: Vec<Vec<NotePitch>>,
 }
 
 impl Display for Instrument {
@@ -43,7 +43,7 @@ impl Instrument {
     fn new(
         instrument_type: InstrumentType,
         tuning_type: TuningType,
-        root_note: PitchedNote,
+        root_note: NotePitch,
         string_count: usize,
         fret_count: usize,
     ) -> Self {
@@ -62,11 +62,11 @@ impl Instrument {
     }
 
     fn calculate_notes(self: &mut Self) {
-        let mut notes: Vec<Vec<PitchedNote>> = Vec::new();
+        let mut notes: Vec<Vec<NotePitch>> = Vec::new();
         for i in 0..self.string_count {
-            let mut musical_string: Vec<PitchedNote> = Vec::new();
+            let mut musical_string: Vec<NotePitch> = Vec::new();
             for j in 0..self.fret_count {
-                musical_string.push(PitchedNote::find_note(
+                musical_string.push(NotePitch::find_note(
                     &self.tuning[i],
                     j.try_into().unwrap(),
                 ));
@@ -81,48 +81,48 @@ impl Instrument {
         match self.instrument_type {
             InstrumentType::Guitar => match self.tuning_type {
                 TuningType::Standard => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[3], 4));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[4], 5));
                 }
                 TuningType::Drop => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[3], 4));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[4], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[3], 4));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[4], 5));
                 }
                 TuningType::Open => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning
-                        .push(PitchedNote::find_note(&self.tuning[0], 12));
+                        .push(NotePitch::find_note(&self.tuning[0], 12));
                     self.tuning
-                        .push(PitchedNote::find_note(&self.tuning[0], 16));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[3], 3));
+                        .push(NotePitch::find_note(&self.tuning[0], 16));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[3], 3));
                     self.tuning
-                        .push(PitchedNote::find_note(&self.tuning[0], 24));
+                        .push(NotePitch::find_note(&self.tuning[0], 24));
                 }
                 _ => todo!(),
             },
             InstrumentType::Bass => match self.tuning_type {
                 TuningType::Standard => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
                 }
                 TuningType::Drop => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[1], 5));
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[2], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
                 }
                 TuningType::Open => {
-                    self.tuning.push(PitchedNote::find_note(&self.tuning[0], 7));
+                    self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning
-                        .push(PitchedNote::find_note(&self.tuning[0], 12));
+                        .push(NotePitch::find_note(&self.tuning[0], 12));
                     self.tuning
-                        .push(PitchedNote::find_note(&self.tuning[0], 16));
+                        .push(NotePitch::find_note(&self.tuning[0], 16));
                 }
                 _ => todo!(),
             },
@@ -132,157 +132,157 @@ impl Instrument {
 }
 
 #[derive(Clone, Debug)]
-struct PitchedNote {
+struct NotePitch {
     note: NoteName,
     octave: u8,
 }
 
-impl Display for PitchedNote {
+impl Display for NotePitch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         write!(f, "{}{}", self.note, self.octave)?;
         Ok(())
     }
 }
 
-impl PitchedNote {
+impl NotePitch {
     fn new(note_name: &str, octave: u8) -> Self {
         match note_name {
-            "A" => PitchedNote {
+            "A" => NotePitch {
                 note: NoteName::A,
                 octave,
             },
-            "Asharp" => PitchedNote {
+            "Asharp" => NotePitch {
                 note: NoteName::Asharp,
                 octave,
             },
-            "B" => PitchedNote {
+            "B" => NotePitch {
                 note: NoteName::B,
                 octave,
             },
-            "C" => PitchedNote {
+            "C" => NotePitch {
                 note: NoteName::C,
                 octave,
             },
-            "Csharp" => PitchedNote {
+            "Csharp" => NotePitch {
                 note: NoteName::Csharp,
                 octave,
             },
-            "D" => PitchedNote {
+            "D" => NotePitch {
                 note: NoteName::D,
                 octave,
             },
-            "Dsharp" => PitchedNote {
+            "Dsharp" => NotePitch {
                 note: NoteName::Dsharp,
                 octave,
             },
-            "E" => PitchedNote {
+            "E" => NotePitch {
                 note: NoteName::E,
                 octave,
             },
-            "F" => PitchedNote {
+            "F" => NotePitch {
                 note: NoteName::F,
                 octave,
             },
-            "Fsharp" => PitchedNote {
+            "Fsharp" => NotePitch {
                 note: NoteName::Fsharp,
                 octave,
             },
-            "G" => PitchedNote {
+            "G" => NotePitch {
                 note: NoteName::G,
                 octave,
             },
-            "Gsharp" => PitchedNote {
+            "Gsharp" => NotePitch {
                 note: NoteName::Gsharp,
                 octave,
             },
-            _ => PitchedNote {
+            _ => NotePitch {
                 note: NoteName::C,
                 octave,
             },
         }
     }
 
-    fn number_to_pitched_note(note_number: u8, octave: u8) -> PitchedNote {
+    fn number_to_note_pitch(note_number: u8, octave: u8) -> NotePitch {
         match note_number {
-            0 => PitchedNote {
+            0 => NotePitch {
                 note: NoteName::C,
                 octave,
             },
-            1 => PitchedNote {
+            1 => NotePitch {
                 note: NoteName::Csharp,
                 octave,
             },
-            2 => PitchedNote {
+            2 => NotePitch {
                 note: NoteName::D,
                 octave,
             },
-            3 => PitchedNote {
+            3 => NotePitch {
                 note: NoteName::Dsharp,
                 octave,
             },
-            4 => PitchedNote {
+            4 => NotePitch {
                 note: NoteName::E,
                 octave,
             },
-            5 => PitchedNote {
+            5 => NotePitch {
                 note: NoteName::F,
                 octave,
             },
-            6 => PitchedNote {
+            6 => NotePitch {
                 note: NoteName::Fsharp,
                 octave,
             },
-            7 => PitchedNote {
+            7 => NotePitch {
                 note: NoteName::G,
                 octave,
             },
-            8 => PitchedNote {
+            8 => NotePitch {
                 note: NoteName::Gsharp,
                 octave,
             },
-            9 => PitchedNote {
+            9 => NotePitch {
                 note: NoteName::A,
                 octave,
             },
-            10 => PitchedNote {
+            10 => NotePitch {
                 note: NoteName::Asharp,
                 octave,
             },
-            11 => PitchedNote {
+            11 => NotePitch {
                 note: NoteName::B,
                 octave,
             },
-            _ => PitchedNote {
+            _ => NotePitch {
                 note: NoteName::A,
                 octave,
             },
         }
     }
 
-    fn pitched_note_to_number(pitched_note: &PitchedNote) -> (u8, u8) {
-        match pitched_note.note {
-            NoteName::C => (0, pitched_note.octave),
-            NoteName::Csharp => (1, pitched_note.octave),
-            NoteName::D => (2, pitched_note.octave),
-            NoteName::Dsharp => (3, pitched_note.octave),
-            NoteName::E => (4, pitched_note.octave),
-            NoteName::F => (5, pitched_note.octave),
-            NoteName::Fsharp => (6, pitched_note.octave),
-            NoteName::G => (7, pitched_note.octave),
-            NoteName::Gsharp => (8, pitched_note.octave),
-            NoteName::A => (9, pitched_note.octave),
-            NoteName::Asharp => (10, pitched_note.octave),
-            NoteName::B => (11, pitched_note.octave),
+    fn note_pitch_to_number(note_pitch: &NotePitch) -> (u8, u8) {
+        match note_pitch.note {
+            NoteName::C => (0, note_pitch.octave),
+            NoteName::Csharp => (1, note_pitch.octave),
+            NoteName::D => (2, note_pitch.octave),
+            NoteName::Dsharp => (3, note_pitch.octave),
+            NoteName::E => (4, note_pitch.octave),
+            NoteName::F => (5, note_pitch.octave),
+            NoteName::Fsharp => (6, note_pitch.octave),
+            NoteName::G => (7, note_pitch.octave),
+            NoteName::Gsharp => (8, note_pitch.octave),
+            NoteName::A => (9, note_pitch.octave),
+            NoteName::Asharp => (10, note_pitch.octave),
+            NoteName::B => (11, note_pitch.octave),
         }
     }
 
-    fn find_note(open_note: &PitchedNote, fret: u8) -> PitchedNote {
-        let (x, y) = PitchedNote::add(&open_note, fret);
-        PitchedNote::number_to_pitched_note(x, y)
+    fn find_note(open_note: &NotePitch, fret: u8) -> NotePitch {
+        let (x, y) = NotePitch::add(&open_note, fret);
+        NotePitch::number_to_note_pitch(x, y)
     }
 
-    fn add(start_note: &PitchedNote, to_add: u8) -> (u8, u8) {
-        let (note_number, octave) = PitchedNote::pitched_note_to_number(&start_note);
+    fn add(start_note: &NotePitch, to_add: u8) -> (u8, u8) {
+        let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
         let mut number = note_number + to_add;
         while number >= 12 {
@@ -292,8 +292,8 @@ impl PitchedNote {
         (number, octave)
     }
 
-    fn minus(start_note: &PitchedNote, to_add: u8) -> (u8, u8) {
-        let (note_number, octave) = PitchedNote::pitched_note_to_number(&start_note);
+    fn minus(start_note: &NotePitch, to_add: u8) -> (u8, u8) {
+        let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
         let mut octave = octave;
         let mut number = note_number - to_add;
         while number < 0 {

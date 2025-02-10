@@ -342,20 +342,6 @@ enum NaturalNote {
     F,
     G,
 }
-impl Display for NaturalNote {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        match self {
-            NaturalNote::A => write!(f, "A")?,
-            NaturalNote::B => write!(f, "B")?,
-            NaturalNote::C => write!(f, "C")?,
-            NaturalNote::D => write!(f, "D")?,
-            NaturalNote::E => write!(f, "E")?,
-            NaturalNote::F => write!(f, "F")?,
-            NaturalNote::G => write!(f, "G")?,
-        };
-        Ok(())
-    }
-}
 
 #[derive(PartialEq, Clone, Debug)]
 enum TuningType {

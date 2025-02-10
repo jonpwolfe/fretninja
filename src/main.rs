@@ -9,10 +9,10 @@ fn main() {
         24,
     );
     print!("{}", i);
-    let s: Scale = Scale::new(&Note::new("D"), &ScaleDef::new_blues());
+    let s: Scale = Scale::new(&NoteName::new("D"), &ScaleDef::new_blues());
     print!("{}", s.pattern);
     print!("{}", s);
-    let c: Chord = Chord::new(&Note::new("D"), &ChordDef::new_minor());
+    let c: Chord = Chord::new(&NoteName::new("D"), &ChordDef::new_minor());
     print!("{}", c.definition);
     print!("{}", c);
 }
@@ -133,7 +133,7 @@ impl Instrument {
 
 #[derive(Clone, Debug)]
 struct PitchedNote {
-    note: Note,
+    note: NoteName,
     octave: u8,
 }
 
@@ -148,55 +148,55 @@ impl PitchedNote {
     fn new(note_name: &str, octave: u8) -> Self {
         match note_name {
             "A" => PitchedNote {
-                note: Note::A,
+                note: NoteName::A,
                 octave,
             },
             "Asharp" => PitchedNote {
-                note: Note::Asharp,
+                note: NoteName::Asharp,
                 octave,
             },
             "B" => PitchedNote {
-                note: Note::B,
+                note: NoteName::B,
                 octave,
             },
             "C" => PitchedNote {
-                note: Note::C,
+                note: NoteName::C,
                 octave,
             },
             "Csharp" => PitchedNote {
-                note: Note::Csharp,
+                note: NoteName::Csharp,
                 octave,
             },
             "D" => PitchedNote {
-                note: Note::D,
+                note: NoteName::D,
                 octave,
             },
             "Dsharp" => PitchedNote {
-                note: Note::Dsharp,
+                note: NoteName::Dsharp,
                 octave,
             },
             "E" => PitchedNote {
-                note: Note::E,
+                note: NoteName::E,
                 octave,
             },
             "F" => PitchedNote {
-                note: Note::F,
+                note: NoteName::F,
                 octave,
             },
             "Fsharp" => PitchedNote {
-                note: Note::Fsharp,
+                note: NoteName::Fsharp,
                 octave,
             },
             "G" => PitchedNote {
-                note: Note::G,
+                note: NoteName::G,
                 octave,
             },
             "Gsharp" => PitchedNote {
-                note: Note::Gsharp,
+                note: NoteName::Gsharp,
                 octave,
             },
             _ => PitchedNote {
-                note: Note::C,
+                note: NoteName::C,
                 octave,
             },
         }
@@ -205,55 +205,55 @@ impl PitchedNote {
     fn number_to_pitched_note(note_number: u8, octave: u8) -> PitchedNote {
         match note_number {
             0 => PitchedNote {
-                note: Note::C,
+                note: NoteName::C,
                 octave,
             },
             1 => PitchedNote {
-                note: Note::Csharp,
+                note: NoteName::Csharp,
                 octave,
             },
             2 => PitchedNote {
-                note: Note::D,
+                note: NoteName::D,
                 octave,
             },
             3 => PitchedNote {
-                note: Note::Dsharp,
+                note: NoteName::Dsharp,
                 octave,
             },
             4 => PitchedNote {
-                note: Note::E,
+                note: NoteName::E,
                 octave,
             },
             5 => PitchedNote {
-                note: Note::F,
+                note: NoteName::F,
                 octave,
             },
             6 => PitchedNote {
-                note: Note::Fsharp,
+                note: NoteName::Fsharp,
                 octave,
             },
             7 => PitchedNote {
-                note: Note::G,
+                note: NoteName::G,
                 octave,
             },
             8 => PitchedNote {
-                note: Note::Gsharp,
+                note: NoteName::Gsharp,
                 octave,
             },
             9 => PitchedNote {
-                note: Note::A,
+                note: NoteName::A,
                 octave,
             },
             10 => PitchedNote {
-                note: Note::Asharp,
+                note: NoteName::Asharp,
                 octave,
             },
             11 => PitchedNote {
-                note: Note::B,
+                note: NoteName::B,
                 octave,
             },
             _ => PitchedNote {
-                note: Note::A,
+                note: NoteName::A,
                 octave,
             },
         }
@@ -261,18 +261,18 @@ impl PitchedNote {
 
     fn pitched_note_to_number(pitched_note: &PitchedNote) -> (u8, u8) {
         match pitched_note.note {
-            Note::C => (0, pitched_note.octave),
-            Note::Csharp => (1, pitched_note.octave),
-            Note::D => (2, pitched_note.octave),
-            Note::Dsharp => (3, pitched_note.octave),
-            Note::E => (4, pitched_note.octave),
-            Note::F => (5, pitched_note.octave),
-            Note::Fsharp => (6, pitched_note.octave),
-            Note::G => (7, pitched_note.octave),
-            Note::Gsharp => (8, pitched_note.octave),
-            Note::A => (9, pitched_note.octave),
-            Note::Asharp => (10, pitched_note.octave),
-            Note::B => (11, pitched_note.octave),
+            NoteName::C => (0, pitched_note.octave),
+            NoteName::Csharp => (1, pitched_note.octave),
+            NoteName::D => (2, pitched_note.octave),
+            NoteName::Dsharp => (3, pitched_note.octave),
+            NoteName::E => (4, pitched_note.octave),
+            NoteName::F => (5, pitched_note.octave),
+            NoteName::Fsharp => (6, pitched_note.octave),
+            NoteName::G => (7, pitched_note.octave),
+            NoteName::Gsharp => (8, pitched_note.octave),
+            NoteName::A => (9, pitched_note.octave),
+            NoteName::Asharp => (10, pitched_note.octave),
+            NoteName::B => (11, pitched_note.octave),
         }
     }
 
@@ -305,7 +305,7 @@ impl PitchedNote {
 }
 
 #[derive(PartialEq, Clone, Debug)]
-enum Note {
+enum NoteName {
     A,
     Asharp,
     B,
@@ -320,37 +320,37 @@ enum Note {
     Gsharp,
 }
 
-impl Note {
+impl NoteName {
     fn new(name: &str) -> Self {
         match name {
-            "A" => Note::A,
-            "Asharp" => Note::Asharp,
-            "B" => Note::B,
-            "C" => Note::C,
-            "Csharp" => Note::Csharp,
-            "D" => Note::D,
-            "Dsharp" => Note::Dsharp,
-            "E" => Note::E,
-            "F" => Note::F,
-            "Fsharp" => Note::Fsharp,
-            "G" => Note::G,
-            "Gsharp" => Note::Gsharp,
-            _ => Note::C,
+            "A" => NoteName::A,
+            "Asharp" => NoteName::Asharp,
+            "B" => NoteName::B,
+            "C" => NoteName::C,
+            "Csharp" => NoteName::Csharp,
+            "D" => NoteName::D,
+            "Dsharp" => NoteName::Dsharp,
+            "E" => NoteName::E,
+            "F" => NoteName::F,
+            "Fsharp" => NoteName::Fsharp,
+            "G" => NoteName::G,
+            "Gsharp" => NoteName::Gsharp,
+            _ => NoteName::C,
         }
     }
 
-    fn up_step(start_note: &Note, step: &Step) -> Note {
-        let number = Note::add(start_note, step);
-        Note::number_to_note(number)
+    fn up_step(start_note: &NoteName, step: &Step) -> NoteName {
+        let number = NoteName::add(start_note, step);
+        NoteName::number_to_note(number)
     }
 
-    fn down_step(start_note: &Note, step: &Step) -> Note {
-        let number = Note::minus(start_note, step);
-        Note::number_to_note(number)
+    fn down_step(start_note: &NoteName, step: &Step) -> NoteName {
+        let number = NoteName::minus(start_note, step);
+        NoteName::number_to_note(number)
     }
 
-    fn add(start_note: &Note, step: &Step) -> u8 {
-        let note_number = Note::note_to_number(start_note);
+    fn add(start_note: &NoteName, step: &Step) -> u8 {
+        let note_number = NoteName::note_to_number(start_note);
         let to_add = match step {
             Step::Whole(step_value) => step_value.value,
             Step::Half(step_value) => step_value.value,
@@ -363,8 +363,8 @@ impl Note {
         number
     }
 
-    fn minus(start_note: &Note, step: &Step) -> u8 {
-        let note_number = Note::note_to_number(start_note);
+    fn minus(start_note: &NoteName, step: &Step) -> u8 {
+        let note_number = NoteName::note_to_number(start_note);
         let to_add = match step {
             Step::Whole(step_value) => step_value.value,
             Step::Half(step_value) => step_value.value,
@@ -377,61 +377,61 @@ impl Note {
         number
     }
 
-    fn note_to_number(note: &Note) -> u8 {
+    fn note_to_number(note: &NoteName) -> u8 {
         match note {
-            Note::C => 0,
-            Note::Csharp => 1,
-            Note::D => 2,
-            Note::Dsharp => 3,
-            Note::E => 4,
-            Note::F => 5,
-            Note::Fsharp => 6,
-            Note::G => 7,
-            Note::Gsharp => 8,
-            Note::A => 9,
-            Note::Asharp => 10,
-            Note::B => 11,
+            NoteName::C => 0,
+            NoteName::Csharp => 1,
+            NoteName::D => 2,
+            NoteName::Dsharp => 3,
+            NoteName::E => 4,
+            NoteName::F => 5,
+            NoteName::Fsharp => 6,
+            NoteName::G => 7,
+            NoteName::Gsharp => 8,
+            NoteName::A => 9,
+            NoteName::Asharp => 10,
+            NoteName::B => 11,
         }
     }
 
-    fn number_to_note(number: u8) -> Note {
+    fn number_to_note(number: u8) -> NoteName {
         match number {
-            0 => Note::C,
-            1 => Note::Csharp,
-            2 => Note::D,
-            3 => Note::Dsharp,
-            4 => Note::E,
-            5 => Note::F,
-            6 => Note::Fsharp,
-            7 => Note::G,
-            8 => Note::Gsharp,
-            9 => Note::A,
-            10 => Note::Asharp,
-            11 => Note::B,
-            _ => Note::C,
+            0 => NoteName::C,
+            1 => NoteName::Csharp,
+            2 => NoteName::D,
+            3 => NoteName::Dsharp,
+            4 => NoteName::E,
+            5 => NoteName::F,
+            6 => NoteName::Fsharp,
+            7 => NoteName::G,
+            8 => NoteName::Gsharp,
+            9 => NoteName::A,
+            10 => NoteName::Asharp,
+            11 => NoteName::B,
+            _ => NoteName::C,
         }
     }
     fn get_name(self: &Self) -> &str {
         match self {
-            Note::A => "A",
-            Note::Asharp => "A♯",
-            Note::B => "B",
-            Note::C => "C",
-            Note::Csharp => "C♯",
-            Note::D => "D",
-            Note::Dsharp => "D♯",
-            Note::E => "E",
-            Note::F => "F",
-            Note::Fsharp => "F♯",
-            Note::G => "G",
-            Note::Gsharp => "G♯",
+            NoteName::A => "A",
+            NoteName::Asharp => "A♯",
+            NoteName::B => "B",
+            NoteName::C => "C",
+            NoteName::Csharp => "C♯",
+            NoteName::D => "D",
+            NoteName::Dsharp => "D♯",
+            NoteName::E => "E",
+            NoteName::F => "F",
+            NoteName::Fsharp => "F♯",
+            NoteName::G => "G",
+            NoteName::Gsharp => "G♯",
         }
     }
 }
 
-impl Display for Note {
+impl Display for NoteName {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let s = Note::get_name(&self);
+        let s = NoteName::get_name(&self);
         write!(f, "{}", s)?;
         Ok(())
     }
@@ -766,16 +766,16 @@ impl Display for ScaleDef {
 #[derive(PartialEq, Clone, Debug)]
 struct Scale {
     pattern: ScaleDef,
-    notes: Vec<Note>,
+    notes: Vec<NoteName>,
 }
 
 impl Scale {
-    fn new(note_1: &Note, pattern: &ScaleDef) -> Self {
-        let mut notes: Vec<Note> = Vec::new();
+    fn new(note_1: &NoteName, pattern: &ScaleDef) -> Self {
+        let mut notes: Vec<NoteName> = Vec::new();
         notes.push(note_1.clone());
         let mut count: usize = 0;
         for step in &pattern.steps {
-            notes.push(Note::up_step(&notes[count], &step));
+            notes.push(NoteName::up_step(&notes[count], &step));
             count = count + 1;
         }
         Scale {
@@ -1438,7 +1438,7 @@ impl ChordDef {
 #[derive(PartialEq, Clone, Debug)]
 struct Chord {
     definition: ChordDef,
-    notes: Vec<Note>,
+    notes: Vec<NoteName>,
     name: String,
     short_name: String,
 }
@@ -1455,29 +1455,29 @@ impl Display for Chord {
 }
 
 impl Chord {
-    fn new(root_note: &Note, definition: &ChordDef) -> Self {
+    fn new(root_note: &NoteName, definition: &ChordDef) -> Self {
         let scale: Scale = Scale::new(&root_note, &ScaleDef::new_major());
-        let mut notes: Vec<Note> = Vec::new();
+        let mut notes: Vec<NoteName> = Vec::new();
         for interval in &definition.intervals {
             if interval.accidental == Accidental::None {
                 notes.push(scale.notes[(interval.interval - 1) as usize].clone());
             }
             if interval.accidental == Accidental::Flat {
-                let mut note: Note = scale.notes[(interval.interval - 1) as usize].clone();
-                note = Note::down_step(&note, &Step::new_half());
+                let mut note: NoteName = scale.notes[(interval.interval - 1) as usize].clone();
+                note = NoteName::down_step(&note, &Step::new_half());
                 notes.push(note);
             }
             if interval.accidental == Accidental::Sharp {
-                let mut note: Note = scale.notes[(interval.interval - 1) as usize].clone();
-                note = Note::up_step(&note, &Step::new_half());
+                let mut note: NoteName = scale.notes[(interval.interval - 1) as usize].clone();
+                note = NoteName::up_step(&note, &Step::new_half());
                 notes.push(note);
             }
         }
         Chord {
             definition: definition.clone(),
             notes,
-            name: Note::get_name(&root_note).to_owned() + " " + &definition.name,
-            short_name: Note::get_name(&root_note).to_owned() + &definition.naming_convention,
+            name: NoteName::get_name(&root_note).to_owned() + " " + &definition.name,
+            short_name: NoteName::get_name(&root_note).to_owned() + &definition.naming_convention,
         }
     }
 }

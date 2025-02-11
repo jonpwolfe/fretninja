@@ -10,14 +10,14 @@ fn main() {
     );
     print!("{}", i);
     let s: Scale = Scale::new(
-        &NotePitch::new(&NaturalNote::C, &None, 5),
-        &ScaleDef::new_minor_pentatonic(),
+        &NotePitch::new(&NaturalNote::D, &None, 5),
+        &ScaleDef::new_major(),
     );
-    print!("{}", s.pattern);
+    print!("{}", s.definition);
     print!("{}", s);
     let c: Chord = Chord::new(
         &NotePitch::new(&NaturalNote::D, &None, 5),
-        &ChordDef::new_augmented(),
+        &ChordDef::new_minor_eleventh(),
     );
     print!("{}", c.definition);
     print!("{}", c);
@@ -312,22 +312,14 @@ impl NotePitch {
         NotePitch::from_number(x, y)
     }
     fn up_step(start_note: &NotePitch, step: &Step) -> NotePitch {
-        let to_add = match step {
-            Step::Whole(step_value) => step_value.value,
-            Step::Half(step_value) => step_value.value,
-            Step::OneAndAHalf(step_value) => step_value.value,
-        };
+        let to_add = Step::to_number(step);
         let (number, octave) = NotePitch::add(start_note, to_add);
         NotePitch::from_number(number, octave)
     }
 
     fn down_step(start_note: &NotePitch, step: &Step) -> NotePitch {
-        let to_add = match step {
-            Step::Whole(step_value) => step_value.value,
-            Step::Half(step_value) => step_value.value,
-            Step::OneAndAHalf(step_value) => step_value.value,
-        };
-        let (number, octave) = NotePitch::minus(start_note, to_add);
+        let to_subtract = Step::to_number(step);
+        let (number, octave) = NotePitch::minus(start_note, to_subtract);
         NotePitch::from_number(number, octave)
     }
     fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
@@ -402,6 +394,13 @@ impl Step {
     }
     fn new_one_and_a_half() -> Self {
         Step::OneAndAHalf(StepValue { value: 3 })
+    }
+    fn to_number(self: &Self) -> i8 {
+        match self {
+            Step::Whole(step_value) => step_value.value,
+            Step::Half(step_value) => step_value.value,
+            Step::OneAndAHalf(step_value) => step_value.value,
+        }
     }
 }
 
@@ -692,21 +691,21 @@ impl Display for ScaleDef {
 
 #[derive(PartialEq, Clone, Debug)]
 struct Scale {
-    pattern: ScaleDef,
+    definition: ScaleDef,
     notes: Vec<NotePitch>,
 }
 
 impl Scale {
-    fn new(note_1: &NotePitch, pattern: &ScaleDef) -> Self {
+    fn new(note_1: &NotePitch, definition: &ScaleDef) -> Self {
         let mut notes: Vec<NotePitch> = Vec::new();
         notes.push(note_1.clone());
         let mut count: usize = 0;
-        for step in &pattern.steps {
+        for step in &definition.steps {
             notes.push(NotePitch::up_step(&notes[count], &step));
             count = count + 1;
         }
         Scale {
-            pattern: pattern.clone(),
+            definition: definition.clone(),
             notes,
         }
     }
@@ -714,7 +713,7 @@ impl Scale {
 
 impl Display for Scale {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} {} scale: ", self.notes[0], self.pattern.name)?;
+        write!(f, "{} {} scale: ", self.notes[0], self.definition.name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1384,31 +1383,40 @@ impl Display for Chord {
         Ok(())
     }
 }
-
 impl Chord {
     fn new(root_note: &NotePitch, definition: &ChordDef) -> Self {
-        let scale: Scale = Scale::new(&root_note, &ScaleDef::new_major());
-        let mut notes: Vec<NotePitch> = Vec::new();
+        let scale = Scale::new(root_note, &ScaleDef::new_major());
+        let mut notes = Vec::new();
+        let scale_length = scale.notes.len();
+
         for interval in &definition.intervals {
-            if interval.accidental == None {
-                notes.push(scale.notes[(interval.interval - 1) as usize].clone());
-            }
-            if interval.accidental == Some(Accidental::Flat) {
-                let mut note: NotePitch = scale.notes[(interval.interval - 1) as usize].clone();
-                note = NotePitch::down_step(&note, &Step::new_half());
-                notes.push(note);
-            }
-            if interval.accidental == Some(Accidental::Sharp) {
-                let mut note: NotePitch = scale.notes[(interval.interval - 1) as usize].clone();
-                note = NotePitch::up_step(&note, &Step::new_half());
-                notes.push(note);
-            }
+            let interval_value = interval.interval as usize;
+
+            let i: usize = if interval_value > scale_length {
+                interval_value % scale_length
+            } else {
+                interval_value - 1
+            };
+
+            let base_note = &scale.notes[i];
+            let note = match interval.accidental {
+                None => base_note.clone(),
+                Some(Accidental::Flat) => NotePitch::down_step(base_note, &Step::new_half()),
+                Some(Accidental::Sharp) => NotePitch::up_step(base_note, &Step::new_half()),
+            };
+
+            notes.push(note);
         }
+
         Chord {
             definition: definition.clone(),
             notes,
-            name: NotePitch::get_name(&root_note).to_owned() + " " + &definition.name,
-            short_name: NotePitch::get_name(&root_note).to_owned() + &definition.naming_convention,
+            name: format!("{} {}", NotePitch::get_name(root_note), definition.name),
+            short_name: format!(
+                "{}{}",
+                NotePitch::get_name(root_note),
+                definition.naming_convention
+            ),
         }
     }
 }

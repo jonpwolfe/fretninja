@@ -36,7 +36,7 @@ struct Instrument {
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         for i in (0..self.string_count).rev() {
-            write!(f, "{} ",self.string_count - i);
+            write!(f, "{} ", self.string_count - i);
             for j in 0..self.fret_count {
                 match &self.fretboard[i][j].accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
@@ -48,11 +48,10 @@ impl Display for Instrument {
         write!(f, "  ")?;
         for i in 0..self.fret_count {
             match i {
-            0..=9 => write!(f, "{}   ",i)?,
-            10.. => write!(f, "{}  ",i)?,
-            _ => panic!("unexpected value"),
+                0..=9 => write!(f, "{}   ", i)?,
+                10.. => write!(f, "{}  ", i)?,
+                _ => panic!("unexpected fret_count"),
             };
-
         }
         write!(f, "\n")?;
         Ok(())
@@ -258,7 +257,7 @@ impl NotePitch {
         let number: i8 = match note_pitch.natural_note {
             NaturalNote::C => {
                 0 + match note_pitch.accidental {
-                    Some(Accidental::Flat) => 0,
+                    Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
@@ -270,14 +269,16 @@ impl NotePitch {
                     None => 0,
                 }
             }
-            NaturalNote::E => 4 + match note_pitch.accidental {
+            NaturalNote::E => {
+                4 + match note_pitch.accidental {
                     Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => 0,
+                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
-                },
+                }
+            }
             NaturalNote::F => {
                 5 + match note_pitch.accidental {
-                    Some(Accidental::Flat) => 0,
+                    Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
@@ -296,11 +297,13 @@ impl NotePitch {
                     None => 0,
                 }
             }
-            NaturalNote::B => 11 + match note_pitch.accidental {
+            NaturalNote::B => {
+                11 + match note_pitch.accidental {
                     Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => 0,
+                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
-                },
+                }
+            }
         };
         if number == -1 {
             return (11, note_pitch.octave - 1);

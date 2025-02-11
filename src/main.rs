@@ -245,11 +245,7 @@ impl NotePitch {
                 accidental: None,
                 octave,
             },
-            _ => NotePitch {
-                natural_note: NaturalNote::A,
-                accidental: None,
-                octave,
-            },
+            _ => panic!("unexpected note number"),
         }
     }
 

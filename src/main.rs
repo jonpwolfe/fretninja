@@ -301,10 +301,10 @@ impl NotePitch {
                 }
             }
         };
-        if number == -1 {
-            return (11, note_pitch.octave - 1);
-        }
-        (number, note_pitch.octave)
+        match number {
+            1 => return (11, note_pitch.octave - 1),
+            _ => return (number, note_pitch.octave),
+        };
     }
 
     fn find_note(open_note: &NotePitch, fret: i8) -> NotePitch {

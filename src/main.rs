@@ -47,12 +47,11 @@ impl Display for Instrument {
         }
         write!(f, "  ")?;
         for i in 0..self.fret_count {
-            if i < 10 {
-                write!(f, "{}   ",i)?;
-            }
-            if i >=10 {
-                write!(f, "{}  ",i)?;
-            }
+            match i {
+            0..=9 => write!(f, "{}   ",i)?,
+            10.. => write!(f, "{}  ",i)?,
+            _ => panic!("unexpected value"),
+            };
 
         }
         write!(f, "\n")?;

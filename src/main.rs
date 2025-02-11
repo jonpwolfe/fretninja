@@ -4,20 +4,20 @@ fn main() {
     let i: Instrument = Instrument::new(
         InstrumentType::Guitar,
         TuningType::Standard,
-        NotePitch::new(&NaturalNote::E, &None, 4),
+        NotePitch::new(&NaturalNote::C, &None, 4),
         6,
         24,
     );
     print!("{}", i);
     let s: Scale = Scale::new(
-        &NotePitch::new(&NaturalNote::D, &None, 5),
-        &ScaleDef::new_blues(),
+        &NotePitch::new(&NaturalNote::C, &None, 5),
+        &ScaleDef::new_minor_pentatonic(),
     );
     print!("{}", s.pattern);
     print!("{}", s);
     let c: Chord = Chord::new(
         &NotePitch::new(&NaturalNote::D, &None, 5),
-        &ChordDef::new_minor(),
+        &ChordDef::new_augmented(),
     );
     print!("{}", c.definition);
     print!("{}", c);
@@ -36,11 +36,26 @@ struct Instrument {
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         for i in (0..self.string_count).rev() {
+            write!(f, "{} ",self.string_count - i);
             for j in 0..self.fret_count {
-                write!(f, "{} ", self.fretboard[i][j])?;
+                match &self.fretboard[i][j].accidental {
+                    None => write!(f, "{}  ", self.fretboard[i][j])?,
+                    Some(_Accidental) => write!(f, "{} ", self.fretboard[i][j])?,
+                };
             }
             write!(f, "\n")?;
         }
+        write!(f, "  ")?;
+        for i in 0..self.fret_count {
+            if i < 10 {
+                write!(f, "{}   ",i)?;
+            }
+            if i >=10 {
+                write!(f, "{}  ",i)?;
+            }
+
+        }
+        write!(f, "\n")?;
         Ok(())
     }
 }
@@ -170,7 +185,7 @@ impl NotePitch {
         let name = natural_note + &accidental;
         name
     }
-    fn number_to_note_pitch(note_number: i8, octave: i8) -> NotePitch {
+    fn from_number(note_number: i8, octave: i8) -> NotePitch {
         match note_number {
             0 => NotePitch {
                 natural_note: NaturalNote::C,
@@ -240,7 +255,7 @@ impl NotePitch {
         }
     }
 
-    fn note_pitch_to_number(note_pitch: &NotePitch) -> (i8, i8) {
+    fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
         let number: i8 = match note_pitch.natural_note {
             NaturalNote::C => {
                 0 + match note_pitch.accidental {
@@ -296,7 +311,7 @@ impl NotePitch {
 
     fn find_note(open_note: &NotePitch, fret: i8) -> NotePitch {
         let (x, y) = NotePitch::add(&open_note, fret);
-        NotePitch::number_to_note_pitch(x, y)
+        NotePitch::from_number(x, y)
     }
     fn up_step(start_note: &NotePitch, step: &Step) -> NotePitch {
         let to_add = match step {
@@ -305,7 +320,7 @@ impl NotePitch {
             Step::OneAndAHalf(step_value) => step_value.value,
         };
         let (number, octave) = NotePitch::add(start_note, to_add);
-        NotePitch::number_to_note_pitch(number, octave)
+        NotePitch::from_number(number, octave)
     }
 
     fn down_step(start_note: &NotePitch, step: &Step) -> NotePitch {
@@ -315,10 +330,10 @@ impl NotePitch {
             Step::OneAndAHalf(step_value) => step_value.value,
         };
         let (number, octave) = NotePitch::minus(start_note, to_add);
-        NotePitch::number_to_note_pitch(number, octave)
+        NotePitch::from_number(number, octave)
     }
     fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
-        let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
+        let (note_number, octave) = NotePitch::to_number(&start_note);
         let mut octave = octave;
         let mut number = note_number + to_add;
         while number >= 12 {
@@ -329,7 +344,7 @@ impl NotePitch {
     }
 
     fn minus(start_note: &NotePitch, to_subtract: i8) -> (i8, i8) {
-        let (note_number, octave) = NotePitch::note_pitch_to_number(&start_note);
+        let (note_number, octave) = NotePitch::to_number(&start_note);
         let mut octave = octave;
         let mut number: i8 = note_number - to_subtract;
         while number < 0 {

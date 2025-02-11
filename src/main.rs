@@ -36,11 +36,11 @@ struct Instrument {
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         for i in (0..self.string_count).rev() {
-            write!(f, "{} ", self.string_count - i);
+            write!(f, "{} ", self.string_count - i)?;
             for j in 0..self.fret_count {
                 match &self.fretboard[i][j].accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
-                    Some(_Accidental) => write!(f, "{} ", self.fretboard[i][j])?,
+                    Some(_accidental) => write!(f, "{} ", self.fretboard[i][j])?,
                 };
             }
             write!(f, "\n")?;

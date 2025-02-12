@@ -1586,6 +1586,7 @@ impl Display for Chord {
         Ok(())
     }
 }
+
 impl Chord {
     fn new(root_note: &NoteName, definition: &ChordDef) -> Self {
         let scale = Scale::new(root_note, &ScaleDef::new_major());

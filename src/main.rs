@@ -10,13 +10,13 @@ fn main() {
     );
     print!("{}", i);
     let s: Scale = Scale::new(
-        &NotePitch::new(&NaturalNote::D, &None, 5),
+        &NoteName::new(&NaturalNote::D, &None),
         &ScaleDef::new_major(),
     );
     print!("{}", s.definition);
     print!("{}", s);
     let c: Chord = Chord::new(
-        &NotePitch::new(&NaturalNote::D, &None, 5),
+        &NoteName::new(&NaturalNote::D, &None),
         &ChordDef::new_minor_eleventh(),
     );
     print!("{}", c.definition);
@@ -38,7 +38,7 @@ impl Display for Instrument {
         for i in (0..self.string_count).rev() {
             write!(f, "{} ", self.string_count - i)?;
             for j in 0..self.fret_count {
-                match &self.fretboard[i][j].accidental {
+                match &self.fretboard[i][j].note_name.accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
                     Some(_accidental) => write!(f, "{} ", self.fretboard[i][j])?,
                 };
@@ -144,14 +144,13 @@ impl Instrument {
 
 #[derive(PartialEq, Clone, Debug)]
 struct NotePitch {
-    natural_note: NaturalNote,
-    accidental: Option<Accidental>,
+    note_name: NoteName,
     octave: i8,
 }
 
 impl Display for NotePitch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}{}", NotePitch::get_name(&self), self.octave)?;
+        write!(f, "{}", NotePitch::get_name(&self))?;
         Ok(())
     }
 }
@@ -159,90 +158,104 @@ impl Display for NotePitch {
 impl NotePitch {
     fn new(natural_note: &NaturalNote, accidental: &Option<Accidental>, octave: i8) -> Self {
         NotePitch {
-            natural_note: natural_note.clone(),
-            accidental: accidental.clone(),
+            note_name: NoteName {
+                natural_note: natural_note.clone(),
+                accidental: accidental.clone(),
+            },
             octave,
         }
     }
 
     fn get_name(self: &Self) -> String {
-        let natural_note = match self.natural_note {
-            NaturalNote::A => "A".to_string(),
-            NaturalNote::B => "B".to_string(),
-            NaturalNote::C => "C".to_string(),
-            NaturalNote::D => "D".to_string(),
-            NaturalNote::E => "E".to_string(),
-            NaturalNote::F => "F".to_string(),
-            NaturalNote::G => "G".to_string(),
-        };
-        let accidental = match self.accidental {
-            Some(Accidental::Sharp) => "♯".to_string(),
-            Some(Accidental::Flat) => "♭".to_string(),
-            None => "".to_string(),
-        };
-        let name = natural_note + &accidental;
+        let note_name = NoteName::get_name(&self.note_name);
+        let name = format!("{}{}", note_name, self.octave);
         name
     }
+
     fn from_number(note_number: i8, octave: i8) -> NotePitch {
         match note_number {
             0 => NotePitch {
-                natural_note: NaturalNote::C,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::C,
+                    accidental: None,
+                },
                 octave,
             },
             1 => NotePitch {
-                natural_note: NaturalNote::C,
-                accidental: Some(Accidental::Sharp),
+                note_name: NoteName {
+                    natural_note: NaturalNote::C,
+                    accidental: Some(Accidental::Sharp),
+                },
                 octave,
             },
             2 => NotePitch {
-                natural_note: NaturalNote::D,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::D,
+                    accidental: None,
+                },
                 octave,
             },
             3 => NotePitch {
-                natural_note: NaturalNote::D,
-                accidental: Some(Accidental::Sharp),
+                note_name: NoteName {
+                    natural_note: NaturalNote::D,
+                    accidental: Some(Accidental::Sharp),
+                },
                 octave,
             },
             4 => NotePitch {
-                natural_note: NaturalNote::E,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::E,
+                    accidental: None,
+                },
                 octave,
             },
             5 => NotePitch {
-                natural_note: NaturalNote::F,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::F,
+                    accidental: None,
+                },
                 octave,
             },
             6 => NotePitch {
-                natural_note: NaturalNote::F,
-                accidental: Some(Accidental::Sharp),
+                note_name: NoteName {
+                    natural_note: NaturalNote::F,
+                    accidental: Some(Accidental::Sharp),
+                },
                 octave,
             },
             7 => NotePitch {
-                natural_note: NaturalNote::G,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::G,
+                    accidental: None,
+                },
                 octave,
             },
             8 => NotePitch {
-                natural_note: NaturalNote::G,
-                accidental: Some(Accidental::Sharp),
+                note_name: NoteName {
+                    natural_note: NaturalNote::G,
+                    accidental: Some(Accidental::Sharp),
+                },
                 octave,
             },
             9 => NotePitch {
-                natural_note: NaturalNote::A,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::A,
+                    accidental: None,
+                },
                 octave,
             },
             10 => NotePitch {
-                natural_note: NaturalNote::A,
-                accidental: Some(Accidental::Sharp),
+                note_name: NoteName {
+                    natural_note: NaturalNote::A,
+                    accidental: Some(Accidental::Sharp),
+                },
                 octave,
             },
             11 => NotePitch {
-                natural_note: NaturalNote::B,
-                accidental: None,
+                note_name: NoteName {
+                    natural_note: NaturalNote::B,
+                    accidental: None,
+                },
                 octave,
             },
             _ => panic!("unexpected note number"),
@@ -250,67 +263,74 @@ impl NotePitch {
     }
 
     fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
-        let number: i8 = match note_pitch.natural_note {
+        let mut octave = note_pitch.octave;
+        let mut number: i8 = match note_pitch.note_name.natural_note {
             NaturalNote::C => {
-                0 + match note_pitch.accidental {
+                0 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::D => {
-                2 + match note_pitch.accidental {
+                2 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::E => {
-                4 + match note_pitch.accidental {
+                4 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
                 }
             }
             NaturalNote::F => {
-                5 + match note_pitch.accidental {
+                5 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::G => {
-                7 + match note_pitch.accidental {
+                7 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::A => {
-                9 + match note_pitch.accidental {
+                9 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::B => {
-                11 + match note_pitch.accidental {
+                11 + match note_pitch.note_name.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
                 }
             }
         };
-        match number {
-            1 => return (11, note_pitch.octave - 1),
-            _ => return (number, note_pitch.octave),
-        };
+        while number > 11 {
+            number = number - 11;
+            octave = octave + 1;
+        }
+        (number, octave)
     }
 
-    fn find_note(open_note: &NotePitch, fret: i8) -> NotePitch {
-        let (x, y) = NotePitch::add(&open_note, fret);
+    fn find_note(open_note: &NotePitch, distance: i8) -> NotePitch {
+        let (x, y) = match distance {
+            x if x < 0 => NotePitch::add(&open_note, distance),
+            0.. => NotePitch::minus(&open_note, distance),
+            _ => panic!("unexpected distance"),
+        };
         NotePitch::from_number(x, y)
     }
+
     fn up_step(start_note: &NotePitch, step: &Step) -> NotePitch {
         let to_add = Step::to_number(step);
         let (number, octave) = NotePitch::add(start_note, to_add);
@@ -343,6 +363,187 @@ impl NotePitch {
         }
         (number, octave)
     }
+}
+impl Display for NoteName {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{}", NoteName::get_name(&self))?;
+        Ok(())
+    }
+}
+impl NoteName {
+    fn new(natural_note: &NaturalNote, accidental: &Option<Accidental>) -> Self {
+        NoteName {
+            natural_note: natural_note.clone(),
+            accidental: accidental.clone(),
+        }
+    }
+
+    fn get_name(self: &Self) -> String {
+        let natural_note = match self.natural_note {
+            NaturalNote::A => "A".to_string(),
+            NaturalNote::B => "B".to_string(),
+            NaturalNote::C => "C".to_string(),
+            NaturalNote::D => "D".to_string(),
+            NaturalNote::E => "E".to_string(),
+            NaturalNote::F => "F".to_string(),
+            NaturalNote::G => "G".to_string(),
+        };
+        let accidental = match self.accidental {
+            Some(Accidental::Sharp) => "♯".to_string(),
+            Some(Accidental::Flat) => "♭".to_string(),
+            None => "".to_string(),
+        };
+        let name = natural_note + &accidental;
+        name
+    }
+
+    fn from_number(note_number: i8) -> NoteName {
+        match note_number {
+            0 => NoteName {
+                natural_note: NaturalNote::C,
+                accidental: None,
+            },
+            1 => NoteName {
+                natural_note: NaturalNote::C,
+                accidental: Some(Accidental::Sharp),
+            },
+            2 => NoteName {
+                natural_note: NaturalNote::D,
+                accidental: None,
+            },
+            3 => NoteName {
+                natural_note: NaturalNote::D,
+                accidental: Some(Accidental::Sharp),
+            },
+            4 => NoteName {
+                natural_note: NaturalNote::E,
+                accidental: None,
+            },
+            5 => NoteName {
+                natural_note: NaturalNote::F,
+                accidental: None,
+            },
+            6 => NoteName {
+                natural_note: NaturalNote::F,
+                accidental: Some(Accidental::Sharp),
+            },
+            7 => NoteName {
+                natural_note: NaturalNote::G,
+                accidental: None,
+            },
+            8 => NoteName {
+                natural_note: NaturalNote::G,
+                accidental: Some(Accidental::Sharp),
+            },
+            9 => NoteName {
+                natural_note: NaturalNote::A,
+                accidental: None,
+            },
+            10 => NoteName {
+                natural_note: NaturalNote::A,
+                accidental: Some(Accidental::Sharp),
+            },
+            11 => NoteName {
+                natural_note: NaturalNote::B,
+                accidental: None,
+            },
+            _ => panic!("unexpected note number"),
+        }
+    }
+
+    fn to_number(note_name: &NoteName) -> i8 {
+        let mut number: i8 = match note_name.natural_note {
+            NaturalNote::C => {
+                0 + match note_name.accidental {
+                    Some(Accidental::Flat) => panic!("unexpected accidental"),
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::D => {
+                2 + match note_name.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::E => {
+                4 + match note_name.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
+                    None => 0,
+                }
+            }
+            NaturalNote::F => {
+                5 + match note_name.accidental {
+                    Some(Accidental::Flat) => panic!("unexpected accidental"),
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::G => {
+                7 + match note_name.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::A => {
+                9 + match note_name.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => 1,
+                    None => 0,
+                }
+            }
+            NaturalNote::B => {
+                11 + match note_name.accidental {
+                    Some(Accidental::Flat) => -1,
+                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
+                    None => 0,
+                }
+            }
+        };
+        while number > 11 {
+            number = number - 11;
+        }
+        number
+    }
+
+    fn up_step(start_note: &NoteName, step: &Step) -> NoteName {
+        let to_add = Step::to_number(step);
+        let number = NoteName::add(start_note, to_add);
+        NoteName::from_number(number)
+    }
+
+    fn down_step(start_note: &NoteName, step: &Step) -> NoteName {
+        let to_subtract = Step::to_number(step);
+        let number = NoteName::minus(start_note, to_subtract);
+        NoteName::from_number(number)
+    }
+
+    fn add(start_note: &NoteName, to_add: i8) -> i8 {
+        let note_number = NoteName::to_number(&start_note);
+        let mut number = note_number + to_add;
+        while number >= 12 {
+            number = number - 12;
+        }
+        number
+    }
+
+    fn minus(start_note: &NoteName, to_subtract: i8) -> i8 {
+        let note_number = NoteName::to_number(&start_note);
+        let mut number: i8 = note_number - to_subtract;
+        while number < 0 {
+            number = number + 12;
+        }
+        number
+    }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct NoteName {
+    natural_note: NaturalNote,
+    accidental: Option<Accidental>,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -692,16 +893,16 @@ impl Display for ScaleDef {
 #[derive(PartialEq, Clone, Debug)]
 struct Scale {
     definition: ScaleDef,
-    notes: Vec<NotePitch>,
+    notes: Vec<NoteName>,
 }
 
 impl Scale {
-    fn new(note_1: &NotePitch, definition: &ScaleDef) -> Self {
-        let mut notes: Vec<NotePitch> = Vec::new();
-        notes.push(note_1.clone());
+    fn new(root_note: &NoteName, definition: &ScaleDef) -> Self {
+        let mut notes: Vec<NoteName> = Vec::new();
+        notes.push(root_note.clone());
         let mut count: usize = 0;
         for step in &definition.steps {
-            notes.push(NotePitch::up_step(&notes[count], &step));
+            notes.push(NoteName::up_step(&notes[count], &step));
             count = count + 1;
         }
         Scale {
@@ -754,6 +955,7 @@ impl Display for Interval {
         Ok(())
     }
 }
+
 #[derive(PartialEq, Clone, Debug)]
 struct ChordDef {
     name: String,
@@ -1368,14 +1570,14 @@ impl ChordDef {
 #[derive(PartialEq, Clone, Debug)]
 struct Chord {
     definition: ChordDef,
-    notes: Vec<NotePitch>,
+    notes: Vec<NoteName>,
     name: String,
     short_name: String,
 }
 
 impl Display for Chord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} or {} chord: ", self.name, self.short_name)?;
+        write!(f, "{} ({}) chord: ", self.name, self.short_name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1384,7 +1586,7 @@ impl Display for Chord {
     }
 }
 impl Chord {
-    fn new(root_note: &NotePitch, definition: &ChordDef) -> Self {
+    fn new(root_note: &NoteName, definition: &ChordDef) -> Self {
         let scale = Scale::new(root_note, &ScaleDef::new_major());
         let mut notes = Vec::new();
         let scale_length = scale.notes.len();
@@ -1401,8 +1603,8 @@ impl Chord {
             let base_note = &scale.notes[i];
             let note = match interval.accidental {
                 None => base_note.clone(),
-                Some(Accidental::Flat) => NotePitch::down_step(base_note, &Step::new_half()),
-                Some(Accidental::Sharp) => NotePitch::up_step(base_note, &Step::new_half()),
+                Some(Accidental::Flat) => NoteName::down_step(base_note, &Step::new_half()),
+                Some(Accidental::Sharp) => NoteName::up_step(base_note, &Step::new_half()),
             };
 
             notes.push(note);
@@ -1411,10 +1613,10 @@ impl Chord {
         Chord {
             definition: definition.clone(),
             notes,
-            name: format!("{} {}", NotePitch::get_name(root_note), definition.name),
+            name: format!("{} {}", NoteName::get_name(root_note), definition.name),
             short_name: format!(
                 "{}{}",
-                NotePitch::get_name(root_note),
+                NoteName::get_name(root_note),
                 definition.naming_convention
             ),
         }

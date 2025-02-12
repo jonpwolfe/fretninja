@@ -9,18 +9,18 @@ fn main() {
         24,
     );
     print!("{}", i);
-    let s: Scale = Scale::new(
-        &NoteName::new(&NaturalNote::D, &None),
-        &ScaleDef::new_major(),
+    let scale: Scale = Scale::new(
+        &NoteName::new(&NaturalNote::C, &None),
+        &ScaleDef::new_minor_pentatonic(),
     );
-    print!("{}", s.definition);
-    print!("{}", s);
-    let c: Chord = Chord::new(
+    print!("{}", scale.definition);
+    print!("{}", scale);
+    let chord: Chord = Chord::new(
         &NoteName::new(&NaturalNote::D, &None),
         &ChordDef::new_minor_eleventh(),
     );
-    print!("{}", c.definition);
-    print!("{}", c);
+    print!("{}", chord.definition);
+    print!("{}", chord);
 }
 
 struct Instrument {

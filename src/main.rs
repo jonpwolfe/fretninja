@@ -2,8 +2,8 @@ use core::fmt::{Display, Formatter, Result};
 
 fn main() {
     let instrument: Instrument = Instrument::new(
-        InstrumentType::Guitar,
-        TuningType::Standard,
+        &InstrumentType::Guitar,
+        &TuningType::Standard,
         &NotePitch::new(&NaturalNote::C, &None, 4),
         6,
         24,
@@ -60,14 +60,14 @@ impl Display for Instrument {
 
 impl Instrument {
     fn new(
-        instrument_type: InstrumentType,
-        tuning_type: TuningType,
+        instrument_type: &InstrumentType,
+        tuning_type: &TuningType,
         root_note: &NotePitch,
         string_count: usize,
         fret_count: usize,
     ) -> Self {
         let mut instrument = Instrument {
-            instrument_type,
+            instrument_type: instrument_type.clone(),
             tuning_type: tuning_type.clone(),
             root_note: root_note.clone(),
             string_count,

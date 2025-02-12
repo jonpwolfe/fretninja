@@ -599,7 +599,7 @@ impl Step {
     fn new_one_and_a_half() -> Self {
         Step::OneAndAHalf(StepValue { value: 3 })
     }
-    
+
     fn to_number(self: &Self) -> i8 {
         match self {
             Step::Whole(step_value) => step_value.value,

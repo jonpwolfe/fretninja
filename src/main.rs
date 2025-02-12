@@ -4,7 +4,7 @@ fn main() {
     let instrument: Instrument = Instrument::new(
         InstrumentType::Guitar,
         TuningType::Standard,
-        NotePitch::new(&NaturalNote::C, &None, 4),
+        &NotePitch::new(&NaturalNote::C, &None, 4),
         6,
         24,
     );
@@ -62,7 +62,7 @@ impl Instrument {
     fn new(
         instrument_type: InstrumentType,
         tuning_type: TuningType,
-        root_note: NotePitch,
+        root_note: &NotePitch,
         string_count: usize,
         fret_count: usize,
     ) -> Self {
@@ -343,6 +343,7 @@ impl NotePitch {
         let (number, octave) = NotePitch::minus(start_note, to_subtract);
         NotePitch::from_number(number, octave)
     }
+    
     fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::to_number(&start_note);
         let mut octave = octave;

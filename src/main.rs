@@ -16,7 +16,7 @@ fn main() {
     print!("{}", scale.definition);
     print!("{}", scale);
     let chord: Chord = Chord::new(
-        &NoteName::new(&NaturalNote::D, &None),
+        &NoteName::new(&NaturalNote::C, &None),
         &ChordDef::new_minor_eleventh(),
     );
     print!("{}", chord.definition);
@@ -505,7 +505,7 @@ impl NoteName {
                 }
             }
         };
-        while number > 11 {
+        if number > 11 {
             number = number - 11;
         }
         number

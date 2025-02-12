@@ -1,14 +1,14 @@
 use core::fmt::{Display, Formatter, Result};
 
 fn main() {
-    let i: Instrument = Instrument::new(
+    let instrument: Instrument = Instrument::new(
         InstrumentType::Guitar,
         TuningType::Standard,
         NotePitch::new(&NaturalNote::C, &None, 4),
         6,
         24,
     );
-    print!("{}", i);
+    print!("{}", instrument);
     let scale: Scale = Scale::new(
         &NoteName::new(&NaturalNote::C, &None),
         &ScaleDef::new_minor_pentatonic(),
@@ -324,8 +324,9 @@ impl NotePitch {
 
     fn find_note(open_note: &NotePitch, distance: i8) -> NotePitch {
         let (x, y) = match distance {
-            x if x < 0 => NotePitch::add(&open_note, distance),
-            0.. => NotePitch::minus(&open_note, distance),
+            i if i > 0 => NotePitch::add(&open_note, distance),
+            i if i < 0 => NotePitch::minus(&open_note, distance),
+            0 => return open_note.clone(),
             _ => panic!("unexpected distance"),
         };
         NotePitch::from_number(x, y)

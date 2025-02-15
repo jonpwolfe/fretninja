@@ -3,7 +3,7 @@ use tokio;
 
 #[tokio::main]
 async fn main() {
-    let instrument: Instrument = Instrument::new(
+    let instrument = Instrument::new(
         &InstrumentType::Guitar,
         &TuningType::Standard,
         &NotePitch::new(&NaturalNote::C, &None, 4),
@@ -11,13 +11,13 @@ async fn main() {
         24,
     );
     print!("{}", instrument);
-    let scale: Scale = Scale::new(
+    let scale = Scale::new(
         &NoteName::new(&NaturalNote::C, &None),
         &ScaleDef::new_minor_pentatonic(),
     );
     print!("{}", scale.definition);
     print!("{}", scale);
-    let chord: Chord = Chord::new(
+    let chord = Chord::new(
         &NoteName::new(&NaturalNote::C, &None),
         &ChordDef::new_minor_eleventh(),
     );
@@ -1083,13 +1083,13 @@ impl ChordDef {
             interval: 5,
         });
         ChordDef {
-            name: "Suspended 2nd".to_string(),
+            name: "Suspended 2".to_string(),
             naming_convention: "sus2".to_string(),
             intervals,
         }
     }
 
-    fn new_suspended_fourth() -> Self {
+    fn new_suspended_four() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1104,7 +1104,7 @@ impl ChordDef {
             interval: 5,
         });
         ChordDef {
-            name: "Suspended 4th".to_string(),
+            name: "Suspended 4".to_string(),
             naming_convention: "sus4".to_string(),
             intervals,
         }
@@ -1127,7 +1127,7 @@ impl ChordDef {
         }
     }
 
-    fn new_major_seventh() -> Self {
+    fn new_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1146,13 +1146,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Major 7th".to_string(),
+            name: "Major 7".to_string(),
             naming_convention: "maj7".to_string(),
             intervals,
         }
     }
 
-    fn new_minor_seventh() -> Self {
+    fn new_minor_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1171,13 +1171,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Minor 7th".to_string(),
+            name: "Minor 7".to_string(),
             naming_convention: "m7".to_string(),
             intervals,
         }
     }
 
-    fn new_dominant_seventh() -> Self {
+    fn new_dominant_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1196,13 +1196,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Dominant 7th".to_string(),
+            name: "Dominant 7".to_string(),
             naming_convention: "7".to_string(),
             intervals,
         }
     }
 
-    fn new_minor_major_7() -> Self {
+    fn new_minor_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1221,13 +1221,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Minor Major 7th".to_string(),
+            name: "Minor Major 7".to_string(),
             naming_convention: "m(Maj7)".to_string(),
             intervals,
         }
     }
 
-    fn new_sixth() -> Self {
+    fn new_six() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1246,13 +1246,13 @@ impl ChordDef {
             interval: 6,
         });
         ChordDef {
-            name: "6th".to_string(),
+            name: "6".to_string(),
             naming_convention: "6".to_string(),
             intervals,
         }
     }
 
-    fn new_minor_sixth() -> Self {
+    fn new_minor_six() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1271,12 +1271,12 @@ impl ChordDef {
             interval: 6,
         });
         ChordDef {
-            name: "Minor 6th".to_string(),
+            name: "Minor 6".to_string(),
             naming_convention: "m6".to_string(),
             intervals,
         }
     }
-    fn new_ninth() -> Self {
+    fn new_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1299,13 +1299,13 @@ impl ChordDef {
             interval: 9,
         });
         ChordDef {
-            name: "9th".to_string(),
+            name: "9".to_string(),
             naming_convention: "9".to_string(),
             intervals,
         }
     }
 
-    fn new_minor_ninth() -> Self {
+    fn new_minor_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1328,13 +1328,13 @@ impl ChordDef {
             interval: 9,
         });
         ChordDef {
-            name: "Minor 9th".to_string(),
+            name: "Minor 9".to_string(),
             naming_convention: "m9".to_string(),
             intervals,
         }
     }
 
-    fn new_add_ninth() -> Self {
+    fn new_add_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1353,13 +1353,13 @@ impl ChordDef {
             interval: 9,
         });
         ChordDef {
-            name: "Add 9th".to_string(),
+            name: "Add 9".to_string(),
             naming_convention: "add9".to_string(),
             intervals,
         }
     }
 
-    fn new_seventh_suspended_fourth() -> Self {
+    fn new_seven_suspended_four() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1378,13 +1378,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "7th Suspended 4th".to_string(),
+            name: "7 Suspended 4".to_string(),
             naming_convention: "7sus4".to_string(),
             intervals,
         }
     }
 
-    fn new_dimished_seventh() -> Self {
+    fn new_dimished_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1403,7 +1403,7 @@ impl ChordDef {
             interval: 6,
         });
         ChordDef {
-            name: "Diminished 7th".to_string(),
+            name: "Diminished 7".to_string(),
             naming_convention: "dim7".to_string(),
             intervals,
         }
@@ -1434,7 +1434,7 @@ impl ChordDef {
         }
     }
 
-    fn new_plus_seventh() -> Self {
+    fn new_plus_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1453,13 +1453,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Plus 7th".to_string(),
+            name: "Plus 7".to_string(),
             naming_convention: "+7".to_string(),
             intervals,
         }
     }
 
-    fn new_minor_eleventh() -> Self {
+    fn new_minor_eleven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1486,13 +1486,13 @@ impl ChordDef {
             interval: 11,
         });
         ChordDef {
-            name: "Minor 11th".to_string(),
+            name: "Minor 11".to_string(),
             naming_convention: "m11".to_string(),
             intervals,
         }
     }
 
-    fn new_augmented_major_seventh() -> Self {
+    fn new_augmented_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1511,13 +1511,13 @@ impl ChordDef {
             interval: 7,
         });
         ChordDef {
-            name: "Augmented Major 7th".to_string(),
+            name: "Augmented Major 7".to_string(),
             naming_convention: "Maj7♯5".to_string(),
             intervals,
         }
     }
 
-    fn new_dominant_seventh_flat_ninth() -> Self {
+    fn new_dominant_seven_flat_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1540,13 +1540,13 @@ impl ChordDef {
             interval: 9,
         });
         ChordDef {
-            name: "Dominant 7th Flat 9th".to_string(),
+            name: "Dominant 7 Flat 9".to_string(),
             naming_convention: "7♭9".to_string(),
             intervals,
         }
     }
 
-    fn new_altered_dominant_seventh() -> Self {
+    fn new_altered_dominant_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval {
             accidental: None,
@@ -1569,7 +1569,7 @@ impl ChordDef {
             interval: 9,
         });
         ChordDef {
-            name: "Altered Dominant 7th".to_string(),
+            name: "Altered Dominant 7".to_string(),
             naming_convention: "7♯5♯9".to_string(),
             intervals,
         }
@@ -1634,7 +1634,7 @@ impl Chord {
 }
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use cpal::{BufferSize, Device, Host, OutputCallbackInfo, SampleRate, StreamConfig};
+use cpal::{BufferSize, Device, OutputCallbackInfo, SampleRate, StreamConfig};
 use std::f32::consts::PI;
 use std::sync::Arc;
 use std::time::Duration;

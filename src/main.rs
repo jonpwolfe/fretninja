@@ -19,7 +19,7 @@ async fn main() {
     print!("{}", scale);
     let chord = Chord::new(
         &NoteName::new(&NaturalNote::C, &None),
-        &ChordDef::new_minor_eleventh(),
+        &ChordDef::new_minor_eleven(),
     );
     print!("{}", chord.definition);
     print!("{}", chord);

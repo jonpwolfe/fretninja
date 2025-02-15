@@ -1637,7 +1637,6 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, Device, Host, OutputCallbackInfo, SampleRate, StreamConfig};
 use std::f32::consts::PI;
 use std::sync::Arc;
-use std::thread;
 use std::time::Duration;
 
 struct AudioEngine {

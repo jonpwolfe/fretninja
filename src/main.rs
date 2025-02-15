@@ -347,7 +347,7 @@ impl NotePitch {
         let (number, octave) = NotePitch::minus(start_note, to_subtract);
         NotePitch::from_number(number, octave)
     }
-    
+
     fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
         let (note_number, octave) = NotePitch::to_number(&start_note);
         let mut octave = octave;
@@ -1633,12 +1633,12 @@ impl Chord {
     }
 }
 
-use cpal::traits::{HostTrait, DeviceTrait, StreamTrait};
-use cpal::{Host, Device, StreamConfig, SampleRate, BufferSize, OutputCallbackInfo};
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::{BufferSize, Device, Host, OutputCallbackInfo, SampleRate, StreamConfig};
 use std::f32::consts::PI;
+use std::sync::Arc;
 use std::thread;
 use std::time::Duration;
-use std::sync::Arc;
 
 struct AudioEngine {
     device: Arc<Device>,
@@ -1648,19 +1648,19 @@ struct AudioEngine {
 impl AudioEngine {
     fn new() -> Self {
         let host = cpal::default_host();
-        let device = Arc::new(host.default_output_device().expect("No output device available"));
+        let device = Arc::new(
+            host.default_output_device()
+                .expect("No output device available"),
+        );
         let config = StreamConfig {
             channels: 2,
             sample_rate: SampleRate(44100),
             buffer_size: BufferSize::Default,
         };
-        AudioEngine {
-            device,
-            config,
-        }
+        AudioEngine { device, config }
     }
 
-  pub async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
+    pub async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
         let device = self.device.clone(); // Clone Arc to pass to async task
         let config = self.config.clone();
 
@@ -1671,35 +1671,39 @@ impl AudioEngine {
             let mut phase = 0.0;
             let phase_increment: Vec<f32> = frequencies
                 .iter()
-                .map(|&freq| (2.0 * std::f32::consts::PI * freq) / sample_rate)
+                .map(|&freq| (2.0 * PI * freq) / sample_rate)
                 .collect();
 
-            let stream = device.build_output_stream(
-                &config,
-                move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
-                    for sample in data.iter_mut() {
-                        let mut value = 0.0;
-                        for &inc in &phase_increment {
-                            value += (phase + inc).sin();
+            let stream = device
+                .build_output_stream(
+                    &config,
+                    move |data: &mut [f32], _: &OutputCallbackInfo| {
+                        for sample in data.iter_mut() {
+                            let mut value = 0.0;
+                            for &inc in &phase_increment {
+                                value += (phase + inc).sin();
+                            }
+                            *sample = value / frequencies.len() as f32;
+                            phase += phase_increment[0];
+                            if phase > 2.0 * PI {
+                                phase -= 2.0 * PI;
+                            }
                         }
-                        *sample = value / frequencies.len() as f32;
-                        phase += phase_increment[0];
-                        if phase > 2.0 * std::f32::consts::PI {
-                            phase -= 2.0 * std::f32::consts::PI;
-                        }
-                    }
-                },
-                move |err| {
-                    eprintln!("An error occurred on the audio stream: {:?}", err);
-                },
-                None,
-            ).expect("Failed to build output stream");
+                    },
+                    move |err| {
+                        eprintln!("An error occurred on the audio stream: {:?}", err);
+                    },
+                    None,
+                )
+                .expect("Failed to build output stream");
 
             stream.play().expect("Failed to play the stream");
 
             // We are not using tokio::time::sleep here because it is async.
             // Instead, we just sleep using std::thread::sleep for simplicity.
-            std::thread::sleep(std::time::Duration::from_secs_f32(duration_secs)); // Simulate playing for a given duration
-        }).await.expect("Audio task failed");
+            std::thread::sleep(Duration::from_secs_f32(duration_secs)); // Simulate playing for a given duration
+        })
+        .await
+        .expect("Audio task failed");
     }
 }

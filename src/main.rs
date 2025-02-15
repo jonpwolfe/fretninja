@@ -1660,10 +1660,9 @@ impl AudioEngine {
     }
 
     pub async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
-        let device = self.device.clone(); // Clone Arc to pass to async task
+        let device = self.device.clone();
         let config = self.config.clone();
 
-        // This runs the blocking audio stream code in a separate thread.
         tokio::task::spawn_blocking(move || {
             let sample_rate = config.sample_rate.0 as f32;
             let channels = config.channels as usize;
@@ -1698,9 +1697,7 @@ impl AudioEngine {
 
             stream.play().expect("Failed to play the stream");
 
-            // We are not using tokio::time::sleep here because it is async.
-            // Instead, we just sleep using std::thread::sleep for simplicity.
-            std::thread::sleep(Duration::from_secs_f32(duration_secs)); // Simulate playing for a given duration
+            std::thread::sleep(Duration::from_secs_f32(duration_secs));
         })
         .await
         .expect("Audio task failed");

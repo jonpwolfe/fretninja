@@ -1,6 +1,8 @@
 use core::fmt::{Display, Formatter, Result};
+use tokio;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let instrument: Instrument = Instrument::new(
         &InstrumentType::Guitar,
         &TuningType::Standard,
@@ -22,7 +24,7 @@ fn main() {
     print!("{}", chord.definition);
     print!("{}", chord);
     let audio_engine = AudioEngine::new();
-    AudioEngine::play_audio(&audio_engine, vec![440.0], 2.0);
+    audio_engine.play_audio(vec![440.0], 2.0).await;
 }
 
 struct Instrument {
@@ -1636,66 +1638,68 @@ use cpal::{Host, Device, StreamConfig, SampleRate, BufferSize, OutputCallbackInf
 use std::f32::consts::PI;
 use std::thread;
 use std::time::Duration;
+use std::sync::Arc;
 
 struct AudioEngine {
-    host: Host,
-    device: Device,
+    device: Arc<Device>,
     config: StreamConfig,
 }
 
 impl AudioEngine {
     fn new() -> Self {
         let host = cpal::default_host();
-        let device = host.default_output_device().expect("No output device available");
+        let device = Arc::new(host.default_output_device().expect("No output device available"));
         let config = StreamConfig {
             channels: 2,
             sample_rate: SampleRate(44100),
             buffer_size: BufferSize::Default,
         };
         AudioEngine {
-            host,
             device,
             config,
         }
     }
 
-   fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
-    let sample_rate = self.config.sample_rate.0 as f32;
-    let channels = self.config.channels as usize;
-    let mut phase = 0.0;
-    let phase_increment: Vec<f32> = frequencies
-        .iter()
-        .map(|&freq| (2.0 * PI * freq) / sample_rate)
-        .collect();
+  pub async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
+        let device = self.device.clone(); // Clone Arc to pass to async task
+        let config = self.config.clone();
 
-    let stream = self.device.build_output_stream(
-        &self.config,
-        move |data: &mut [f32], _: &OutputCallbackInfo| {
-            for sample in data.iter_mut() {
-                let mut value = 0.0;
-                for &inc in &phase_increment {
-                    value += (phase + inc).sin();
-                }
-                *sample = value / frequencies.len() as f32;
-                phase += phase_increment[0]; // Update phase for continuous wave
-                if phase > 2.0 * PI {
-                    phase -= 2.0 * PI; // Keep phase in [0, 2π]
-                }
-            }
-        },
-        move |err| {
-            eprintln!("An error occurred on the audio stream: {:?}", err);
-        },
-        None,
-    ).expect("Failed to build output stream");
+        // This runs the blocking audio stream code in a separate thread.
+        tokio::task::spawn_blocking(move || {
+            let sample_rate = config.sample_rate.0 as f32;
+            let channels = config.channels as usize;
+            let mut phase = 0.0;
+            let phase_increment: Vec<f32> = frequencies
+                .iter()
+                .map(|&freq| (2.0 * std::f32::consts::PI * freq) / sample_rate)
+                .collect();
 
-    stream.play().expect("Failed to play the stream");
+            let stream = device.build_output_stream(
+                &config,
+                move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
+                    for sample in data.iter_mut() {
+                        let mut value = 0.0;
+                        for &inc in &phase_increment {
+                            value += (phase + inc).sin();
+                        }
+                        *sample = value / frequencies.len() as f32;
+                        phase += phase_increment[0];
+                        if phase > 2.0 * std::f32::consts::PI {
+                            phase -= 2.0 * std::f32::consts::PI;
+                        }
+                    }
+                },
+                move |err| {
+                    eprintln!("An error occurred on the audio stream: {:?}", err);
+                },
+                None,
+            ).expect("Failed to build output stream");
 
-    // Sleep for the specified duration
-    thread::sleep(Duration::from_secs_f32(duration_secs));
+            stream.play().expect("Failed to play the stream");
 
-    // Drop the stream after the duration ends
-    drop(stream);
-}
-    
+            // We are not using tokio::time::sleep here because it is async.
+            // Instead, we just sleep using std::thread::sleep for simplicity.
+            std::thread::sleep(std::time::Duration::from_secs_f32(duration_secs)); // Simulate playing for a given duration
+        }).await.expect("Audio task failed");
+    }
 }

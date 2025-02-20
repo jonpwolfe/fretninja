@@ -1797,7 +1797,7 @@ struct EarTraining<T> {
 }
 
 impl<T> EarTraining<T> {
-    fn new_instrument_notes(instrument: &Instrument) -> EarTraining<NotePitch> {
+    fn new_notepitch_from_instrument(instrument: &Instrument) -> EarTraining<NotePitch> {
         let mut possible_notes: Vec<NotePitch> = Vec::new();
         for string in &instrument.fretboard{
             for note in string {

@@ -171,8 +171,8 @@ impl NotePitch {
     }
 
     fn get_name(self: &Self) -> String {
-        let note_name = NoteName::get_name(&self.note_name);
-        let name = format!("{}{}", note_name, self.octave);
+        let note_name: String = NoteName::get_name(&self.note_name);
+        let name: String = format!("{}{}", note_name, self.octave);
         name
     }
 
@@ -267,7 +267,7 @@ impl NotePitch {
     }
 
     fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
-        let mut octave = note_pitch.octave;
+        let mut octave: i8 = note_pitch.octave;
         let mut number: i8 = match note_pitch.note_name.natural_note {
             NaturalNote::C => {
                 0 + match note_pitch.note_name.accidental {
@@ -616,12 +616,12 @@ impl Step {
 
 impl Display for Step {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let s = match self {
+        let display_character = match self {
             Step::Whole(_step_value) => "W".to_string(),
             Step::Half(_step_value) => "H".to_string(),
             Step::OneAndAHalf(_step_value) => "3/2".to_string(),
         };
-        write!(f, "{}", s)?;
+        write!(f, "{}", display_character)?;
         Ok(())
     }
 }
@@ -1598,7 +1598,7 @@ impl Display for Chord {
 impl Chord {
     fn new(root_note: &NoteName, definition: &ChordDef) -> Self {
         let scale = Scale::new(root_note, &ScaleDef::new_major());
-        let mut notes = Vec::new();
+        let mut notes: Vec<NoteName> = Vec::new();
         let scale_length = scale.notes.len();
 
         for interval in &definition.intervals {
@@ -1752,7 +1752,6 @@ impl<T: PartialEq> Attempt<T> {
         }
     }
 
-    // Deserialize back to `NaiveDateTime`
     fn deserialize_time(&self) -> (Option<Duration>, Duration, NaiveDateTime) {
         match self.time_since_last_attempt {
             Some(time_since) => (
@@ -1798,11 +1797,11 @@ struct EarTraining<T> {
 }
 
 impl<T> EarTraining<T> {
-    fn new_instrument_notes(instrument:Instrument) -> EarTraining<NotePitch> {
-        let mut possible_notes = Vec::new();
-        for string in instrument.fretboard{
+    fn new_instrument_notes(instrument: &Instrument) -> EarTraining<NotePitch> {
+        let mut possible_notes: Vec<NotePitch> = Vec::new();
+        for string in &instrument.fretboard{
             for note in string {
-                possible_notes.push(note);
+                possible_notes.push(note.clone());
             }
         }
         EarTraining{

@@ -23,8 +23,8 @@ async fn main() {
     );
     print!("{}", chord.definition);
     print!("{}", chord);
-    let audio_engine = AudioEngine::new();
-    audio_engine.play_audio(vec![440.0], 2.0).await;
+    // let audio_engine = AudioEngine::new();
+    //  audio_engine.play_audio(vec![440.0], 2.0).await;
 }
 
 struct Instrument {
@@ -1701,5 +1701,113 @@ impl AudioEngine {
         })
         .await
         .expect("Audio task failed");
+    }
+}
+
+use chrono::{NaiveDateTime, Utc};
+
+struct Attempt<T> {
+    correct_answer: T,
+    attempt_answer: T,
+    correct: bool,
+    attempt_number: u64,
+    time_since_last_attempt: Option<u64>,
+    elapsed_time: u64,
+    attempt_time: NaiveDateTime,
+    game_number: u64,
+}
+
+impl<T: PartialEq> Attempt<T> {
+    fn new(
+        correct_answer: T,
+        attempt_answer: T,
+        attempt_number: u64,
+        time_since_last_attempt: Option<Duration>,
+        elapsed_time: Duration,
+        game_number: u64,
+    ) -> Self {
+        let correct = correct_answer == attempt_answer;
+        let attempt_time = Utc::now().naive_utc();
+        match time_since_last_attempt {
+            Some(time_since) => Attempt {
+                correct_answer,
+                attempt_answer,
+                correct,
+                attempt_number,
+                time_since_last_attempt: Some(time_since.as_secs()),
+                elapsed_time: elapsed_time.as_secs(),
+                attempt_time,
+                game_number,
+            },
+            None => Attempt {
+                correct_answer,
+                attempt_answer,
+                correct,
+                attempt_number,
+                time_since_last_attempt: None,
+                elapsed_time: elapsed_time.as_secs(),
+                attempt_time,
+                game_number,
+            },
+        }
+    }
+
+    // Deserialize back to `NaiveDateTime`
+    fn deserialize_time(&self) -> (Option<Duration>, Duration, NaiveDateTime) {
+        match self.time_since_last_attempt {
+            Some(time_since) => (
+                Some(Duration::from_secs(time_since)),
+                Duration::from_secs(self.elapsed_time),
+                self.attempt_time,
+            ),
+            None => (
+                None,
+                Duration::from_secs(self.elapsed_time),
+                self.attempt_time,
+            ),
+        }
+    }
+}
+
+struct Game<T> {
+    game_number: u64,
+    possible_notes: Vec<T>,
+    attempted_notes: Vec<T>,
+    attempts: Vec<Attempt<T>>,
+    start_time: NaiveDateTime,
+    end_time: Option<NaiveDateTime>,
+
+}
+
+impl<T> Game<T> {
+    fn new(possible_notes: Vec<T>, game_number: u64,) -> Self {
+        Game {
+            game_number,
+            possible_notes,
+            attempted_notes: Vec::new(),
+            attempts: Vec::new(),
+            start_time: Utc::now().naive_utc(),
+            end_time: None,
+        }
+    }
+}
+
+struct EarTraining<T> {
+    audio_engine: AudioEngine,
+    game: Game<T>,
+}
+
+impl<T> EarTraining<T> {
+    fn new_instrument_notes(instrument:Instrument) -> EarTraining<NotePitch> {
+        let mut possible_notes = Vec::new();
+        for string in instrument.fretboard{
+            for note in string {
+                possible_notes.push(note);
+            }
+        }
+        EarTraining{
+            audio_engine: AudioEngine::new(),
+            game: Game::new(possible_notes, 1)
+        }
     }
 }

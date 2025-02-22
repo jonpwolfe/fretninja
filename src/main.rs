@@ -3,6 +3,7 @@ use tokio;
 
 #[tokio::main]
 async fn main() {
+
     let instrument = Instrument::new(
         &InstrumentType::Guitar,
         &TuningType::Standard,
@@ -1808,5 +1809,40 @@ impl<T> EarTraining<T> {
             audio_engine: AudioEngine::new(),
             game: Game::new(possible_notes, 1)
         }
+    }
+}
+
+
+struct RunTime {
+    instrument: Instrument,
+    key: NoteName,
+    scale_current: Scale,
+    chord_current: Chord,
+}
+
+
+impl RunTime {
+    fn new() -> Self {
+        let instrument = Instrument::new(
+            &InstrumentType::Guitar,
+            &TuningType::Standard,
+            &NotePitch::new(&NaturalNote::C, &None, 4),
+            6,
+            24,
+        );
+        let key: NoteName = NoteName::new(&NaturalNote::C, &None);
+        let scale_current: Scale = Scale::new(&key, &ScaleDef::new_major());
+        let chord_current: Chord = Chord::new(&NoteName::new(&NaturalNote::C, &None), &ChordDef::new_minor_seven());
+        RunTime {
+            instrument,
+            key,
+            scale_current,
+            chord_current,
+
+        }
+    }
+    fn start() -> Result {
+        let run_time : RunTime = RunTime::new();
+        Ok(())
     }
 }

@@ -633,21 +633,21 @@ impl NoteName {
             NaturalNote::A => match note_name.accidental {
                 Some(Accidental::Flat) => Rgb { 0: 0, 1: 191, 2: 0 },
                 Some(Accidental::Sharp) => Rgb {
-                    0: 165,
-                    1: 255,
-                    2: 235,
-                },
-                None => Rgb {
                     0: 64,
                     1: 191,
                     2: 191,
                 },
-            },
-            NaturalNote::B => match note_name.accidental {
-                Some(Accidental::Flat) => Rgb {
+                None => Rgb {
                     0: 165,
                     1: 255,
                     2: 235,
+                },
+            },
+            NaturalNote::B => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb {
+                    0: 64,
+                    1: 191,
+                    2: 191,
                 },
                 Some(Accidental::Sharp) => panic!("unexpected accidental"),
                 None => Rgb {

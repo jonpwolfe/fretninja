@@ -1016,6 +1016,7 @@ impl Display for ScaleDef {
 #[derive(PartialEq, Clone, Debug)]
 struct Scale {
     definition: ScaleDef,
+    name: String,
     notes: Vec<NoteName>,
 }
 
@@ -1030,6 +1031,7 @@ impl Scale {
         }
         Scale {
             definition: definition.clone(),
+            name: format!("{} {}", &notes[0].get_name(), definition.name),
             notes,
         }
     }
@@ -1037,7 +1039,7 @@ impl Scale {
 
 impl Display for Scale {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} {} scale: ", self.notes[0], self.definition.name)?;
+        write!(f, "{} scale: ", self.name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1700,7 +1702,7 @@ struct Chord {
 
 impl Display for Chord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} {} ({}{}) chord: ",self.notes[0], self.name, self.notes[0],self.short_name)?;
+        write!(f, "{} ({}) chord: ", self.name, self.short_name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1737,9 +1739,12 @@ impl Chord {
         Chord {
             definition: definition.clone(),
             notes,
-            name: definition.name.clone(),
-            short_name:
-                definition.naming_convention.clone()
+            name: format!("{} {}", NoteName::get_name(root_note), definition.name),
+            short_name: format!(
+                "{}{}",
+                NoteName::get_name(root_note),
+                definition.naming_convention
+            ),
         }
     }
 }

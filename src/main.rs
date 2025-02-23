@@ -1,9 +1,9 @@
 use core::fmt::{Display, Formatter, Result};
+use owo_colors::{OwoColorize, Rgb};
 use tokio;
 
 #[tokio::main]
 async fn main() {
-
     let instrument = Instrument::new(
         &InstrumentType::Guitar,
         &TuningType::Standard,
@@ -148,6 +148,19 @@ impl Instrument {
 }
 
 #[derive(PartialEq, Clone, Debug)]
+struct NoteDisplay {
+    note_name: NoteName,
+    octave: Option<i8>,
+    rgb: Rgb,
+}
+
+/*
+impl NoteDisplay {
+
+}
+*/
+
+#[derive(PartialEq, Clone, Debug)]
 struct NotePitch {
     note_name: NoteName,
     octave: i8,
@@ -155,7 +168,8 @@ struct NotePitch {
 
 impl Display for NotePitch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", NotePitch::get_name(&self))?;
+        let rgb = NoteName::to_rgb(&self.note_name);
+        write!(f, "{}", self.get_name().color(rgb))?;
         Ok(())
     }
 }
@@ -371,12 +385,15 @@ impl NotePitch {
         (number, octave)
     }
 }
+
 impl Display for NoteName {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", NoteName::get_name(&self))?;
+        let rgb = NoteName::to_rgb(self); // Assuming this function returns an 1	 struct
+        write!(f, "{}", self.get_name().color(rgb))?;
         Ok(())
     }
 }
+
 impl NoteName {
     fn new(natural_note: &NaturalNote, accidental: &Option<Accidental>) -> Self {
         NoteName {
@@ -544,6 +561,102 @@ impl NoteName {
             number = number + 12;
         }
         number
+    }
+
+    fn to_rgb(note_name: &NoteName) -> Rgb {
+        match note_name.natural_note {
+            NaturalNote::C => match note_name.accidental {
+                Some(Accidental::Flat) => panic!("unexpected accidental"),
+                Some(Accidental::Sharp) => Rgb {
+                    0: 191,
+                    1: 64,
+                    2: 191,
+                },
+                None => Rgb {
+                    0: 191,
+                    1: 0,
+                    2: 87,
+                },
+            },
+            NaturalNote::D => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb {
+                    0: 191,
+                    1: 64,
+                    2: 191,
+                },
+                Some(Accidental::Sharp) => Rgb {
+                    0: 198,
+                    1: 255,
+                    2: 0,
+                },
+                None => Rgb {
+                    0: 255,
+                    1: 191,
+                    2: 64,
+                },
+            },
+            NaturalNote::E => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb {
+                    0: 198,
+                    1: 255,
+                    2: 0,
+                },
+                Some(Accidental::Sharp) => panic!("unexpected accidental"),
+                None => Rgb {
+                    0: 244,
+                    1: 67,
+                    2: 54,
+                },
+            },
+            NaturalNote::F => match note_name.accidental {
+                Some(Accidental::Flat) => panic!("unexpected accidental"),
+                Some(Accidental::Sharp) => Rgb {
+                    0: 255,
+                    1: 0,
+                    2: 191,
+                },
+                None => Rgb {
+                    0: 255,
+                    1: 0,
+                    2: 255,
+                },
+            },
+            NaturalNote::G => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb {
+                    0: 255,
+                    1: 0,
+                    2: 191,
+                },
+                Some(Accidental::Sharp) => Rgb { 0: 0, 1: 191, 2: 0 },
+                None => Rgb { 0: 0, 1: 255, 2: 0 },
+            },
+            NaturalNote::A => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb { 0: 0, 1: 191, 2: 0 },
+                Some(Accidental::Sharp) => Rgb {
+                    0: 165,
+                    1: 255,
+                    2: 235,
+                },
+                None => Rgb {
+                    0: 64,
+                    1: 191,
+                    2: 191,
+                },
+            },
+            NaturalNote::B => match note_name.accidental {
+                Some(Accidental::Flat) => Rgb {
+                    0: 165,
+                    1: 255,
+                    2: 235,
+                },
+                Some(Accidental::Sharp) => panic!("unexpected accidental"),
+                None => Rgb {
+                    0: 101,
+                    1: 31,
+                    2: 255,
+                },
+            },
+        }
     }
 }
 
@@ -1776,11 +1889,10 @@ struct Game<T> {
     attempts: Vec<Attempt<T>>,
     start_time: NaiveDateTime,
     end_time: Option<NaiveDateTime>,
-
 }
 
 impl<T> Game<T> {
-    fn new(possible_notes: Vec<T>, game_number: u64,) -> Self {
+    fn new(possible_notes: Vec<T>, game_number: u64) -> Self {
         Game {
             game_number,
             possible_notes,
@@ -1800,26 +1912,29 @@ struct EarTraining<T> {
 impl<T> EarTraining<T> {
     fn new_notepitch_from_instrument(instrument: &Instrument) -> EarTraining<NotePitch> {
         let mut possible_notes: Vec<NotePitch> = Vec::new();
-        for string in &instrument.fretboard{
+        for string in &instrument.fretboard {
             for note in string {
                 possible_notes.push(note.clone());
             }
         }
-        EarTraining{
+        EarTraining {
             audio_engine: AudioEngine::new(),
-            game: Game::new(possible_notes, 1)
+            game: Game::new(possible_notes, 1),
         }
     }
 }
 
-
+/*
 struct RunTime {
     instrument: Instrument,
     key: NoteName,
     scale_current: Scale,
     chord_current: Chord,
+    audio_engine: AudioEngine,
 }
 
+use std::io;
+use tokio::task;
 
 impl RunTime {
     fn new() -> Self {
@@ -1833,16 +1948,88 @@ impl RunTime {
         let key: NoteName = NoteName::new(&NaturalNote::C, &None);
         let scale_current: Scale = Scale::new(&key, &ScaleDef::new_major());
         let chord_current: Chord = Chord::new(&NoteName::new(&NaturalNote::C, &None), &ChordDef::new_minor_seven());
+        let audio_engine: AudioEngine = AudioEngine::new();
         RunTime {
             instrument,
             key,
             scale_current,
             chord_current,
+            audio_engine,
 
         }
     }
-    fn start() -> Result {
-        let run_time : RunTime = RunTime::new();
-        Ok(())
+
+     pub async fn start(&mut self) {
+        loop {
+            println!("\nMenu:");
+            println!("1 - Choose Key");
+            println!("2 - Choose Chord");
+            println!("3 - Choose Scale");
+            println!("8 - Display Full Instrument");
+            println!("9 - Change Instrument Tuning");
+            println!("0 - Exit");
+            println!("Enter your choice:");
+
+            let mut input = String::new();
+            io::stdin().read_line(&mut input).expect("Failed to read input");
+
+            match input.trim() {
+                "1" => self.choose_key().await,
+                "2" => self.choose_chord().await,
+                "3" => self.choose_scale().await,
+                "8" => self.display_instrument().await,
+                "9" => self.change_tuning().await,
+                "0" => {
+                    println!("Exiting...");
+                    break;
+                }
+                _ => println!("Invalid choice, please try again."),
+            }
+        }
     }
-}
+
+    async fn choose_key(&mut self) {
+        println!("Enter a new key (e.g., C, D#, F#):");
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read input");
+        let key = NoteName::from_string(input.trim());
+        self.key = key;
+        println!("Key changed to {:?}", self.key);
+    }
+
+    async fn choose_chord(&mut self) {
+        println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read input");
+        let chord = Chord::from_string(input.trim());
+        self.chord_current = chord;
+        println!("Chord changed to {:?}", self.chord_current);
+    }
+
+    async fn choose_scale(&mut self) {
+        println!("Enter a scale (e.g., Major, Minor, Dorian):");
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read input");
+        let scale = Scale::from_string(input.trim());
+        self.scale_current = scale;
+        println!("Scale changed to {:?}", self.scale_current);
+    }
+
+    async fn change_tuning(&mut self) {
+        println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).expect("Failed to read input");
+        let tuning = TuningType::from_string(input.trim());
+        self.instrument.set_tuning(tuning);
+        println!("Tuning changed to {:?}", self.instrument.tuning());
+    }
+
+    async fn display_instrument(&self) {
+        println!("\nInstrument Details:");
+        println!("Type: {:?}", self.instrument.instrument_type());
+        println!("Tuning: {:?}", self.instrument.tuning());
+        println!("Root Note: {:?}", self.instrument.root_note());
+        println!("Strings: {:?}", self.instrument.num_strings());
+        println!("Frets: {:?}", self.instrument.num_frets());
+    }
+}*/

@@ -1700,7 +1700,7 @@ struct Chord {
 
 impl Display for Chord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} ({}) chord: ", self.name, self.short_name)?;
+        write!(f, "{} {} ({}{}) chord: ",self.notes[0], self.name, self.notes[0],self.short_name)?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1737,12 +1737,9 @@ impl Chord {
         Chord {
             definition: definition.clone(),
             notes,
-            name: format!("{} {}", NoteName::get_name(root_note), definition.name),
-            short_name: format!(
-                "{}{}",
-                NoteName::get_name(root_note),
-                definition.naming_convention
-            ),
+            name: definition.name.clone(),
+            short_name:
+                definition.naming_convention.clone()
         }
     }
 }

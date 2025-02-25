@@ -585,7 +585,7 @@ impl NoteName {
                 None => Rgb {
                     0: 191,
                     1: 0,
-                    2: 57,
+                    2: 0,
                 },
             },
             NaturalNote::D => match note_name.accidental {

@@ -40,13 +40,13 @@ struct Instrument {
 
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = Rgb {
+        let white_rgb = Rgb {
             0: 255,
             1: 255,
             2: 255,
         };
         for i in (0..self.string_count).rev() {
-            write!(f, "{} ", (self.string_count - i).color(rgb))?;
+            write!(f, "{} ", (self.string_count - i).color(white_rgb))?;
             for j in 0..self.fret_count {
                 match &self.fretboard[i][j].note_name.accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
@@ -58,8 +58,8 @@ impl Display for Instrument {
         write!(f, "  ")?;
         for i in 0..self.fret_count {
             match i {
-                0..=9 => write!(f, "{}   ", i.color(rgb))?,
-                10.. => write!(f, "{}  ", i.color(rgb))?,
+                0..=9 => write!(f, "{}   ", i.color(white_rgb))?,
+                10.. => write!(f, "{}  ", i.color(white_rgb))?,
                 _ => panic!("unexpected fret_count"),
             };
         }
@@ -1008,15 +1008,15 @@ impl ScaleDef {
 
 impl Display for ScaleDef {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = Rgb {
+        let white_rgb = Rgb {
             0: 255,
             1: 255,
             2: 255,
         };
         let scale_str: &str = "scale: ";
-        write!(f, "{} {}", self.name.color(rgb), scale_str.color(rgb))?;
+        write!(f, "{} {}", self.name.color(white_rgb), scale_str.color(white_rgb))?;
         for step in &self.steps {
-            write!(f, "{} ", step.color(rgb))?;
+            write!(f, "{} ", step.color(white_rgb))?;
         }
         write!(f, "\n")?;
         Ok(())
@@ -1049,13 +1049,13 @@ impl Scale {
 
 impl Display for Scale {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = Rgb {
+        let white_rgb = Rgb {
             0: 255,
             1: 255,
             2: 255,
         };
         let scale_str: &str = "scale: ";
-        write!(f, "{} {}", self.name.color(rgb), scale_str.color(rgb))?;
+        write!(f, "{} {}", self.name.color(white_rgb), scale_str.color(white_rgb))?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1106,15 +1106,15 @@ struct ChordDef {
 
 impl Display for ChordDef {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = Rgb {
+        let white_rgb = Rgb {
             0: 255,
             1: 255,
             2: 255,
         };
         let chord_str: &str = "chord: ";
-        write!(f, "{} {}", self.name.color(rgb), chord_str.color(rgb))?;
+        write!(f, "{} {}", self.name.color(white_rgb), chord_str.color(white_rgb))?;
         for interval in &self.intervals {
-            write!(f, "{} ", interval.color(rgb))?;
+            write!(f, "{} ", interval.color(white_rgb))?;
         }
         write!(f, "\n")?;
         Ok(())
@@ -1724,7 +1724,7 @@ struct Chord {
 
 impl Display for Chord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = Rgb {
+        let white_rgb = Rgb {
             0: 255,
             1: 255,
             2: 255,
@@ -1735,11 +1735,11 @@ impl Display for Chord {
         write!(
             f,
             "{} {}{}{} {}",
-            self.name.color(rgb),
-            open_bracket.color(rgb),
-            self.short_name.color(rgb),
-            closed_bracket.color(rgb),
-            chord_str.color(rgb)
+            self.name.color(white_rgb),
+            open_bracket.color(white_rgb),
+            self.short_name.color(white_rgb),
+            closed_bracket.color(white_rgb),
+            chord_str.color(white_rgb)
         )?;
         for note in &self.notes {
             write!(f, "{} ", note)?;

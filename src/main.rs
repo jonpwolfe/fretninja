@@ -661,7 +661,7 @@ impl NoteName {
                 },
                 Some(Accidental::Sharp) => panic!("unexpected accidental"),
                 None => Rgb {
-                    0: 101,
+                    0: 64,
                     1: 31,
                     2: 255,
                 },

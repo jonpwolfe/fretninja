@@ -40,8 +40,9 @@ struct Instrument {
 
 impl Display for Instrument {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        let rgb = Rgb{0: 255, 1: 255, 2: 255};
         for i in (0..self.string_count).rev() {
-            write!(f, "{} ", self.string_count - i)?;
+            write!(f, "{} ", (self.string_count - i).color(rgb))?;
             for j in 0..self.fret_count {
                 match &self.fretboard[i][j].note_name.accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
@@ -53,8 +54,8 @@ impl Display for Instrument {
         write!(f, "  ")?;
         for i in 0..self.fret_count {
             match i {
-                0..=9 => write!(f, "{}   ", i)?,
-                10.. => write!(f, "{}  ", i)?,
+                0..=9 => write!(f, "{}   ", i.color(rgb))?,
+                10.. => write!(f, "{}  ", i.color(rgb))?,
                 _ => panic!("unexpected fret_count"),
             };
         }
@@ -149,9 +150,8 @@ impl Instrument {
 
 #[derive(PartialEq, Clone, Debug)]
 struct NoteDisplay {
-    note_name: NoteName,
-    octave: Option<i8>,
-    rgb: Rgb,
+    note_pitch: NotePitch,
+    is_displayed: bool,
 }
 
 /*
@@ -186,8 +186,8 @@ impl NotePitch {
     }
 
     fn get_name(self: &Self) -> String {
-        let note_name: String = NoteName::get_name(&self.note_name);
-        let name: String = format!("{}{}", note_name, self.octave);
+        let note_and_accidental: String = NoteName::get_name(&self.note_name);
+        let name: String = format!("{}{}", note_and_accidental, self.octave);
         name
     }
 
@@ -384,6 +384,12 @@ impl NotePitch {
         }
         (number, octave)
     }
+}
+
+#[derive(PartialEq, Clone, Debug)]
+struct NoteName {
+    natural_note: NaturalNote,
+    accidental: Option<Accidental>,
 }
 
 impl Display for NoteName {
@@ -658,12 +664,6 @@ impl NoteName {
             },
         }
     }
-}
-
-#[derive(PartialEq, Clone, Debug)]
-struct NoteName {
-    natural_note: NaturalNote,
-    accidental: Option<Accidental>,
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -1004,9 +1004,11 @@ impl ScaleDef {
 
 impl Display for ScaleDef {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} scale: ", self.name)?;
+        let rgb = Rgb{0: 255, 1: 255, 2: 255};
+        let scale_str : &str = "scale: ";
+        write!(f, "{} {}", self.name.color(rgb), scale_str.color(rgb))?;
         for step in &self.steps {
-            write!(f, "{} ", step)?;
+            write!(f, "{} ", step.color(rgb))?;
         }
         write!(f, "\n")?;
         Ok(())
@@ -1039,7 +1041,9 @@ impl Scale {
 
 impl Display for Scale {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} scale: ", self.name)?;
+        let rgb = Rgb{0: 255, 1: 255, 2: 255};
+        let scale_str : &str = "scale: ";
+        write!(f, "{} {}", self.name.color(rgb), scale_str.color(rgb))?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1090,9 +1094,11 @@ struct ChordDef {
 
 impl Display for ChordDef {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} chord: ", self.name)?;
+        let rgb = Rgb{0: 255, 1: 255, 2: 255};
+        let chord_str : &str = "chord: ";
+        write!(f, "{} {}", self.name.color(rgb), chord_str.color(rgb))?;
         for interval in &self.intervals {
-            write!(f, "{} ", interval)?;
+            write!(f, "{} ", interval.color(rgb))?;
         }
         write!(f, "\n")?;
         Ok(())
@@ -1702,7 +1708,11 @@ struct Chord {
 
 impl Display for Chord {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{} ({}) chord: ", self.name, self.short_name)?;
+        let rgb = Rgb{0: 255, 1: 255, 2: 255};
+        let open_bracket :&str = "(";
+        let closed_bracket : &str = ")";
+        let chord_str : &str = "chord: ";
+        write!(f, "{} {}{}{} {}", self.name.color(rgb), open_bracket.color(rgb), self.short_name.color(rgb), closed_bracket.color(rgb), chord_str.color(rgb))?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }

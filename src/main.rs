@@ -1,5 +1,6 @@
 use core::fmt::{Display, Formatter, Result};
 use owo_colors::{OwoColorize, Rgb};
+use std::io;
 use tokio;
 
 #[tokio::main]
@@ -582,11 +583,7 @@ impl NoteName {
                     1: 64,
                     2: 191,
                 },
-                None => Rgb {
-                    0: 191,
-                    1: 0,
-                    2: 0,
-                },
+                None => Rgb { 0: 191, 1: 0, 2: 0 },
             },
             NaturalNote::D => match note_name.accidental {
                 Some(Accidental::Flat) => Rgb {
@@ -666,6 +663,69 @@ impl NoteName {
                     2: 255,
                 },
             },
+        }
+    }
+
+    fn from_string(input: String) -> NoteName {
+        let input: String = input.to_uppercase();
+        match input.as_str() {
+            "A" => NoteName {
+                natural_note: NaturalNote::A,
+                accidental: None,
+            },
+            "A#" => NoteName {
+                natural_note: NaturalNote::A,
+                accidental: Some(Accidental::Sharp),
+            },
+            "B" => NoteName {
+                natural_note: NaturalNote::B,
+                accidental: None,
+            },
+            "C" => NoteName {
+                natural_note: NaturalNote::C,
+                accidental: None,
+            },
+            "C#" => NoteName {
+                natural_note: NaturalNote::C,
+                accidental: Some(Accidental::Sharp),
+            },
+            "D" => NoteName {
+                natural_note: NaturalNote::D,
+                accidental: None,
+            },
+            "D#" => NoteName {
+                natural_note: NaturalNote::D,
+                accidental: Some(Accidental::Sharp),
+            },
+            "E" => NoteName {
+                natural_note: NaturalNote::E,
+                accidental: None,
+            },
+            "F" => NoteName {
+                natural_note: NaturalNote::F,
+                accidental: None,
+            },
+            "F#" => NoteName {
+                natural_note: NaturalNote::F,
+                accidental: Some(Accidental::Sharp),
+            },
+            "G" => NoteName {
+                natural_note: NaturalNote::G,
+                accidental: None,
+            },
+            "G#" => NoteName {
+                natural_note: NaturalNote::G,
+                accidental: Some(Accidental::Sharp),
+            },
+            _ => {
+                println!("Enter a new key (e.g., C, D#, F#):");
+                let mut reinput = String::new();
+                io::stdin()
+                    .read_line(&mut reinput)
+                    .expect("Failed to read input");
+                let key = NoteName::from_string(reinput.trim().to_string());
+                return key;
+            }
         }
     }
 }
@@ -1014,7 +1074,12 @@ impl Display for ScaleDef {
             2: 255,
         };
         let scale_str: &str = "scale: ";
-        write!(f, "{} {}", self.name.color(white_rgb), scale_str.color(white_rgb))?;
+        write!(
+            f,
+            "{} {}",
+            self.name.color(white_rgb),
+            scale_str.color(white_rgb)
+        )?;
         for step in &self.steps {
             write!(f, "{} ", step.color(white_rgb))?;
         }
@@ -1045,6 +1110,39 @@ impl Scale {
             notes,
         }
     }
+    fn from_string(input: String, key: &NoteName) -> Self {
+        let input: String = input.to_uppercase();
+        match input.as_str() {
+            "MAJOR" => Scale::new(&key, &ScaleDef::new_major()),
+            "IONIAN" => Scale::new(&key, &ScaleDef::new_ionian()),
+            "DORIAN" => Scale::new(&key, &ScaleDef::new_dorian()),
+            "PHRYGIAN" => Scale::new(&key, &ScaleDef::new_phrygian()),
+            "LYDIAN" => Scale::new(&key, &ScaleDef::new_lydian()),
+            "MIXOLYDIAN" => Scale::new(&key, &ScaleDef::new_mixolydian()),
+            "AEOLIAN" => Scale::new(&key, &ScaleDef::new_aeolian()),
+            "LOCRIAN" => Scale::new(&key, &ScaleDef::new_locrian()),
+            "NATURAL MINOR" => Scale::new(&key, &ScaleDef::new_natural_minor()),
+            "HARMONIC MINOR" => Scale::new(&key, &ScaleDef::new_harmonic_minor()),
+            "MELODIC MINOR ASCENDING" => Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()),
+            "MELODIC MINOR DESCENDING" => {
+                Scale::new(&key, &ScaleDef::new_melodic_minor_descending())
+            }
+            "CHROMATIC" => Scale::new(&key, &ScaleDef::new_chromatic()),
+            "WHOLE TONE" => Scale::new(&key, &ScaleDef::new_whole_tone()),
+            "MAJOR PENTATONIC" => Scale::new(&key, &ScaleDef::new_major_pentatonic()),
+            "MINOR PENTATONIC" => Scale::new(&key, &ScaleDef::new_minor_pentatonic()),
+            "BLUES" => Scale::new(&key, &ScaleDef::new_blues()),
+            _ => {
+                println!("Enter a scale (e.g., Major, Minor, Dorian):");
+                let mut reinput = String::new();
+                io::stdin()
+                    .read_line(&mut reinput)
+                    .expect("Failed to read input");
+                let scale = Scale::from_string(reinput.trim().to_string(), &key);
+                return scale;
+            }
+        }
+    }
 }
 
 impl Display for Scale {
@@ -1055,7 +1153,12 @@ impl Display for Scale {
             2: 255,
         };
         let scale_str: &str = "scale: ";
-        write!(f, "{} {}", self.name.color(white_rgb), scale_str.color(white_rgb))?;
+        write!(
+            f,
+            "{} {}",
+            self.name.color(white_rgb),
+            scale_str.color(white_rgb)
+        )?;
         for note in &self.notes {
             write!(f, "{} ", note)?;
         }
@@ -1112,7 +1215,12 @@ impl Display for ChordDef {
             2: 255,
         };
         let chord_str: &str = "chord: ";
-        write!(f, "{} {}", self.name.color(white_rgb), chord_str.color(white_rgb))?;
+        write!(
+            f,
+            "{} {}",
+            self.name.color(white_rgb),
+            chord_str.color(white_rgb)
+        )?;
         for interval in &self.intervals {
             write!(f, "{} ", interval.color(white_rgb))?;
         }
@@ -2050,7 +2158,7 @@ impl RunTime {
         println!("Enter a scale (e.g., Major, Minor, Dorian):");
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read input");
-        let scale = Scale::from_string(input.trim());
+        let scale = Scale::from_string(input.trim(), &self.key);
         self.scale_current = scale;
         println!("Scale changed to {:?}", self.scale_current);
     }

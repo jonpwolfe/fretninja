@@ -749,6 +749,38 @@ enum TuningType {
     Custom,
 }
 
+impl TuningType {
+    fn from_string(input: String) -> Self {
+        let input_uppercase = input.to_uppercase();
+        /*let mut count = 0;
+        let mut indices = Vec::new();
+        for (index, ch) in input.char_indices() {
+            if ch == ' ' {
+                count += 1;
+                indices.push(index);
+            }
+        }
+        if count > 0 {
+
+        }*/
+        match input_uppercase.as_str() {
+            "OPEN" => TuningType::Open,
+            "DROP" => TuningType::Drop,
+            "STANDARD" => TuningType::Standard,
+            "CUSTOM" => TuningType::Custom,
+            _ => {
+                println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
+                let mut reinput = String::new();
+                io::stdin()
+                    .read_line(&mut reinput)
+                    .expect("Failed to read input");
+                let tuning = TuningType::from_string(reinput.trim().to_string());
+                return tuning;
+            }
+        }
+    }
+}
+
 #[derive(PartialEq, Clone, Debug)]
 enum InstrumentType {
     Guitar,
@@ -1110,7 +1142,7 @@ impl Scale {
             notes,
         }
     }
-    fn from_string(input: String, key: &NoteName) -> Self {
+    fn from_string(key: &NoteName, input: String) -> Self {
         let input: String = input.to_uppercase();
         match input.as_str() {
             "MAJOR" => Scale::new(&key, &ScaleDef::new_major()),
@@ -1138,7 +1170,7 @@ impl Scale {
                 io::stdin()
                     .read_line(&mut reinput)
                     .expect("Failed to read input");
-                let scale = Scale::from_string(reinput.trim().to_string(), &key);
+                let scale = Scale::from_string(&key, reinput.trim().to_string());
                 return scale;
             }
         }
@@ -1893,6 +1925,47 @@ impl Chord {
             ),
         }
     }
+
+    fn from_string(key: &NoteName, input: String) -> Self {
+        let input_uppercase: String = input.to_uppercase();
+        match input_uppercase.as_str() {
+            "MAJOR" => Chord::new(&key, &ChordDef::new_major()),
+            "MINOR" => Chord::new(&key, &ChordDef::new_minor()),
+            "DIMINISHED" => Chord::new(&key, &ChordDef::new_diminished()),
+            "AUGMENTED" => Chord::new(&key, &ChordDef::new_augmented()),
+            "SUSPENDED TWO" => Chord::new(&key, &ChordDef::new_suspended_second()),
+            "SUSPENDED FOUR" => Chord::new(&key, &ChordDef::new_suspended_four()),
+            "POWER" => Chord::new(&key, &ChordDef::new_power()),
+            "MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_major_seven()),
+            "MINOR SEVEN" => Chord::new(&key, &ChordDef::new_minor_seven()),
+            "DOMINANT SEVEN" => Chord::new(&key, &ChordDef::new_dominant_seven()),
+            "MINOR MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_minor_major_seven()),
+            "SIX" => Chord::new(&key, &ChordDef::new_six()),
+            "MINOR SIX" => Chord::new(&key, &ChordDef::new_minor_six()),
+            "NINE" => Chord::new(&key, &ChordDef::new_nine()),
+            "MINOR NINE" => Chord::new(&key, &ChordDef::new_minor_nine()),
+            "ADD NINE" => Chord::new(&key, &ChordDef::new_add_nine()),
+            "SEVEN SUSPENDED FOUR" => Chord::new(&key, &ChordDef::new_seven_suspended_four()),
+            "DIMINISHED SEVEN" => Chord::new(&key, &ChordDef::new_dimished_seven()),
+            "HALF DIMINISHED" => Chord::new(&key, &ChordDef::new_half_diminished()),
+            "PLUS SEVEN" => Chord::new(&key, &ChordDef::new_plus_seven()),
+            "MINOR ELEVEN" => Chord::new(&key, &ChordDef::new_minor_eleven()),
+            "AUGMENTED MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_augmented_major_seven()),
+            "DOMINANT SEVEN FLAT NINE" => {
+                Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine())
+            }
+            "ALTERED DOMINANT SEVEN" => Chord::new(&key, &ChordDef::new_altered_dominant_seven()),
+            _ => {
+                println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
+                let mut reinput = String::new();
+                io::stdin()
+                    .read_line(&mut reinput)
+                    .expect("Failed to read input");
+                let chord = Chord::from_string(&key, reinput.trim().to_string());
+                return chord;
+            }
+        }
+    }
 }
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -2072,7 +2145,7 @@ impl<T> EarTraining<T> {
     }
 }
 
-/*
+
 struct RunTime {
     instrument: Instrument,
     key: NoteName,
@@ -2081,8 +2154,6 @@ struct RunTime {
     audio_engine: AudioEngine,
 }
 
-use std::io;
-use tokio::task;
 
 impl RunTime {
     fn new() -> Self {
@@ -2140,7 +2211,7 @@ impl RunTime {
         println!("Enter a new key (e.g., C, D#, F#):");
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read input");
-        let key = NoteName::from_string(input.trim());
+        let key = NoteName::from_string(input.trim().to_string());
         self.key = key;
         println!("Key changed to {:?}", self.key);
     }
@@ -2149,7 +2220,7 @@ impl RunTime {
         println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read input");
-        let chord = Chord::from_string(input.trim());
+        let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
         println!("Chord changed to {:?}", self.chord_current);
     }
@@ -2158,7 +2229,7 @@ impl RunTime {
         println!("Enter a scale (e.g., Major, Minor, Dorian):");
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read input");
-        let scale = Scale::from_string(input.trim(), &self.key);
+        let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
         println!("Scale changed to {:?}", self.scale_current);
     }
@@ -2167,17 +2238,12 @@ impl RunTime {
         println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
         let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read input");
-        let tuning = TuningType::from_string(input.trim());
-        self.instrument.set_tuning(tuning);
-        println!("Tuning changed to {:?}", self.instrument.tuning());
+        let tuning = TuningType::from_string(input.trim().to_string());
+        println!("Tuning changed to {:?}", tuning);
     }
 
     async fn display_instrument(&self) {
         println!("\nInstrument Details:");
-        println!("Type: {:?}", self.instrument.instrument_type());
-        println!("Tuning: {:?}", self.instrument.tuning());
-        println!("Root Note: {:?}", self.instrument.root_note());
-        println!("Strings: {:?}", self.instrument.num_strings());
-        println!("Frets: {:?}", self.instrument.num_frets());
+        println!("{}", self.instrument);
     }
-}*/
+}

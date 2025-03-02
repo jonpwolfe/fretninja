@@ -2225,6 +2225,7 @@ struct RunTime {
     scale_current: Scale,
     chord_current: Chord,
     audio_engine: AudioEngine,
+    display_notes: Vec<NoteName>,
 }
 
 impl RunTime {
@@ -2249,6 +2250,7 @@ impl RunTime {
             scale_current,
             chord_current,
             audio_engine,
+            display_notes: Vec::new(),
         }
     }
 
@@ -2303,7 +2305,8 @@ impl RunTime {
             .expect("Failed to read input");
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
-        Instrument::show_notes(&mut self.instrument, &self.chord_current.notes);
+        self.display_notes = self.chord_current.notes.clone();
+        Instrument::show_notes(&mut self.instrument, &self.display_notes);
         println!(
             "Chord changed to {} {} definition: {}",
             self.chord_current, self.chord_current.name, self.chord_current.definition
@@ -2318,7 +2321,8 @@ impl RunTime {
             .expect("Failed to read input");
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
-        Instrument::show_notes(&mut self.instrument, &self.scale_current.notes);
+        self.display_notes = self.scale_current.notes.clone();
+        Instrument::show_notes(&mut self.instrument, &self.display_notes);
         println!(
             "Scale changed to {} {} definition: {}",
             self.scale_current, self.scale_current.name, self.scale_current.definition

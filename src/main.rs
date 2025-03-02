@@ -2303,6 +2303,11 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
+        let (key, input) = RunTime::split_input(input);
+        match key.as_str() {
+            "" => (),
+            _ => self.key = NoteName::from_string(key),
+        };
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
         self.display_notes = self.chord_current.notes.clone();
@@ -2319,6 +2324,11 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
+        let (key, input) = RunTime::split_input(input);
+        match key.as_str() {
+            "" => (),
+            _ => self.key = NoteName::from_string(key),
+        };
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
         self.display_notes = self.scale_current.notes.clone();
@@ -2342,5 +2352,22 @@ impl RunTime {
     async fn display_instrument(&mut self) {
         println!("\nInstrument Details:");
         Instrument::show_all(&mut self.instrument);
+    }
+    fn split_input(input: String) -> (String, String) {
+        let input_uppercase = input.to_uppercase();
+        let Some((first, rest)) = input_uppercase.split_once(' ') else {
+            return ("".to_string(), input_uppercase);
+        };
+        match first.chars().next() {
+            Some('A') => (),
+            Some('B') => (),
+            Some('C') => (),
+            Some('D') => (),
+            Some('E') => (),
+            Some('F') => (),
+            Some('G') => (),
+            _ => return ("".to_string(), first.to_owned() + " " + rest),
+        };
+        return (first.to_string(), rest.to_string());
     }
 }

@@ -36,7 +36,7 @@ struct Instrument {
     string_count: usize,
     fret_count: usize,
     tuning: Vec<NotePitch>,
-    fretboard: Vec<Vec<NotePitch>>,
+    fretboard: Vec<Vec<NoteDisplay>>,
 }
 
 impl Display for Instrument {
@@ -49,7 +49,7 @@ impl Display for Instrument {
         for i in (0..self.string_count).rev() {
             write!(f, "{} ", (self.string_count - i).color(white_rgb))?;
             for j in 0..self.fret_count {
-                match &self.fretboard[i][j].note_name.accidental {
+                match &self.fretboard[i][j].note_pitch.note_name.accidental {
                     None => write!(f, "{}  ", self.fretboard[i][j])?,
                     Some(_accidental) => write!(f, "{} ", self.fretboard[i][j])?,
                 };
@@ -92,11 +92,11 @@ impl Instrument {
     }
 
     fn calculate_notes(self: &mut Self) {
-        let mut notes: Vec<Vec<NotePitch>> = Vec::new();
+        let mut notes: Vec<Vec<NoteDisplay>> = Vec::new();
         for i in 0..self.string_count {
-            let mut musical_string: Vec<NotePitch> = Vec::new();
+            let mut musical_string: Vec<NoteDisplay> = Vec::new();
             for j in 0..self.fret_count {
-                musical_string.push(NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()));
+                musical_string.push(NoteDisplay{note_pitch:NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()), is_displayed: true});
             }
             notes.push(musical_string.clone());
         }
@@ -164,6 +164,22 @@ impl NoteDisplay {
 
 }
 */
+
+impl Display for NoteDisplay {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self.is_displayed {
+            true => {
+                let rgb = NoteName::to_rgb(&self.note_pitch.note_name);
+                write!(f, "{}", self.note_pitch.get_name().color(rgb))?;
+                Ok(())
+            }
+            false => {
+                write!(f, "  ")?;
+                Ok(())
+            }
+        }
+    }
+}
 
 #[derive(PartialEq, Clone, Debug)]
 struct NotePitch {
@@ -2135,7 +2151,7 @@ impl<T> EarTraining<T> {
         let mut possible_notes: Vec<NotePitch> = Vec::new();
         for string in &instrument.fretboard {
             for note in string {
-                possible_notes.push(note.clone());
+                possible_notes.push(note.note_pitch.clone());
             }
         }
         EarTraining {
@@ -2145,7 +2161,6 @@ impl<T> EarTraining<T> {
     }
 }
 
-
 struct RunTime {
     instrument: Instrument,
     key: NoteName,
@@ -2153,7 +2168,6 @@ struct RunTime {
     chord_current: Chord,
     audio_engine: AudioEngine,
 }
-
 
 impl RunTime {
     fn new() -> Self {
@@ -2166,7 +2180,10 @@ impl RunTime {
         );
         let key: NoteName = NoteName::new(&NaturalNote::C, &None);
         let scale_current: Scale = Scale::new(&key, &ScaleDef::new_major());
-        let chord_current: Chord = Chord::new(&NoteName::new(&NaturalNote::C, &None), &ChordDef::new_minor_seven());
+        let chord_current: Chord = Chord::new(
+            &NoteName::new(&NaturalNote::C, &None),
+            &ChordDef::new_minor_seven(),
+        );
         let audio_engine: AudioEngine = AudioEngine::new();
         RunTime {
             instrument,
@@ -2174,11 +2191,10 @@ impl RunTime {
             scale_current,
             chord_current,
             audio_engine,
-
         }
     }
 
-     pub async fn start(&mut self) {
+    pub async fn start(&mut self) {
         loop {
             println!("\nMenu:");
             println!("1 - Choose Key");
@@ -2190,7 +2206,9 @@ impl RunTime {
             println!("Enter your choice:");
 
             let mut input = String::new();
-            io::stdin().read_line(&mut input).expect("Failed to read input");
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read input");
 
             match input.trim() {
                 "1" => self.choose_key().await,
@@ -2210,34 +2228,42 @@ impl RunTime {
     async fn choose_key(&mut self) {
         println!("Enter a new key (e.g., C, D#, F#):");
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
         let key = NoteName::from_string(input.trim().to_string());
         self.key = key;
-        println!("Key changed to {:?}", self.key);
+        println!("Key changed to {}", self.key);
     }
 
     async fn choose_chord(&mut self) {
         println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
-        println!("Chord changed to {:?}", self.chord_current);
+        println!("Chord changed to {}", self.chord_current);
     }
 
     async fn choose_scale(&mut self) {
         println!("Enter a scale (e.g., Major, Minor, Dorian):");
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
-        println!("Scale changed to {:?}", self.scale_current);
+        println!("Scale changed to {}", self.scale_current);
     }
 
     async fn change_tuning(&mut self) {
         println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
         let mut input = String::new();
-        io::stdin().read_line(&mut input).expect("Failed to read input");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
         let tuning = TuningType::from_string(input.trim().to_string());
         println!("Tuning changed to {:?}", tuning);
     }

@@ -47,13 +47,34 @@ impl Display for Instrument {
             1: 255,
             2: 255,
         };
+        let marked_frets: Vec<usize> = vec![0, 1, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+        let mut marked = false;
         for i in (0..self.string_count).rev() {
             write!(f, "{} ", (self.string_count - i).color(white_rgb))?;
             for j in 0..self.fret_count {
-                match &self.fretboard[i][j].note_pitch.note_name.accidental {
-                    None => write!(f, "{}  ", self.fretboard[i][j])?,
-                    Some(_accidental) => write!(f, "{} ", self.fretboard[i][j])?,
-                };
+                marked = false;
+                for mark in &marked_frets {
+                    if j == *mark {
+                        marked = true;
+                    }
+                }
+                match marked {
+                    false => {
+                        match &self.fretboard[i][j].note_pitch.note_name.accidental {
+                            None => write!(f, "{} ", self.fretboard[i][j])?,
+                            Some(_accidental) => write!(f, "{}", self.fretboard[i][j])?,
+                        };
+                    }
+                    true => {
+                        match &self.fretboard[i][j].note_pitch.note_name.accidental {
+                            None => write!(f, "\x1b[4m{} \x1b[0m", self.fretboard[i][j])?,
+                            Some(_accidental) => {
+                                write!(f, "\x1b[4m{}\x1b[0m", self.fretboard[i][j])?
+                            }
+                        };
+                    }
+                }
+                write!(f, " ")?;
             }
             write!(f, "\n")?;
         }
@@ -173,7 +194,9 @@ impl Instrument {
         for note in notes {
             for i in 0..self.string_count {
                 for j in 0..self.fret_count {
-                    if NoteName::to_number(&note) == NoteName::to_number(&self.fretboard[i][j].note_pitch.note_name) {
+                    if NoteName::to_number(&note)
+                        == NoteName::to_number(&self.fretboard[i][j].note_pitch.note_name)
+                    {
                         self.fretboard[i][j].is_displayed = true;
                     }
                 }
@@ -204,10 +227,10 @@ impl Display for NoteDisplay {
             }
             false => {
                 match &self.note_pitch.note_name.accidental {
-                    Some(_accidental) =>write!(f, "   ")?,
-                    None =>write!(f, "  ")?,
+                    Some(_accidental) => write!(f, "   ")?,
+                    None => write!(f, "  ")?,
                 }
-                
+
                 Ok(())
             }
         }
@@ -223,8 +246,10 @@ struct NotePitch {
 impl Display for NotePitch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let rgb = NoteName::to_rgb(&self.note_name);
-        write!(f, "{}", self.get_name().color(rgb))?;
-        Ok(())
+        match &self.note_name.accidental {
+            Some(_accidental) => write!(f, "{}", self.get_name().color(rgb)),
+            None => write!(f, "\u{2002}{}", self.get_name().color(rgb)),
+        }
     }
 }
 
@@ -2229,7 +2254,7 @@ impl RunTime {
 
     pub async fn start(&mut self) {
         loop {
-            println!("{}",self.instrument);
+            println!("{}", self.instrument);
             println!("\nMenu:");
             println!("1 - Choose Key");
             println!("2 - Choose Chord");
@@ -2279,8 +2304,10 @@ impl RunTime {
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
         Instrument::show_notes(&mut self.instrument, &self.chord_current.notes);
-        println!("Chord changed to {}", self.chord_current);
-        println!("{} definition: {}", self.chord_current.name, self.chord_current.definition)
+        println!(
+            "Chord changed to {} {} definition: {}",
+            self.chord_current, self.chord_current.name, self.chord_current.definition
+        );
     }
 
     async fn choose_scale(&mut self) {
@@ -2292,8 +2319,10 @@ impl RunTime {
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
         Instrument::show_notes(&mut self.instrument, &self.scale_current.notes);
-        println!("Scale changed to {}", self.scale_current);
-        println!("{} definition: {}", self.scale_current.name, self.scale_current.definition)
+        println!(
+            "Scale changed to {} {} definition: {}",
+            self.scale_current, self.scale_current.name, self.scale_current.definition
+        );
     }
 
     async fn change_tuning(&mut self) {

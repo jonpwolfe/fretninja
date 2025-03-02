@@ -2358,6 +2358,9 @@ impl RunTime {
         let Some((first, rest)) = input_uppercase.split_once(' ') else {
             return ("".to_string(), input_uppercase);
         };
+        if first.len() != 1 || first.len() != 2 {
+            return ("".to_string(), first.to_owned() + " " + rest);
+        }
         match first.chars().next() {
             Some('A') => (),
             Some('B') => (),

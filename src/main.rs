@@ -154,6 +154,31 @@ impl Instrument {
             _ => todo!(),
         }
     }
+
+    fn show_all(self: &mut Self) {
+        for i in 0..self.string_count {
+            for j in 0..self.fret_count {
+                self.fretboard[i][j].is_displayed = true;
+            }
+        }
+    }
+
+    fn show_notes(self: &mut Self, notes: &Vec<NoteName>) {
+        for i in 0..self.string_count {
+            for j in 0..self.fret_count {
+                self.fretboard[i][j].is_displayed = false;
+            }
+        }
+        for note in notes {
+            for i in 0..self.string_count {
+                for j in 0..self.fret_count {
+                    if NoteName::to_number(&note) == NoteName::to_number(&self.fretboard[i][j].note_pitch.note_name) {
+                        self.fretboard[i][j].is_displayed = true;
+                    }
+                }
+            }
+        }
+    }
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -2248,6 +2273,8 @@ impl RunTime {
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
         println!("Chord changed to {}", self.chord_current);
+        Instrument::show_notes(&mut self.instrument, &self.chord_current.notes);
+        println!("{}", self.instrument);
     }
 
     async fn choose_scale(&mut self) {
@@ -2259,6 +2286,8 @@ impl RunTime {
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
         println!("Scale changed to {}", self.scale_current);
+        Instrument::show_notes(&mut self.instrument, &self.scale_current.notes);
+        println!("{}", self.instrument);
     }
 
     async fn change_tuning(&mut self) {
@@ -2271,8 +2300,9 @@ impl RunTime {
         println!("Tuning changed to {:?}", tuning);
     }
 
-    async fn display_instrument(&self) {
+    async fn display_instrument(&mut self) {
         println!("\nInstrument Details:");
+        Instrument::show_all(&mut self.instrument);
         println!("{}", self.instrument);
     }
 }

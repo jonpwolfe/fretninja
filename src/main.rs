@@ -27,6 +27,7 @@ async fn main() {
     print!("{}", chord);
     // let audio_engine = AudioEngine::new();
     //  audio_engine.play_audio(vec![440.0], 2.0).await;
+    RunTime::start(&mut RunTime::new()).await;
 }
 
 struct Instrument {
@@ -202,7 +203,11 @@ impl Display for NoteDisplay {
                 Ok(())
             }
             false => {
-                write!(f, "  ")?;
+                match &self.note_pitch.note_name.accidental {
+                    Some(_accidental) =>write!(f, "   ")?,
+                    None =>write!(f, "  ")?,
+                }
+                
                 Ok(())
             }
         }
@@ -2224,6 +2229,7 @@ impl RunTime {
 
     pub async fn start(&mut self) {
         loop {
+            println!("{}",self.instrument);
             println!("\nMenu:");
             println!("1 - Choose Key");
             println!("2 - Choose Chord");
@@ -2272,9 +2278,9 @@ impl RunTime {
             .expect("Failed to read input");
         let chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
-        println!("Chord changed to {}", self.chord_current);
         Instrument::show_notes(&mut self.instrument, &self.chord_current.notes);
-        println!("{}", self.instrument);
+        println!("Chord changed to {}", self.chord_current);
+        println!("{} definition: {}", self.chord_current.name, self.chord_current.definition)
     }
 
     async fn choose_scale(&mut self) {
@@ -2285,9 +2291,9 @@ impl RunTime {
             .expect("Failed to read input");
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
-        println!("Scale changed to {}", self.scale_current);
         Instrument::show_notes(&mut self.instrument, &self.scale_current.notes);
-        println!("{}", self.instrument);
+        println!("Scale changed to {}", self.scale_current);
+        println!("{} definition: {}", self.scale_current.name, self.scale_current.definition)
     }
 
     async fn change_tuning(&mut self) {
@@ -2303,6 +2309,5 @@ impl RunTime {
     async fn display_instrument(&mut self) {
         println!("\nInstrument Details:");
         Instrument::show_all(&mut self.instrument);
-        println!("{}", self.instrument);
     }
 }

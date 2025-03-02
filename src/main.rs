@@ -47,7 +47,7 @@ impl Display for Instrument {
             1: 255,
             2: 255,
         };
-        let marked_frets: Vec<usize> = vec![0, 1, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
+        let marked_frets: Vec<usize> = vec![1, 3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
         let mut marked = false;
         for i in (0..self.string_count).rev() {
             write!(f, "{} ", (self.string_count - i).color(white_rgb))?;

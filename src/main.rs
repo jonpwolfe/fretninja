@@ -96,7 +96,10 @@ impl Instrument {
         for i in 0..self.string_count {
             let mut musical_string: Vec<NoteDisplay> = Vec::new();
             for j in 0..self.fret_count {
-                musical_string.push(NoteDisplay{note_pitch:NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()), is_displayed: true});
+                musical_string.push(NoteDisplay {
+                    note_pitch: NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()),
+                    is_displayed: true,
+                });
             }
             notes.push(musical_string.clone());
         }

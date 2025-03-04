@@ -8,7 +8,7 @@ async fn main() {
     let instrument = Instrument::new(
         &InstrumentType::Guitar,
         &TuningType::Standard,
-        &NotePitch::new(&NaturalNote::C, &None, 4),
+        &NotePitch::new(&NaturalNote::C, &None, 2),
         6,
         24,
     );
@@ -2230,10 +2230,10 @@ struct RunTime {
 
 impl RunTime {
     fn new() -> Self {
-        let instrument = Instrument::new(
+        let instrument: Instrument = Instrument::new(
             &InstrumentType::Guitar,
             &TuningType::Standard,
-            &NotePitch::new(&NaturalNote::C, &None, 4),
+            &NotePitch::new(&NaturalNote::C, &None, 2),
             6,
             24,
         );
@@ -2266,7 +2266,7 @@ impl RunTime {
             println!("0 - Exit");
             println!("Enter your choice:");
 
-            let mut input = String::new();
+            let mut input: String = String::new();
             io::stdin()
                 .read_line(&mut input)
                 .expect("Failed to read input");
@@ -2288,27 +2288,27 @@ impl RunTime {
 
     async fn choose_key(&mut self) {
         println!("Enter a new key (e.g., C, D#, F#):");
-        let mut input = String::new();
+        let mut input: String = String::new();
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let key = NoteName::from_string(input.trim().to_string());
+        let key: NoteName = NoteName::from_string(input.trim().to_string());
         self.key = key;
         println!("Key changed to {}", self.key);
     }
 
     async fn choose_chord(&mut self) {
         println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
-        let mut input = String::new();
+        let mut input: String = String::new();
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let (key, input) = RunTime::split_input(input);
-        match key.as_str() {
+        let (key_string, input) = RunTime::split_input(input);
+        match key_string.as_str() {
             "" => (),
-            _ => self.key = NoteName::from_string(key),
+            _ => self.key = NoteName::from_string(key_string),
         };
-        let chord = Chord::from_string(&self.key, input.trim().to_string());
+        let chord: Chord = Chord::from_string(&self.key, input.trim().to_string());
         self.chord_current = chord;
         self.display_notes = self.chord_current.notes.clone();
         Instrument::show_notes(&mut self.instrument, &self.display_notes);
@@ -2320,14 +2320,14 @@ impl RunTime {
 
     async fn choose_scale(&mut self) {
         println!("Enter a scale (e.g., Major, Minor, Dorian):");
-        let mut input = String::new();
+        let mut input: String = String::new();
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let (key, input) = RunTime::split_input(input);
-        match key.as_str() {
+        let (key_string, input) = RunTime::split_input(input);
+        match key_string.as_str() {
             "" => (),
-            _ => self.key = NoteName::from_string(key),
+            _ => self.key = NoteName::from_string(key_string),
         };
         let scale = Scale::from_string(&self.key, input.trim().to_string());
         self.scale_current = scale;
@@ -2341,11 +2341,11 @@ impl RunTime {
 
     async fn change_tuning(&mut self) {
         println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
-        let mut input = String::new();
+        let mut input: String = String::new();
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let tuning = TuningType::from_string(input.trim().to_string());
+        let tuning: TuningType = TuningType::from_string(input.trim().to_string());
         println!("Tuning changed to {:?}", tuning);
     }
 
@@ -2354,7 +2354,7 @@ impl RunTime {
         Instrument::show_all(&mut self.instrument);
     }
     fn split_input(input: String) -> (String, String) {
-        let input_uppercase = input.to_uppercase();
+        let input_uppercase: String = input.to_uppercase();
         let Some((first, rest)) = input_uppercase.split_once(' ') else {
             return ("".to_string(), input_uppercase);
         };

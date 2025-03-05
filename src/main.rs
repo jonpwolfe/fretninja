@@ -1240,12 +1240,22 @@ impl Scale {
             "BLUES" => Scale::new(&key, &ScaleDef::new_blues()),
             _ => {
                 println!("Enter a scale (e.g., Major, Minor, Dorian):");
-                let mut reinput = String::new();
+                let mut input: String = String::new();
                 io::stdin()
-                    .read_line(&mut reinput)
+                    .read_line(&mut input)
                     .expect("Failed to read input");
-                let scale = Scale::from_string(&key, reinput.trim().to_string());
-                return scale;
+                let (key_string, input) = RunTime::split_input(input);
+                match key_string.as_str() {
+                    "" => {
+                        let scale = Scale::from_string(&key, input.trim().to_string());
+                        return scale;
+                    }
+                    _ => {
+                        let key = NoteName::from_string(key_string);
+                        let scale = Scale::from_string(&key, input.trim().to_string());
+                        return scale;
+                    }
+                }
             }
         }
     }
@@ -2303,12 +2313,13 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let (key_string, input) = RunTime::split_input(input);
+        input = input.to_uppercase();
+        let (key_string, input_mod) = RunTime::split_input(input);
         match key_string.as_str() {
             "" => (),
             _ => self.key = NoteName::from_string(key_string),
         };
-        let chord: Chord = Chord::from_string(&self.key, input.trim().to_string());
+        let chord: Chord = Chord::from_string(&self.key, input_mod.trim().to_string());
         self.chord_current = chord;
         self.display_notes = self.chord_current.notes.clone();
         Instrument::show_notes(&mut self.instrument, &self.display_notes);
@@ -2324,12 +2335,13 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let (key_string, input) = RunTime::split_input(input);
+        input = input.to_uppercase();
+        let (key_string, input_mod) = RunTime::split_input(input);
         match key_string.as_str() {
             "" => (),
             _ => self.key = NoteName::from_string(key_string),
         };
-        let scale = Scale::from_string(&self.key, input.trim().to_string());
+        let scale = Scale::from_string(&self.key, input_mod.trim().to_string());
         self.scale_current = scale;
         self.display_notes = self.scale_current.notes.clone();
         Instrument::show_notes(&mut self.instrument, &self.display_notes);
@@ -2354,13 +2366,12 @@ impl RunTime {
         Instrument::show_all(&mut self.instrument);
     }
     fn split_input(input: String) -> (String, String) {
-        let input_uppercase: String = input.to_uppercase();
-        let Some((first, rest)) = input_uppercase.split_once(' ') else {
-            return ("".to_string(), input_uppercase);
+        let Some((first, rest)) = input.split_once(' ') else {
+            return ("".to_string(), input);
         };
-        if first.len() != 1 || first.len() != 2 {
-            return ("".to_string(), first.to_owned() + " " + rest);
-        }
+       /* if first.len() != 1 || first.len() != 2 {
+            return ("".to_string(), input);
+        }*/
         match first.chars().next() {
             Some('A') => (),
             Some('B') => (),
@@ -2369,7 +2380,7 @@ impl RunTime {
             Some('E') => (),
             Some('F') => (),
             Some('G') => (),
-            _ => return ("".to_string(), first.to_owned() + " " + rest),
+            _ => return ("".to_string(), input),
         };
         return (first.to_string(), rest.to_string());
     }

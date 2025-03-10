@@ -30,6 +30,7 @@ async fn main() {
     RunTime::start(&mut RunTime::new()).await;
 }
 
+#[derive(Clone)]
 struct Instrument {
     instrument_type: InstrumentType,
     tuning_type: TuningType,
@@ -2229,48 +2230,66 @@ impl<T> EarTraining<T> {
     }
 }
 
-struct RunTime {
+struct DisplayGroup {
     instrument: Instrument,
     key: NoteName,
-    scale_current: Scale,
-    chord_current: Chord,
+    notes: Vec<NoteName>,
+    chord: Option<Chord>,
+    scale: Option<Scale>,
+}
+
+impl DisplayGroup {
+    fn new() -> Self {
+        let instrument = Instrument::new(
+            &InstrumentType::Guitar, 
+            &TuningType::Standard, 
+            &NotePitch::new(&NaturalNote::C, &None, 2),
+            6,
+            24,
+            );
+        let key = NoteName::new(&NaturalNote::C, &None);
+        let notes: Vec<NoteName> = Vec::new();
+        DisplayGroup {
+            instrument,
+            key,
+            notes,
+            chord: None,
+            scale: None,
+        }
+    }
+}
+
+struct RunTime {
+    displays: Vec<DisplayGroup>,
+    display: DisplayGroup,
     audio_engine: AudioEngine,
-    display_notes: Vec<NoteName>,
 }
 
 impl RunTime {
     fn new() -> Self {
-        let instrument: Instrument = Instrument::new(
-            &InstrumentType::Guitar,
-            &TuningType::Standard,
-            &NotePitch::new(&NaturalNote::C, &None, 2),
-            6,
-            24,
-        );
-        let key: NoteName = NoteName::new(&NaturalNote::C, &None);
-        let scale_current: Scale = Scale::new(&key, &ScaleDef::new_major());
-        let chord_current: Chord = Chord::new(
-            &NoteName::new(&NaturalNote::C, &None),
-            &ChordDef::new_minor_seven(),
-        );
+        let mut displays: Vec<DisplayGroup> = Vec::new();
+        for i in 0..=3 {
+            let display = DisplayGroup::new();
+            displays.push(display);
+        }
+        let display = DisplayGroup::new();
         let audio_engine: AudioEngine = AudioEngine::new();
         RunTime {
-            instrument,
-            key,
-            scale_current,
-            chord_current,
+            displays,
+            display,
             audio_engine,
-            display_notes: Vec::new(),
+            
         }
     }
 
     pub async fn start(&mut self) {
         loop {
-            println!("{}", self.instrument);
+            println!("{}", self.display.instrument);
             println!("\nMenu:");
-            println!("1 - Choose Key");
-            println!("2 - Choose Chord");
-            println!("3 - Choose Scale");
+            println!("1 - Fret Ninja");
+            println!("2 - Choose Key");
+            println!("3 - Choose Chord");
+            println!("4 - Choose Scale");
             println!("8 - Display Full Instrument");
             println!("9 - Change Instrument Tuning");
             println!("0 - Exit");
@@ -2282,9 +2301,10 @@ impl RunTime {
                 .expect("Failed to read input");
 
             match input.trim() {
-                "1" => self.choose_key().await,
-                "2" => self.choose_chord().await,
-                "3" => self.choose_scale().await,
+                "1" => self.fret_ninja().await,
+                "2" => self.choose_key().await,
+                "3" => self.choose_chord().await,
+                "4" => self.choose_scale().await,
                 "8" => self.display_instrument().await,
                 "9" => self.change_tuning().await,
                 "0" => {
@@ -2296,6 +2316,36 @@ impl RunTime {
         }
     }
 
+    async fn fret_ninja(&mut self) {
+        println!("Choose Chord progession seperated by commas");
+        let mut input: String = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+        let mut chords = Vec::new();
+        let input_splits = RunTime::split_input_advanced(input);
+        let mut key_current = NoteName::new(&NaturalNote::C, &None);
+        for input_split in input_splits{
+            let (key_string, input_mod) = RunTime::split_input(input_split);
+            match key_string.as_str() {
+                "" => (),
+                _ => key_current = NoteName::from_string(key_string),
+            };
+            let chord: Chord = Chord::from_string(&key_current, input_mod.trim().to_string());
+            chords.push(chord);
+        }
+        for (index, chord) in chords.iter().enumerate() {
+            Instrument::show_notes(&mut self.displays[index].instrument, &chord.notes);
+        }
+        for display in &self.displays {
+            println!("{}", display.instrument);
+        }
+    }
+
+    fn scale_discovery(&mut self) {
+
+    }
+
     async fn choose_key(&mut self) {
         println!("Enter a new key (e.g., C, D#, F#):");
         let mut input: String = String::new();
@@ -2303,8 +2353,8 @@ impl RunTime {
             .read_line(&mut input)
             .expect("Failed to read input");
         let key: NoteName = NoteName::from_string(input.trim().to_string());
-        self.key = key;
-        println!("Key changed to {}", self.key);
+        self.display.key = key;
+        println!("Key changed to {}", self.display.key);
     }
 
     async fn choose_chord(&mut self) {
@@ -2317,15 +2367,15 @@ impl RunTime {
         let (key_string, input_mod) = RunTime::split_input(input);
         match key_string.as_str() {
             "" => (),
-            _ => self.key = NoteName::from_string(key_string),
+            _ => self.display.key = NoteName::from_string(key_string),
         };
-        let chord: Chord = Chord::from_string(&self.key, input_mod.trim().to_string());
-        self.chord_current = chord;
-        self.display_notes = self.chord_current.notes.clone();
-        Instrument::show_notes(&mut self.instrument, &self.display_notes);
+        let chord: Chord = Chord::from_string(&self.display.key, input_mod.trim().to_string());
+        self.display.chord = Some(chord.clone());
+        self.display.notes = chord.notes.clone();
+        Instrument::show_notes(&mut self.display.instrument, &self.display.notes);
         println!(
             "Chord changed to {} {} definition: {}",
-            self.chord_current, self.chord_current.name, self.chord_current.definition
+            chord, chord.name, chord.definition
         );
     }
 
@@ -2339,15 +2389,15 @@ impl RunTime {
         let (key_string, input_mod) = RunTime::split_input(input);
         match key_string.as_str() {
             "" => (),
-            _ => self.key = NoteName::from_string(key_string),
+            _ => self.display.key = NoteName::from_string(key_string),
         };
-        let scale = Scale::from_string(&self.key, input_mod.trim().to_string());
-        self.scale_current = scale;
-        self.display_notes = self.scale_current.notes.clone();
-        Instrument::show_notes(&mut self.instrument, &self.display_notes);
+        let scale = Scale::from_string(&self.display.key, input_mod.trim().to_string());
+        self.display.scale = Some(scale.clone());
+        self.display.notes = scale.notes.clone();
+        Instrument::show_notes(&mut self.display.instrument, &self.display.notes);
         println!(
             "Scale changed to {} {} definition: {}",
-            self.scale_current, self.scale_current.name, self.scale_current.definition
+            scale, scale.name, scale.definition
         );
     }
 
@@ -2363,8 +2413,8 @@ impl RunTime {
 
     async fn display_instrument(&mut self) {
         println!("\nInstrument Details:");
-        Instrument::show_all(&mut self.instrument);
-    }
+        Instrument::show_all(&mut self.display.instrument)
+;    }
     fn split_input(input: String) -> (String, String) {
         let Some((first, rest)) = input.split_once(' ') else {
             return ("".to_string(), input);
@@ -2383,5 +2433,25 @@ impl RunTime {
             _ => return ("".to_string(), input),
         };
         return (first.to_string(), rest.to_string());
+    }
+    fn split_input_advanced(input: String) -> Vec<String> {
+        let words_str: Vec<&str> = input.split(',').collect();
+        let mut words: Vec<String> = Vec::new();
+        for word in words_str {
+            words.push(word.trim().to_string())
+        }
+        /*let mut result = Vec::new();
+        let mut i = 0;
+    
+        while i < words.len() {
+            if i + 1 < words.len() {
+                result.push(format!("{} {}", words[i], words[i + 1]));
+                i += 2; // Skip the next space
+            } else {
+                result.push(words[i].to_string());
+                break;
+            }
+        }*/
+        return words;
     }
 }

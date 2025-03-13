@@ -1217,6 +1217,32 @@ impl Scale {
             notes,
         }
     }
+
+    fn from_number(key: &NoteName, input: i8) -> Self {
+        match input {
+            0 => Scale::new(&key, &ScaleDef::new_major()),
+            1 => Scale::new(&key, &ScaleDef::new_ionian()),
+            2 => Scale::new(&key, &ScaleDef::new_dorian()),
+            3 => Scale::new(&key, &ScaleDef::new_phrygian()),
+            4 => Scale::new(&key, &ScaleDef::new_lydian()),
+            5 => Scale::new(&key, &ScaleDef::new_mixolydian()),
+            6 => Scale::new(&key, &ScaleDef::new_aeolian()),
+            7 => Scale::new(&key, &ScaleDef::new_locrian()),
+            8 => Scale::new(&key, &ScaleDef::new_natural_minor()),
+            9 => Scale::new(&key, &ScaleDef::new_harmonic_minor()),
+            10 => Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()),
+            11 => {
+                Scale::new(&key, &ScaleDef::new_melodic_minor_descending())
+            },
+            12 => Scale::new(&key, &ScaleDef::new_chromatic()),
+            13 => Scale::new(&key, &ScaleDef::new_whole_tone()),
+            14 => Scale::new(&key, &ScaleDef::new_major_pentatonic()),
+            15 => Scale::new(&key, &ScaleDef::new_minor_pentatonic()),
+            16 => Scale::new(&key, &ScaleDef::new_blues()),
+            _ => panic!("unexpected"),
+        }
+    }
+
     fn from_string(key: &NoteName, input: String) -> Self {
         let input: String = input.to_uppercase();
         match input.as_str() {
@@ -2290,6 +2316,7 @@ impl RunTime {
             println!("2 - Choose Key");
             println!("3 - Choose Chord");
             println!("4 - Choose Scale");
+            println!("5 - Find Scale");
             println!("8 - Display Full Instrument");
             println!("9 - Change Instrument Tuning");
             println!("0 - Exit");
@@ -2305,6 +2332,7 @@ impl RunTime {
                 "2" => self.choose_key().await,
                 "3" => self.choose_chord().await,
                 "4" => self.choose_scale().await,
+                "5" => self.scale_discovery().await,
                 "8" => self.display_instrument().await,
                 "9" => self.change_tuning().await,
                 "0" => {
@@ -2336,14 +2364,46 @@ impl RunTime {
         }
         for (index, chord) in chords.iter().enumerate() {
             Instrument::show_notes(&mut self.displays[index].instrument, &chord.notes);
+            self.displays[index].chord = Some(chord.clone());
         }
         for display in &self.displays {
+            println!("{}", display.chord.clone().unwrap());
             println!("{}", display.instrument);
         }
     }
 
-    fn scale_discovery(&mut self) {
-
+    async fn scale_discovery(&mut self) {
+        let mut results: Vec<Scale> = Vec::new();
+        for i in 0..=11 {
+            let key = NoteName::from_number(i);
+            for j in 0..=16 {
+                let scale = Scale::from_number(&key, j);
+                let mut works = true;
+                let mut contains:Vec<bool> = Vec::new();
+                for note in &self.display.notes{
+                    contains.push(false);
+                }
+                for (k, note) in self.display.notes.iter().enumerate() {
+                    for scale_note in &scale.notes{
+                        if note == scale_note {
+                            contains[k] = true;
+                        }
+                    }
+                }
+                for value in contains {
+                    if value == false{
+                            works = false;
+                    }
+                }
+                if works == true {
+                    results.push(scale.clone());
+                }
+            }
+        }
+        for result in results{
+            println!("{}", result);
+        }
+        
     }
 
     async fn choose_key(&mut self) {

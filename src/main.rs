@@ -2371,6 +2371,7 @@ impl RunTime {
     pub async fn start(&mut self) {
         loop {
             self.show_notes_displayed().await;
+            println!();
             println!("{}", self.display.instrument);
             println!("\nMenu:");
             println!("1 - Fret Ninja");

@@ -466,7 +466,7 @@ impl NotePitch {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 struct NoteName {
     natural_note: NaturalNote,
     accidental: Option<Accidental>,
@@ -477,6 +477,18 @@ impl Display for NoteName {
         let rgb = NoteName::to_rgb(self); // Assuming this function returns an 1	 struct
         write!(f, "{}", self.get_name().color(rgb))?;
         Ok(())
+    }
+}
+
+impl Ord for NoteName {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        NoteName::to_number(&self).cmp(&NoteName::to_number(&other)) // Compare by age
+    }
+}
+
+impl PartialOrd for NoteName {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -805,7 +817,7 @@ impl NoteName {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 enum NaturalNote {
     A,
     B,
@@ -814,6 +826,33 @@ enum NaturalNote {
     E,
     F,
     G,
+}
+
+impl Ord for NaturalNote {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        NaturalNote::to_number(&self).cmp(&NaturalNote::to_number(&other)) // Compare by age
+    }
+}
+
+
+impl PartialOrd for NaturalNote {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl NaturalNote {
+    fn to_number(&self) -> i8 {
+        match self {
+            NaturalNote::A => 6,
+            NaturalNote::B => 7, 
+            NaturalNote::C => 1,
+            NaturalNote::D => 2,
+            NaturalNote::E => 3,
+            NaturalNote::F => 4,
+            NaturalNote::G => 5,
+        }
+    }
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -1310,10 +1349,22 @@ impl Display for Scale {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 enum Accidental {
     Sharp,
     Flat,
+}
+
+impl Ord for Accidental {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        Accidental::to_number(&self).cmp(&Accidental::to_number(&other)) // Compare by age
+    }
+}
+
+impl PartialOrd for Accidental {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Display for Accidental {
@@ -1323,6 +1374,15 @@ impl Display for Accidental {
             Accidental::Flat => write!(f, "♭")?,
         }
         Ok(())
+    }
+}
+
+impl Accidental {
+    fn to_number(&self) -> i8 {
+        match self {
+            Accidental::Sharp => 1,
+            Accidental::Flat => -1,
+        }
     }
 }
 
@@ -2310,6 +2370,7 @@ impl RunTime {
 
     pub async fn start(&mut self) {
         loop {
+            self.show_notes_displayed().await;
             println!("{}", self.display.instrument);
             println!("\nMenu:");
             println!("1 - Fret Ninja");
@@ -2317,6 +2378,8 @@ impl RunTime {
             println!("3 - Choose Chord");
             println!("4 - Choose Scale");
             println!("5 - Find Scale");
+            println!("6 - Add Note(s)");
+            println!("7 - Remove Note(s)");
             println!("8 - Display Full Instrument");
             println!("9 - Change Instrument Tuning");
             println!("0 - Exit");
@@ -2333,6 +2396,8 @@ impl RunTime {
                 "3" => self.choose_chord().await,
                 "4" => self.choose_scale().await,
                 "5" => self.scale_discovery().await,
+                "6" => self.add_notes().await,
+                "7" => self.remove_notes().await,
                 "8" => self.display_instrument().await,
                 "9" => self.change_tuning().await,
                 "0" => {
@@ -2342,6 +2407,49 @@ impl RunTime {
                 _ => println!("Invalid choice, please try again."),
             }
         }
+    }
+
+    async fn remove_notes(&mut self) {
+        println!("Enter Notes you wish to remove seperated by commas");
+        let mut input: String = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+        let note_strs: Vec<&str> = input.split(',').collect();
+        for note_str in note_strs {
+            if let Some(index) = self.display.notes.iter().position(|x| x == &NoteName::from_string(note_str.trim().to_string())) {
+                self.display.notes.remove(index);
+            } 
+        }
+        self.display.instrument.show_notes(&self.display.notes);
+    }
+
+    async fn show_notes_displayed(&mut self) {
+        print!("The notes you have selected are: ");
+        for note in &self.display.notes {
+            print!("{} ", note);
+        }
+        print!("\n");
+    }
+
+
+    async fn add_notes(&mut self) {
+        println!("Enter Notes you wish to add seperated by commas");
+        let mut input: String = String::new();
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read input");
+        let note_strs: Vec<&str> = input.split(',').collect();
+        let mut notes: Vec<NoteName> = Vec::new();
+        for note_str in note_strs {
+
+            notes.push(NoteName::from_string(note_str.trim().to_string()));
+        }
+        for note in &notes {
+            self.display.notes.push(note.clone());
+        }
+        self.display.notes.sort();
+        self.display.instrument.show_notes(&self.display.notes);
     }
 
     async fn fret_ninja(&mut self) {
@@ -2432,6 +2540,7 @@ impl RunTime {
         let chord: Chord = Chord::from_string(&self.display.key, input_mod.trim().to_string());
         self.display.chord = Some(chord.clone());
         self.display.notes = chord.notes.clone();
+        self.display.notes.sort();
         Instrument::show_notes(&mut self.display.instrument, &self.display.notes);
         println!(
             "Chord changed to {} {} definition: {}",
@@ -2454,6 +2563,7 @@ impl RunTime {
         let scale = Scale::from_string(&self.display.key, input_mod.trim().to_string());
         self.display.scale = Some(scale.clone());
         self.display.notes = scale.notes.clone();
+        self.display.notes.sort();
         Instrument::show_notes(&mut self.display.instrument, &self.display.notes);
         println!(
             "Scale changed to {} {} definition: {}",

@@ -37,7 +37,7 @@ impl Display for Instrument {
         let mut marked = false;
         for i in (0..self.string_count).rev() {
             write!(f, "{} ", (self.string_count - i).color(white_rgb))?;
-            for j in 0..self.fret_count {
+            for j in 0..(self.fret_count + 1) {
                 marked = false;
                 for mark in &marked_frets {
                     if j == *mark {
@@ -65,7 +65,7 @@ impl Display for Instrument {
             write!(f, "\n")?;
         }
         write!(f, "  ")?;
-        for i in 0..self.fret_count {
+        for i in 0..(self.fret_count + 1) {
             match i {
                 0..=9 => write!(f, "{}   ", i.color(white_rgb))?,
                 10.. => write!(f, "{}  ", i.color(white_rgb))?,
@@ -90,7 +90,7 @@ impl Instrument {
             tuning_type: tuning_type.clone(),
             root_note: root_note.clone(),
             string_count,
-            fret_count: fret_count + 1,
+            fret_count: fret_count,
             tuning: Vec::new(),
             fretboard: Vec::new(),
         };
@@ -103,7 +103,7 @@ impl Instrument {
         let mut notes: Vec<Vec<NoteDisplay>> = Vec::new();
         for i in 0..self.string_count {
             let mut musical_string: Vec<NoteDisplay> = Vec::new();
-            for j in 0..self.fret_count {
+            for j in 0..(self.fret_count + 1) {
                 musical_string.push(NoteDisplay {
                     note_pitch: NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()),
                     is_displayed: true,
@@ -903,6 +903,19 @@ enum InstrumentType {
     Mandolin,
     Banjo,
     Ukelelle,
+}
+
+impl Display for InstrumentType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            InstrumentType::Guitar => write!(f, "Guitar")?,
+            InstrumentType::Bass => write!(f, "Bass")?,
+            InstrumentType::Mandolin => write!(f, "Mandolin")?,
+            InstrumentType::Banjo => write!(f, "Banjo")?,
+            InstrumentType::Ukelelle => write!(f, "Ukelelle")?,
+        }
+        Ok(())
+    }
 }
 
 #[derive(PartialEq, Clone, Debug)]
@@ -2132,7 +2145,7 @@ impl AudioEngine {
         AudioEngine { device, config }
     }
 
-    pub async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
+    async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
         let device = self.device.clone();
         let config = self.config.clone();
 
@@ -2335,8 +2348,9 @@ impl RunTime {
     }
 
     async fn start(&mut self) {
+        self.show_details().await;
         loop {
-            self.show_notes_displayed().await;
+            self.show_notes_displayed();
             println!();
             println!("{}", self.display.instrument);
             println!("\nMenu:");
@@ -2348,7 +2362,8 @@ impl RunTime {
             println!("6 - Add Note(s)");
             println!("7 - Remove Note(s)");
             println!("8 - Display Full Instrument");
-            println!("9 - Change Instrument Tuning");
+            println!("9 - Show Details");
+            println!("10 - Change Instrument Tuning");
             println!("0 - Exit");
             println!("Enter your choice:");
 
@@ -2365,8 +2380,9 @@ impl RunTime {
                 "5" => self.scale_discovery().await,
                 "6" => self.add_notes().await,
                 "7" => self.remove_notes().await,
-                "8" => self.display_instrument().await,
-                "9" => self.change_tuning().await,
+                "8" => self.display_full_instrument().await,
+                "9" => self.show_details().await,
+                "10" => self.change_tuning().await,
                 "0" => {
                     println!("Exiting...");
                     break;
@@ -2392,16 +2408,24 @@ impl RunTime {
             {
                 self.display.notes.remove(index);
             }
+            else {
+                println!("{} not in notes displayed", NoteName::from_string(note_str.trim().to_string()))
+            }
         }
         self.display.instrument.show_notes(&self.display.notes);
     }
 
-    async fn show_notes_displayed(&mut self) {
-        print!("The notes you have selected are: ");
-        for note in &self.display.notes {
-            print!("{} ", note);
-        }
-        print!("\n");
+    fn show_notes_displayed(&mut self) {
+        match self.display.notes.len() {
+            0 => (),
+            _ => {  print!("The notes you have selected are: ");
+                    for note in &self.display.notes {
+                        print!("{} ", note);
+                    }
+                    print!("\n");
+                }
+        } 
+        
     }
 
     async fn add_notes(&mut self) {
@@ -2578,10 +2602,23 @@ impl RunTime {
         println!("Tuning changed to {} {}", self.display.instrument.root_note.note_name, self.display.instrument.tuning_type);
     }
 
-    async fn display_instrument(&mut self) {
-        println!("\nInstrument Details:");
+    async fn show_details(&mut self) {
+        println!("Instrument Details:");
+        println!("\tType: {}", self.display.instrument.instrument_type);
+        println!("\tNumber of strings: {}", self.display.instrument.string_count);
+        println!("\tNumber of frets: {}", self.display.instrument.fret_count);
+        println!("\tTuning: {} {}", self.display.instrument.root_note.note_name, self.display.instrument.tuning_type);
+        print!("\tOpen Notes: ");
+        for note in &self.display.instrument.tuning {
+            print!("{} ", note);
+        }
+        print!("\n");
+    }
+
+    async fn display_full_instrument(&mut self) {
         Instrument::show_all(&mut self.display.instrument);
     }
+
     fn split_input(input: String) -> (String, String) {
         let Some((first, rest)) = input.split_once(' ') else {
             return ("".to_string(), input);
@@ -2601,11 +2638,12 @@ impl RunTime {
         };
         return (first.to_string(), rest.to_string());
     }
+
     fn split_input_advanced(input: String) -> Vec<String> {
-        let words_str: Vec<&str> = input.split(',').collect();
+        let word_strs: Vec<&str> = input.split(',').collect();
         let mut words: Vec<String> = Vec::new();
-        for word in words_str {
-            words.push(word.trim().to_string())
+        for word_str in word_strs {
+            words.push(word_str.trim().to_string())
         }
         /*let mut result = Vec::new();
         let mut i = 0;

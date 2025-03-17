@@ -125,7 +125,7 @@ impl Instrument {
                     self.tuning.push(NotePitch::find_note(&self.tuning[3], 4));
                     self.tuning.push(NotePitch::find_note(&self.tuning[4], 5));
                 }
-                TuningType::Drop => {
+                TuningType::Drop_Tuning => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
@@ -147,7 +147,7 @@ impl Instrument {
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
                 }
-                TuningType::Drop => {
+                TuningType::Drop_Tuning => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
@@ -842,9 +842,21 @@ impl NaturalNote {
 #[derive(PartialEq, Clone, Debug)]
 enum TuningType {
     Open,
-    Drop,
+    Drop_Tuning,
     Standard,
     Custom,
+}
+
+impl Display for TuningType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            TuningType::Open => write!(f, "Open")?,
+            TuningType::Drop_Tuning => write!(f, "Drop")?,
+            TuningType::Standard => write!(f, "Standard")?,
+            TuningType::Custom => write!(f, "Custom")?,
+        }
+        Ok(())
+    }
 }
 
 impl TuningType {
@@ -863,7 +875,7 @@ impl TuningType {
         }*/
         match input_uppercase.as_str() {
             "OPEN" => TuningType::Open,
-            "DROP" => TuningType::Drop,
+            "DROP" => TuningType::Drop_Tuning,
             "STANDARD" => TuningType::Standard,
             "CUSTOM" => TuningType::Custom,
             _ => {
@@ -2481,7 +2493,7 @@ impl RunTime {
     async fn choose_chord(&mut self) {
         let mut chord: Option<Chord> = None;
         loop {
-            println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
+            println!("Enter a chord (e.g., C major seven, D minor, G six):");
             let mut input: String = String::new();
             io::stdin()
                 .read_line(&mut input)
@@ -2512,7 +2524,7 @@ impl RunTime {
     async fn choose_scale(&mut self) {
         let mut scale: Option<Scale> = None;
         loop {
-            println!("Enter a scale (e.g., Major, Minor, Dorian):");
+            println!("Enter a scale (e.g., E Major, D Minor, G Dorian):");
             let mut input: String = String::new();
             io::stdin()
                 .read_line(&mut input)
@@ -2546,8 +2558,19 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let tuning: TuningType = TuningType::from_string(input.trim().to_string());
-        println!("Tuning changed to {:?}", tuning);
+        let (key, input_mod) = RunTime::split_input(input);
+        let tuning_type: TuningType = TuningType::from_string(input_mod.trim().to_string());
+        self.display.instrument.tuning_type = tuning_type;
+        let key = NoteName::from_string(key);
+        self.display.instrument.root_note = NotePitch::new(&key.natural_note, &key.accidental, 2);
+        self.display.instrument.tuning = Vec::new();
+        self.display.instrument.calculate_tuning();
+        self.display.instrument.calculate_notes();
+        match self.display.notes.len() {
+            0 => self.display.instrument.show_all(),
+            _ => self.display.instrument.show_notes(&self.display.notes),
+        }
+        println!("Tuning changed to {} {}", self.display.instrument.root_note.note_name, self.display.instrument.tuning_type);
     }
 
     async fn display_instrument(&mut self) {

@@ -251,8 +251,7 @@ impl NotePitch {
     }
 
     fn get_name(self: &Self) -> String {
-        let note_and_accidental: String = NoteName::get_name(&self.note_name);
-        let name: String = format!("{}{}", note_and_accidental, self.octave);
+        let name: String = format!("{}{}", self.note_name.get_name(), self.octave);
         name
     }
 

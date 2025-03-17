@@ -2553,7 +2553,7 @@ impl RunTime {
     }
 
     async fn change_tuning(&mut self) {
-        println!("Enter a tuning (e.g., Standard, Drop D, Open G):");
+        println!("Enter a tuning (e.g., E Standard, D Drop, G Open):");
         let mut input: String = String::new();
         io::stdin()
             .read_line(&mut input)

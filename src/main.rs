@@ -256,7 +256,14 @@ impl NotePitch {
         name
     }
 
-    fn from_number(note_number: i8, octave: i8) -> NotePitch {
+    fn from_note_name(note_name: &NoteName, octave: i8) -> Self {
+        NotePitch {
+            note_name: note_name.clone(),
+            octave,
+        }
+    }
+
+    fn from_number(note_number: i8, octave: i8) -> Self {
         match note_number {
             0 => NotePitch {
                 note_name: NoteName {
@@ -406,7 +413,7 @@ impl NotePitch {
         (number, octave)
     }
 
-    fn find_note(open_note: &NotePitch, distance: i8) -> NotePitch {
+    fn find_note(open_note: &NotePitch, distance: i8) -> Self {
         let (x, y) = match distance {
             i if i > 0 => NotePitch::add(&open_note, distance),
             i if i < 0 => NotePitch::minus(&open_note, distance),
@@ -416,13 +423,13 @@ impl NotePitch {
         NotePitch::from_number(x, y)
     }
 
-    fn up_step(start_note: &NotePitch, step: &Step) -> NotePitch {
+    fn up_step(start_note: &NotePitch, step: &Step) -> Self {
         let to_add = Step::to_number(step);
         let (number, octave) = NotePitch::add(start_note, to_add);
         NotePitch::from_number(number, octave)
     }
 
-    fn down_step(start_note: &NotePitch, step: &Step) -> NotePitch {
+    fn down_step(start_note: &NotePitch, step: &Step) -> Self {
         let to_subtract = Step::to_number(step);
         let (number, octave) = NotePitch::minus(start_note, to_subtract);
         NotePitch::from_number(number, octave)
@@ -2562,7 +2569,7 @@ impl RunTime {
         let tuning_type: TuningType = TuningType::from_string(input_mod.trim().to_string());
         self.display.instrument.tuning_type = tuning_type;
         let key = NoteName::from_string(key);
-        self.display.instrument.root_note = NotePitch::new(&key.natural_note, &key.accidental, 2);
+        self.display.instrument.root_note = NotePitch::from_note_name(&key, 2);
         self.display.instrument.tuning = Vec::new();
         self.display.instrument.calculate_tuning();
         self.display.instrument.calculate_notes();

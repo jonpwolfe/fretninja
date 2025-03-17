@@ -125,7 +125,7 @@ impl Instrument {
                     self.tuning.push(NotePitch::find_note(&self.tuning[3], 4));
                     self.tuning.push(NotePitch::find_note(&self.tuning[4], 5));
                 }
-                TuningType::Drop_Tuning => {
+                TuningType::DropTuning => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
@@ -147,7 +147,7 @@ impl Instrument {
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
                 }
-                TuningType::Drop_Tuning => {
+                TuningType::DropTuning => {
                     self.tuning.push(NotePitch::find_note(&self.tuning[0], 7));
                     self.tuning.push(NotePitch::find_note(&self.tuning[1], 5));
                     self.tuning.push(NotePitch::find_note(&self.tuning[2], 5));
@@ -847,7 +847,7 @@ impl NaturalNote {
 #[derive(PartialEq, Clone, Debug)]
 enum TuningType {
     Open,
-    Drop_Tuning,
+    DropTuning,
     Standard,
     Custom,
 }
@@ -856,7 +856,7 @@ impl Display for TuningType {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
             TuningType::Open => write!(f, "Open")?,
-            TuningType::Drop_Tuning => write!(f, "Drop")?,
+            TuningType::DropTuning => write!(f, "Drop")?,
             TuningType::Standard => write!(f, "Standard")?,
             TuningType::Custom => write!(f, "Custom")?,
         }
@@ -880,7 +880,7 @@ impl TuningType {
         }*/
         match input_uppercase.as_str() {
             "OPEN" => TuningType::Open,
-            "DROP" => TuningType::Drop_Tuning,
+            "DROP" => TuningType::DropTuning,
             "STANDARD" => TuningType::Standard,
             "CUSTOM" => TuningType::Custom,
             _ => {
@@ -2321,7 +2321,7 @@ struct RunTime {
 impl RunTime {
     fn new() -> Self {
         let mut displays: Vec<DisplayGroup> = Vec::new();
-        for i in 0..=3 {
+        for _i in 0..=3 {
             let display = DisplayGroup::new();
             displays.push(display);
         }
@@ -2458,7 +2458,7 @@ impl RunTime {
                 let scale = Scale::from_number(&key, j);
                 let mut works = true;
                 let mut contains: Vec<bool> = Vec::new();
-                for note in &self.display.notes {
+                for _note in &self.display.notes {
                     contains.push(false);
                 }
                 for (k, note) in self.display.notes.iter().enumerate() {

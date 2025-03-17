@@ -1264,47 +1264,29 @@ impl Scale {
         }
     }
 
-    fn from_string(key: &NoteName, input: String) -> Self {
+    fn from_string(key: &NoteName, input: String) -> Option<Self> {
         let input: String = input.to_uppercase();
         match input.as_str() {
-            "MAJOR" => Scale::new(&key, &ScaleDef::new_major()),
-            "IONIAN" => Scale::new(&key, &ScaleDef::new_ionian()),
-            "DORIAN" => Scale::new(&key, &ScaleDef::new_dorian()),
-            "PHRYGIAN" => Scale::new(&key, &ScaleDef::new_phrygian()),
-            "LYDIAN" => Scale::new(&key, &ScaleDef::new_lydian()),
-            "MIXOLYDIAN" => Scale::new(&key, &ScaleDef::new_mixolydian()),
-            "AEOLIAN" => Scale::new(&key, &ScaleDef::new_aeolian()),
-            "LOCRIAN" => Scale::new(&key, &ScaleDef::new_locrian()),
-            "NATURAL MINOR" => Scale::new(&key, &ScaleDef::new_natural_minor()),
-            "HARMONIC MINOR" => Scale::new(&key, &ScaleDef::new_harmonic_minor()),
-            "MELODIC MINOR ASCENDING" => Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()),
+            "MAJOR" => Some(Scale::new(&key, &ScaleDef::new_major())),
+            "IONIAN" => Some(Scale::new(&key, &ScaleDef::new_ionian())),
+            "DORIAN" => Some(Scale::new(&key, &ScaleDef::new_dorian())),
+            "PHRYGIAN" => Some(Scale::new(&key, &ScaleDef::new_phrygian())),
+            "LYDIAN" => Some(Scale::new(&key, &ScaleDef::new_lydian())),
+            "MIXOLYDIAN" => Some(Scale::new(&key, &ScaleDef::new_mixolydian())),
+            "AEOLIAN" => Some(Scale::new(&key, &ScaleDef::new_aeolian())),
+            "LOCRIAN" => Some(Scale::new(&key, &ScaleDef::new_locrian())),
+            "NATURAL MINOR" => Some(Scale::new(&key, &ScaleDef::new_natural_minor())),
+            "HARMONIC MINOR" => Some(Scale::new(&key, &ScaleDef::new_harmonic_minor())),
+            "MELODIC MINOR ASCENDING" => Some(Scale::new(&key, &ScaleDef::new_melodic_minor_ascending())),
             "MELODIC MINOR DESCENDING" => {
-                Scale::new(&key, &ScaleDef::new_melodic_minor_descending())
+                Some(Scale::new(&key, &ScaleDef::new_melodic_minor_descending()))
             }
-            "CHROMATIC" => Scale::new(&key, &ScaleDef::new_chromatic()),
-            "WHOLE TONE" => Scale::new(&key, &ScaleDef::new_whole_tone()),
-            "MAJOR PENTATONIC" => Scale::new(&key, &ScaleDef::new_major_pentatonic()),
-            "MINOR PENTATONIC" => Scale::new(&key, &ScaleDef::new_minor_pentatonic()),
-            "BLUES" => Scale::new(&key, &ScaleDef::new_blues()),
-            _ => {
-                println!("Enter a scale (e.g., Major, Minor, Dorian):");
-                let mut input: String = String::new();
-                io::stdin()
-                    .read_line(&mut input)
-                    .expect("Failed to read input");
-                let (key_string, input) = RunTime::split_input(input);
-                match key_string.as_str() {
-                    "" => {
-                        let scale = Scale::from_string(&key, input.trim().to_string());
-                        return scale;
-                    }
-                    _ => {
-                        let key = NoteName::from_string(key_string);
-                        let scale = Scale::from_string(&key, input.trim().to_string());
-                        return scale;
-                    }
-                }
-            }
+            "CHROMATIC" => Some(Scale::new(&key, &ScaleDef::new_chromatic())),
+            "WHOLE TONE" => Some(Scale::new(&key, &ScaleDef::new_whole_tone())),
+            "MAJOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_major_pentatonic())),
+            "MINOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_minor_pentatonic())),
+            "BLUES" => Some(Scale::new(&key, &ScaleDef::new_blues())),
+            _ => None
         }
     }
 }
@@ -2079,44 +2061,36 @@ impl Chord {
         }
     }
 
-    fn from_string(key: &NoteName, input: String) -> Self {
+    fn from_string(key: &NoteName, input: String) -> Option<Self> {
         let input_uppercase: String = input.to_uppercase();
         match input_uppercase.as_str() {
-            "MAJOR" => Chord::new(&key, &ChordDef::new_major()),
-            "MINOR" => Chord::new(&key, &ChordDef::new_minor()),
-            "DIMINISHED" => Chord::new(&key, &ChordDef::new_diminished()),
-            "AUGMENTED" => Chord::new(&key, &ChordDef::new_augmented()),
-            "SUSPENDED TWO" => Chord::new(&key, &ChordDef::new_suspended_second()),
-            "SUSPENDED FOUR" => Chord::new(&key, &ChordDef::new_suspended_four()),
-            "POWER" => Chord::new(&key, &ChordDef::new_power()),
-            "MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_major_seven()),
-            "MINOR SEVEN" => Chord::new(&key, &ChordDef::new_minor_seven()),
-            "DOMINANT SEVEN" => Chord::new(&key, &ChordDef::new_dominant_seven()),
-            "MINOR MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_minor_major_seven()),
-            "SIX" => Chord::new(&key, &ChordDef::new_six()),
-            "MINOR SIX" => Chord::new(&key, &ChordDef::new_minor_six()),
-            "NINE" => Chord::new(&key, &ChordDef::new_nine()),
-            "MINOR NINE" => Chord::new(&key, &ChordDef::new_minor_nine()),
-            "ADD NINE" => Chord::new(&key, &ChordDef::new_add_nine()),
-            "SEVEN SUSPENDED FOUR" => Chord::new(&key, &ChordDef::new_seven_suspended_four()),
-            "DIMINISHED SEVEN" => Chord::new(&key, &ChordDef::new_dimished_seven()),
-            "HALF DIMINISHED" => Chord::new(&key, &ChordDef::new_half_diminished()),
-            "PLUS SEVEN" => Chord::new(&key, &ChordDef::new_plus_seven()),
-            "MINOR ELEVEN" => Chord::new(&key, &ChordDef::new_minor_eleven()),
-            "AUGMENTED MAJOR SEVEN" => Chord::new(&key, &ChordDef::new_augmented_major_seven()),
+            "MAJOR" => Some(Chord::new(&key, &ChordDef::new_major())),
+            "MINOR" => Some(Chord::new(&key, &ChordDef::new_minor())),
+            "DIMINISHED" => Some(Chord::new(&key, &ChordDef::new_diminished())),
+            "AUGMENTED" => Some(Chord::new(&key, &ChordDef::new_augmented())),
+            "SUSPENDED TWO" => Some(Chord::new(&key, &ChordDef::new_suspended_second())),
+            "SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDef::new_suspended_four())),
+            "POWER" => Some(Chord::new(&key, &ChordDef::new_power())),
+            "MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_major_seven())),
+            "MINOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_seven())),
+            "DOMINANT SEVEN" => Some(Chord::new(&key, &ChordDef::new_dominant_seven())),
+            "MINOR MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_major_seven())),
+            "SIX" => Some(Chord::new(&key, &ChordDef::new_six())),
+            "MINOR SIX" => Some(Chord::new(&key, &ChordDef::new_minor_six())),
+            "NINE" => Some(Chord::new(&key, &ChordDef::new_nine())),
+            "MINOR NINE" => Some(Chord::new(&key, &ChordDef::new_minor_nine())),
+            "ADD NINE" => Some(Chord::new(&key, &ChordDef::new_add_nine())),
+            "SEVEN SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDef::new_seven_suspended_four())),
+            "DIMINISHED SEVEN" => Some(Chord::new(&key, &ChordDef::new_dimished_seven())),
+            "HALF DIMINISHED" => Some(Chord::new(&key, &ChordDef::new_half_diminished())),
+            "PLUS SEVEN" => Some(Chord::new(&key, &ChordDef::new_plus_seven())),
+            "MINOR ELEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_eleven())),
+            "AUGMENTED MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_augmented_major_seven())),
             "DOMINANT SEVEN FLAT NINE" => {
-                Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine())
+                Some(Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine()))
             }
-            "ALTERED DOMINANT SEVEN" => Chord::new(&key, &ChordDef::new_altered_dominant_seven()),
-            _ => {
-                println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
-                let mut reinput = String::new();
-                io::stdin()
-                    .read_line(&mut reinput)
-                    .expect("Failed to read input");
-                let chord = Chord::from_string(&key, reinput.trim().to_string());
-                return chord;
-            }
+            "ALTERED DOMINANT SEVEN" => Some(Chord::new(&key, &ChordDef::new_altered_dominant_seven())),
+            _ => None
         }
     }
 }
@@ -2343,7 +2317,7 @@ impl RunTime {
         }
     }
 
-    pub async fn start(&mut self) {
+    async fn start(&mut self) {
         loop {
             self.show_notes_displayed().await;
             println!();
@@ -2446,8 +2420,8 @@ impl RunTime {
                 "" => (),
                 _ => key_current = NoteName::from_string(key_string),
             };
-            let chord: Chord = Chord::from_string(&key_current, input_mod.trim().to_string());
-            chords.push(chord);
+            let chord: Option<Chord> = Chord::from_string(&key_current, input_mod.trim().to_string());
+            chords.push(chord.unwrap());
         }
         for (index, chord) in chords.iter().enumerate() {
             Instrument::show_notes(&mut self.displays[index].instrument, &chord.notes);
@@ -2505,19 +2479,27 @@ impl RunTime {
     }
 
     async fn choose_chord(&mut self) {
-        println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
-        let mut input: String = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read input");
-        input = input.to_uppercase();
-        let (key_string, input_mod) = RunTime::split_input(input);
-        match key_string.as_str() {
-            "" => (),
-            _ => self.display.key = NoteName::from_string(key_string),
-        };
-        let chord: Chord = Chord::from_string(&self.display.key, input_mod.trim().to_string());
-        self.display.chord = Some(chord.clone());
+        let mut chord: Option<Chord> = None;
+        loop {
+            println!("Enter a chord (e.g., Cmaj7, Dm, G7):");
+            let mut input: String = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read input");
+            input = input.to_uppercase();
+            let (key_string, input_mod) = RunTime::split_input(input);
+            match key_string.as_str() {
+                "" => (),
+                _ => self.display.key = NoteName::from_string(key_string),
+            };
+            chord = Chord::from_string(&self.display.key, input_mod.trim().to_string());
+            match chord {
+                None => (),
+                Some(ref _chord) => break,
+            };
+        }   
+        self.display.chord = chord.clone();
+        let chord = chord.unwrap();
         self.display.notes = chord.notes.clone();
         self.display.notes.sort();
         Instrument::show_notes(&mut self.display.instrument, &self.display.notes);
@@ -2528,19 +2510,27 @@ impl RunTime {
     }
 
     async fn choose_scale(&mut self) {
-        println!("Enter a scale (e.g., Major, Minor, Dorian):");
-        let mut input: String = String::new();
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read input");
-        input = input.to_uppercase();
-        let (key_string, input_mod) = RunTime::split_input(input);
-        match key_string.as_str() {
-            "" => (),
-            _ => self.display.key = NoteName::from_string(key_string),
-        };
-        let scale = Scale::from_string(&self.display.key, input_mod.trim().to_string());
-        self.display.scale = Some(scale.clone());
+        let mut scale: Option<Scale> = None;
+        loop {
+            println!("Enter a scale (e.g., Major, Minor, Dorian):");
+            let mut input: String = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read input");
+            input = input.to_uppercase();
+            let (key_string, input_mod) = RunTime::split_input(input);
+            match key_string.as_str() {
+                "" => (),
+                _ => self.display.key = NoteName::from_string(key_string),
+            };
+            scale = Scale::from_string(&self.display.key, input_mod.trim().to_string());
+            match scale {
+                None => (),
+                Some(ref _scale) => break,
+            };
+        }
+        self.display.scale = scale.clone();
+        let scale = scale.unwrap();
         self.display.notes = scale.notes.clone();
         self.display.notes.sort();
         Instrument::show_notes(&mut self.display.instrument, &self.display.notes);

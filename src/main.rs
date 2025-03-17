@@ -1,30 +1,15 @@
 use core::fmt::{Display, Formatter, Result};
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::{BufferSize, Device, OutputCallbackInfo, SampleRate, StreamConfig};
 use owo_colors::{OwoColorize, Rgb};
+use std::f32::consts::PI;
 use std::io;
+use std::sync::Arc;
+use std::time::Duration;
 use tokio;
 
 #[tokio::main]
 async fn main() {
-    let instrument = Instrument::new(
-        &InstrumentType::Guitar,
-        &TuningType::Standard,
-        &NotePitch::new(&NaturalNote::C, &None, 2),
-        6,
-        24,
-    );
-    print!("{}", instrument);
-    let scale = Scale::new(
-        &NoteName::new(&NaturalNote::C, &None),
-        &ScaleDef::new_minor_pentatonic(),
-    );
-    print!("{}", scale.definition);
-    print!("{}", scale);
-    let chord = Chord::new(
-        &NoteName::new(&NaturalNote::C, &None),
-        &ChordDef::new_minor_eleven(),
-    );
-    print!("{}", chord.definition);
-    print!("{}", chord);
     // let audio_engine = AudioEngine::new();
     //  audio_engine.play_audio(vec![440.0], 2.0).await;
     RunTime::start(&mut RunTime::new()).await;
@@ -474,7 +459,7 @@ struct NoteName {
 
 impl Display for NoteName {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = NoteName::to_rgb(self); // Assuming this function returns an 1	 struct
+        let rgb = NoteName::to_rgb(self);
         write!(f, "{}", self.get_name().color(rgb))?;
         Ok(())
     }
@@ -482,7 +467,7 @@ impl Display for NoteName {
 
 impl Ord for NoteName {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        NoteName::to_number(&self).cmp(&NoteName::to_number(&other)) // Compare by age
+        NoteName::to_number(&self).cmp(&NoteName::to_number(&other))
     }
 }
 
@@ -830,10 +815,9 @@ enum NaturalNote {
 
 impl Ord for NaturalNote {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        NaturalNote::to_number(&self).cmp(&NaturalNote::to_number(&other)) // Compare by age
+        NaturalNote::to_number(&self).cmp(&NaturalNote::to_number(&other))
     }
 }
-
 
 impl PartialOrd for NaturalNote {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -844,13 +828,13 @@ impl PartialOrd for NaturalNote {
 impl NaturalNote {
     fn to_number(&self) -> i8 {
         match self {
-            NaturalNote::A => 6,
-            NaturalNote::B => 7, 
-            NaturalNote::C => 1,
+            NaturalNote::A => 9,
+            NaturalNote::B => 11,
+            NaturalNote::C => 0,
             NaturalNote::D => 2,
-            NaturalNote::E => 3,
-            NaturalNote::F => 4,
-            NaturalNote::G => 5,
+            NaturalNote::E => 4,
+            NaturalNote::F => 5,
+            NaturalNote::G => 7,
         }
     }
 }
@@ -1270,9 +1254,7 @@ impl Scale {
             8 => Scale::new(&key, &ScaleDef::new_natural_minor()),
             9 => Scale::new(&key, &ScaleDef::new_harmonic_minor()),
             10 => Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()),
-            11 => {
-                Scale::new(&key, &ScaleDef::new_melodic_minor_descending())
-            },
+            11 => Scale::new(&key, &ScaleDef::new_melodic_minor_descending()),
             12 => Scale::new(&key, &ScaleDef::new_chromatic()),
             13 => Scale::new(&key, &ScaleDef::new_whole_tone()),
             14 => Scale::new(&key, &ScaleDef::new_major_pentatonic()),
@@ -1357,7 +1339,7 @@ enum Accidental {
 
 impl Ord for Accidental {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        Accidental::to_number(&self).cmp(&Accidental::to_number(&other)) // Compare by age
+        Accidental::to_number(&self).cmp(&Accidental::to_number(&other))
     }
 }
 
@@ -2139,12 +2121,6 @@ impl Chord {
     }
 }
 
-use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
-use cpal::{BufferSize, Device, OutputCallbackInfo, SampleRate, StreamConfig};
-use std::f32::consts::PI;
-use std::sync::Arc;
-use std::time::Duration;
-
 struct AudioEngine {
     device: Arc<Device>,
     config: StreamConfig,
@@ -2327,12 +2303,12 @@ struct DisplayGroup {
 impl DisplayGroup {
     fn new() -> Self {
         let instrument = Instrument::new(
-            &InstrumentType::Guitar, 
-            &TuningType::Standard, 
+            &InstrumentType::Guitar,
+            &TuningType::Standard,
             &NotePitch::new(&NaturalNote::C, &None, 2),
             6,
             24,
-            );
+        );
         let key = NoteName::new(&NaturalNote::C, &None);
         let notes: Vec<NoteName> = Vec::new();
         DisplayGroup {
@@ -2364,7 +2340,6 @@ impl RunTime {
             displays,
             display,
             audio_engine,
-            
         }
     }
 
@@ -2418,9 +2393,14 @@ impl RunTime {
             .expect("Failed to read input");
         let note_strs: Vec<&str> = input.split(',').collect();
         for note_str in note_strs {
-            if let Some(index) = self.display.notes.iter().position(|x| x == &NoteName::from_string(note_str.trim().to_string())) {
+            if let Some(index) = self
+                .display
+                .notes
+                .iter()
+                .position(|x| x == &NoteName::from_string(note_str.trim().to_string()))
+            {
                 self.display.notes.remove(index);
-            } 
+            }
         }
         self.display.instrument.show_notes(&self.display.notes);
     }
@@ -2433,7 +2413,6 @@ impl RunTime {
         print!("\n");
     }
 
-
     async fn add_notes(&mut self) {
         println!("Enter Notes you wish to add seperated by commas");
         let mut input: String = String::new();
@@ -2443,7 +2422,6 @@ impl RunTime {
         let note_strs: Vec<&str> = input.split(',').collect();
         let mut notes: Vec<NoteName> = Vec::new();
         for note_str in note_strs {
-
             notes.push(NoteName::from_string(note_str.trim().to_string()));
         }
         for note in &notes {
@@ -2462,7 +2440,7 @@ impl RunTime {
         let mut chords = Vec::new();
         let input_splits = RunTime::split_input_advanced(input);
         let mut key_current = NoteName::new(&NaturalNote::C, &None);
-        for input_split in input_splits{
+        for input_split in input_splits {
             let (key_string, input_mod) = RunTime::split_input(input_split);
             match key_string.as_str() {
                 "" => (),
@@ -2488,31 +2466,31 @@ impl RunTime {
             for j in 0..=16 {
                 let scale = Scale::from_number(&key, j);
                 let mut works = true;
-                let mut contains:Vec<bool> = Vec::new();
-                for note in &self.display.notes{
+                let mut contains: Vec<bool> = Vec::new();
+                for note in &self.display.notes {
                     contains.push(false);
                 }
                 for (k, note) in self.display.notes.iter().enumerate() {
-                    for scale_note in &scale.notes{
+                    for scale_note in &scale.notes {
                         if note == scale_note {
                             contains[k] = true;
                         }
                     }
                 }
                 for value in contains {
-                    if value == false{
-                            works = false;
+                    if value == false {
+                        works = false;
                     }
                 }
-                if works == true {
+                if works == true && scale.definition.name != "Chromatic" {
                     results.push(scale.clone());
                 }
             }
         }
-        for result in results{
+        println!("Scales that fit are:");
+        for result in results {
             println!("{}", result);
         }
-        
     }
 
     async fn choose_key(&mut self) {
@@ -2584,13 +2562,13 @@ impl RunTime {
 
     async fn display_instrument(&mut self) {
         println!("\nInstrument Details:");
-        Instrument::show_all(&mut self.display.instrument)
-;    }
+        Instrument::show_all(&mut self.display.instrument);
+    }
     fn split_input(input: String) -> (String, String) {
         let Some((first, rest)) = input.split_once(' ') else {
             return ("".to_string(), input);
         };
-       /* if first.len() != 1 || first.len() != 2 {
+        /* if first.len() != 1 || first.len() != 2 {
             return ("".to_string(), input);
         }*/
         match first.chars().next() {
@@ -2613,7 +2591,7 @@ impl RunTime {
         }
         /*let mut result = Vec::new();
         let mut i = 0;
-    
+
         while i < words.len() {
             if i + 1 < words.len() {
                 result.push(format!("{} {}", words[i], words[i + 1]));

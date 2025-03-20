@@ -1307,7 +1307,9 @@ impl Scale {
             "LOCRIAN" => Some(Scale::new(&key, &ScaleDef::new_locrian())),
             "NATURAL MINOR" => Some(Scale::new(&key, &ScaleDef::new_natural_minor())),
             "HARMONIC MINOR" => Some(Scale::new(&key, &ScaleDef::new_harmonic_minor())),
-            "MELODIC MINOR ASCENDING" => Some(Scale::new(&key, &ScaleDef::new_melodic_minor_ascending())),
+            "MELODIC MINOR ASCENDING" => {
+                Some(Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()))
+            }
             "MELODIC MINOR DESCENDING" => {
                 Some(Scale::new(&key, &ScaleDef::new_melodic_minor_descending()))
             }
@@ -1316,7 +1318,7 @@ impl Scale {
             "MAJOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_major_pentatonic())),
             "MINOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_minor_pentatonic())),
             "BLUES" => Some(Scale::new(&key, &ScaleDef::new_blues())),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -2115,16 +2117,20 @@ impl Chord {
             "HALF DIMINISHED" => Some(Chord::new(&key, &ChordDef::new_half_diminished())),
             "PLUS SEVEN" => Some(Chord::new(&key, &ChordDef::new_plus_seven())),
             "MINOR ELEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_eleven())),
-            "AUGMENTED MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_augmented_major_seven())),
+            "AUGMENTED MAJOR SEVEN" => {
+                Some(Chord::new(&key, &ChordDef::new_augmented_major_seven()))
+            }
             "DOMINANT SEVEN FLAT NINE" => {
                 Some(Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine()))
             }
-            "ALTERED DOMINANT SEVEN" => Some(Chord::new(&key, &ChordDef::new_altered_dominant_seven())),
-            _ => None
+            "ALTERED DOMINANT SEVEN" => {
+                Some(Chord::new(&key, &ChordDef::new_altered_dominant_seven()))
+            }
+            _ => None,
         }
     }
 
-     fn from_number(key: &NoteName, input: i8) -> Self {
+    fn from_number(key: &NoteName, input: i8) -> Self {
         match input {
             0 => Chord::new(&key, &ChordDef::new_major()),
             1 => Chord::new(&key, &ChordDef::new_minor()),
@@ -2148,9 +2154,7 @@ impl Chord {
             19 => Chord::new(&key, &ChordDef::new_plus_seven()),
             20 => Chord::new(&key, &ChordDef::new_minor_eleven()),
             21 => Chord::new(&key, &ChordDef::new_augmented_major_seven()),
-            22 => {
-                Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine())
-            }
+            22 => Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine()),
             23 => Chord::new(&key, &ChordDef::new_altered_dominant_seven()),
             _ => panic!("Unexpected"),
         }
@@ -2235,7 +2239,7 @@ struct Attempt<T, U> {
     game_number: u64,
 }
 
-impl<T: Ord, U: Ord > Attempt<T, U> {
+impl<T: Ord, U: Ord> Attempt<T, U> {
     fn new(
         correct_answer: T,
         attempt_answer: U,
@@ -2440,9 +2444,11 @@ impl RunTime {
                 .position(|x| x == &NoteName::from_string(note_str.trim().to_string()))
             {
                 self.display.notes.remove(index);
-            }
-            else {
-                println!("{} not in notes displayed", NoteName::from_string(note_str.trim().to_string()))
+            } else {
+                println!(
+                    "{} not in notes displayed",
+                    NoteName::from_string(note_str.trim().to_string())
+                )
             }
         }
         self.display.instrument.show_notes(&self.display.notes);
@@ -2451,14 +2457,14 @@ impl RunTime {
     fn show_notes_displayed(&mut self) {
         match self.display.notes.len() {
             0 => (),
-            _ => {  print!("The notes you have selected are: ");
-                    for note in &self.display.notes {
-                        print!("{} ", note);
-                    }
-                    print!("\n");
+            _ => {
+                print!("The notes you have selected are: ");
+                for note in &self.display.notes {
+                    print!("{} ", note);
                 }
-        } 
-        
+                print!("\n");
+            }
+        }
     }
 
     async fn add_notes(&mut self) {
@@ -2494,7 +2500,8 @@ impl RunTime {
                 "" => (),
                 _ => key_current = NoteName::from_string(key_string),
             };
-            let chord: Option<Chord> = Chord::from_string(&key_current, input_mod.trim().to_string());
+            let chord: Option<Chord> =
+                Chord::from_string(&key_current, input_mod.trim().to_string());
             chords.push(chord.unwrap());
         }
         for (index, chord) in chords.iter().enumerate() {
@@ -2533,7 +2540,7 @@ impl RunTime {
                 if works == true {
                     results.push(chord.clone());
                 }
-            }   
+            }
         }
         println!("Chords that fit are: ");
         for result in results {
@@ -2604,7 +2611,7 @@ impl RunTime {
                 None => (),
                 Some(ref _chord) => break,
             };
-        }   
+        }
         self.display.chord = chord.clone();
         let chord = chord.unwrap();
         self.display.notes = chord.notes.clone();
@@ -2665,15 +2672,24 @@ impl RunTime {
             0 => self.display.instrument.show_all(),
             _ => self.display.instrument.show_notes(&self.display.notes),
         }
-        println!("Tuning changed to {} {}", self.display.instrument.root_note.note_name, self.display.instrument.tuning_type);
+        println!(
+            "Tuning changed to {} {}",
+            self.display.instrument.root_note.note_name, self.display.instrument.tuning_type
+        );
     }
 
     async fn show_details(&mut self) {
         println!("Instrument Details:");
         println!("\tType: {}", self.display.instrument.instrument_type);
-        println!("\tNumber of strings: {}", self.display.instrument.string_count);
+        println!(
+            "\tNumber of strings: {}",
+            self.display.instrument.string_count
+        );
         println!("\tNumber of frets: {}", self.display.instrument.fret_count);
-        println!("\tTuning: {} {}", self.display.instrument.root_note.note_name, self.display.instrument.tuning_type);
+        println!(
+            "\tTuning: {} {}",
+            self.display.instrument.root_note.note_name, self.display.instrument.tuning_type
+        );
         print!("\tOpen Notes: ");
         for note in &self.display.instrument.tuning {
             print!("{} ", note);

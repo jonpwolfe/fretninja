@@ -2123,6 +2123,38 @@ impl Chord {
             _ => None
         }
     }
+
+     fn from_number(key: &NoteName, input: i8) -> Self {
+        match input {
+            0 => Chord::new(&key, &ChordDef::new_major()),
+            1 => Chord::new(&key, &ChordDef::new_minor()),
+            2 => Chord::new(&key, &ChordDef::new_diminished()),
+            3 => Chord::new(&key, &ChordDef::new_augmented()),
+            4 => Chord::new(&key, &ChordDef::new_suspended_second()),
+            5 => Chord::new(&key, &ChordDef::new_suspended_four()),
+            6 => Chord::new(&key, &ChordDef::new_power()),
+            7 => Chord::new(&key, &ChordDef::new_major_seven()),
+            8 => Chord::new(&key, &ChordDef::new_minor_seven()),
+            9 => Chord::new(&key, &ChordDef::new_dominant_seven()),
+            10 => Chord::new(&key, &ChordDef::new_minor_major_seven()),
+            11 => Chord::new(&key, &ChordDef::new_six()),
+            12 => Chord::new(&key, &ChordDef::new_minor_six()),
+            13 => Chord::new(&key, &ChordDef::new_nine()),
+            14 => Chord::new(&key, &ChordDef::new_minor_nine()),
+            15 => Chord::new(&key, &ChordDef::new_add_nine()),
+            16 => Chord::new(&key, &ChordDef::new_seven_suspended_four()),
+            17 => Chord::new(&key, &ChordDef::new_dimished_seven()),
+            18 => Chord::new(&key, &ChordDef::new_half_diminished()),
+            19 => Chord::new(&key, &ChordDef::new_plus_seven()),
+            20 => Chord::new(&key, &ChordDef::new_minor_eleven()),
+            21 => Chord::new(&key, &ChordDef::new_augmented_major_seven()),
+            22 => {
+                Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine())
+            }
+            23 => Chord::new(&key, &ChordDef::new_altered_dominant_seven()),
+            _ => panic!("Unexpected"),
+        }
+    }
 }
 
 struct AudioEngine {
@@ -2192,9 +2224,9 @@ impl AudioEngine {
 
 use chrono::{NaiveDateTime, Utc};
 
-struct Attempt<T> {
+struct Attempt<T, U> {
     correct_answer: T,
-    attempt_answer: T,
+    attempt_answer: U,
     correct: bool,
     attempt_number: u64,
     time_since_last_attempt: Option<u64>,
@@ -2203,22 +2235,22 @@ struct Attempt<T> {
     game_number: u64,
 }
 
-impl<T: PartialEq> Attempt<T> {
+impl<T: Ord, U: Ord > Attempt<T, U> {
     fn new(
         correct_answer: T,
-        attempt_answer: T,
+        attempt_answer: U,
         attempt_number: u64,
         time_since_last_attempt: Option<Duration>,
         elapsed_time: Duration,
         game_number: u64,
     ) -> Self {
-        let correct = correct_answer == attempt_answer;
+        //let correct = correct_answer == attempt_answer;
         let attempt_time = Utc::now().naive_utc();
         match time_since_last_attempt {
             Some(time_since) => Attempt {
                 correct_answer,
                 attempt_answer,
-                correct,
+                correct: false,
                 attempt_number,
                 time_since_last_attempt: Some(time_since.as_secs()),
                 elapsed_time: elapsed_time.as_secs(),
@@ -2228,7 +2260,7 @@ impl<T: PartialEq> Attempt<T> {
             None => Attempt {
                 correct_answer,
                 attempt_answer,
-                correct,
+                correct: false,
                 attempt_number,
                 time_since_last_attempt: None,
                 elapsed_time: elapsed_time.as_secs(),
@@ -2254,16 +2286,16 @@ impl<T: PartialEq> Attempt<T> {
     }
 }
 
-struct Game<T> {
+struct Game<T, U> {
     game_number: u64,
     possible_notes: Vec<T>,
-    attempted_notes: Vec<T>,
-    attempts: Vec<Attempt<T>>,
+    attempted_notes: Vec<U>,
+    attempts: Vec<Attempt<T, U>>,
     start_time: NaiveDateTime,
     end_time: Option<NaiveDateTime>,
 }
 
-impl<T> Game<T> {
+impl<T, U> Game<T, U> {
     fn new(possible_notes: Vec<T>, game_number: u64) -> Self {
         Game {
             game_number,
@@ -2276,13 +2308,13 @@ impl<T> Game<T> {
     }
 }
 
-struct EarTraining<T> {
+struct EarTraining<T, U> {
     audio_engine: AudioEngine,
-    game: Game<T>,
+    game: Game<T, U>,
 }
 
-impl<T> EarTraining<T> {
-    fn new_notepitch_from_instrument(instrument: &Instrument) -> EarTraining<NotePitch> {
+impl<T, U> EarTraining<T, U> {
+    fn new_notepitch_from_instrument(instrument: &Instrument) -> EarTraining<NotePitch, NotePitch> {
         let mut possible_notes: Vec<NotePitch> = Vec::new();
         for string in &instrument.fretboard {
             for note in string {
@@ -2351,19 +2383,19 @@ impl RunTime {
         self.show_details().await;
         loop {
             self.show_notes_displayed();
-            println!();
-            println!("{}", self.display.instrument);
+            println!("\n{}", self.display.instrument);
             println!("\nMenu:");
             println!("1 - Fret Ninja");
             println!("2 - Choose Key");
             println!("3 - Choose Chord");
             println!("4 - Choose Scale");
-            println!("5 - Find Scale");
-            println!("6 - Add Note(s)");
-            println!("7 - Remove Note(s)");
-            println!("8 - Display Full Instrument");
-            println!("9 - Show Details");
-            println!("10 - Change Instrument Tuning");
+            println!("5 - Add Note(s)");
+            println!("6 - Remove Note(s)");
+            println!("7 - Find Scales");
+            println!("8 - Find Chords");
+            println!("9 - Display Full Instrument");
+            println!("10 - Show Details");
+            println!("11 - Change Instrument Tuning");
             println!("0 - Exit");
             println!("Enter your choice:");
 
@@ -2377,12 +2409,13 @@ impl RunTime {
                 "2" => self.choose_key().await,
                 "3" => self.choose_chord().await,
                 "4" => self.choose_scale().await,
-                "5" => self.scale_discovery().await,
-                "6" => self.add_notes().await,
-                "7" => self.remove_notes().await,
-                "8" => self.display_full_instrument().await,
-                "9" => self.show_details().await,
-                "10" => self.change_tuning().await,
+                "5" => self.add_notes().await,
+                "6" => self.remove_notes().await,
+                "7" => self.scale_discovery().await,
+                "8" => self.chord_discovery().await,
+                "9" => self.display_full_instrument().await,
+                "10" => self.show_details().await,
+                "11" => self.change_tuning().await,
                 "0" => {
                     println!("Exiting...");
                     break;
@@ -2474,6 +2507,39 @@ impl RunTime {
         }
     }
 
+    async fn chord_discovery(&mut self) {
+        let mut results: Vec<Chord> = Vec::new();
+        for i in 0..=11 {
+            let key = NoteName::from_number(i);
+            for j in 0..=23 {
+                let chord = Chord::from_number(&key, j);
+                let mut works = true;
+                let mut contains: Vec<bool> = Vec::new();
+                for _note in &chord.notes {
+                    contains.push(false);
+                }
+                for (k, note) in chord.notes.iter().enumerate() {
+                    for display_note in &self.display.notes {
+                        if note == display_note {
+                            contains[k] = true;
+                        }
+                    }
+                }
+                for value in contains {
+                    if value == false {
+                        works = false
+                    }
+                }
+                if works == true {
+                    results.push(chord.clone());
+                }
+            }   
+        }
+        println!("Chords that fit are: ");
+        for result in results {
+            println!("{}", result);
+        }
+    }
     async fn scale_discovery(&mut self) {
         let mut results: Vec<Scale> = Vec::new();
         for i in 0..=11 {
@@ -2616,6 +2682,7 @@ impl RunTime {
     }
 
     async fn display_full_instrument(&mut self) {
+        self.display.notes = Vec::new();
         Instrument::show_all(&mut self.display.instrument);
     }
 

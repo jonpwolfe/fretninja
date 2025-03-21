@@ -1388,6 +1388,15 @@ struct Interval {
     interval: i8,
 }
 
+impl Interval {
+    fn new(interval: i8, accidental: Option<Accidental>) -> Self {
+        Interval {
+            interval,
+            accidental,
+        }
+    }
+}
+
 impl Display for Interval {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self.accidental {
@@ -1431,18 +1440,9 @@ impl Display for ChordDef {
 impl ChordDef {
     fn new_major() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
         ChordDef {
             name: "Major".to_string(),
             naming_convention: "".to_string(),
@@ -1452,18 +1452,9 @@ impl ChordDef {
 
     fn new_minor() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
         ChordDef {
             name: "Minor".to_string(),
             naming_convention: "m".to_string(),
@@ -1473,18 +1464,9 @@ impl ChordDef {
 
     fn new_diminished() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, Some(Accidental::Flat)));
         ChordDef {
             name: "Diminished".to_string(),
             naming_convention: "dim".to_string(),
@@ -1494,18 +1476,9 @@ impl ChordDef {
 
     fn new_augmented() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Sharp),
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, Some(Accidental::Sharp)));
         ChordDef {
             name: "Augmented".to_string(),
             naming_convention: "aug".to_string(),
@@ -1515,18 +1488,9 @@ impl ChordDef {
 
     fn new_suspended_second() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 2,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(2, None));
+        intervals.push(Interval::new(5, None));
         ChordDef {
             name: "Suspended 2".to_string(),
             naming_convention: "sus2".to_string(),
@@ -1536,18 +1500,9 @@ impl ChordDef {
 
     fn new_suspended_four() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 4,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(4, None));
+        intervals.push(Interval::new(5, None));
         ChordDef {
             name: "Suspended 4".to_string(),
             naming_convention: "sus4".to_string(),
@@ -1557,14 +1512,8 @@ impl ChordDef {
 
     fn new_power() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(5, None));
         ChordDef {
             name: "Power".to_string(),
             naming_convention: "5".to_string(),
@@ -1574,22 +1523,10 @@ impl ChordDef {
 
     fn new_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, None));
         ChordDef {
             name: "Major 7".to_string(),
             naming_convention: "maj7".to_string(),
@@ -1599,22 +1536,10 @@ impl ChordDef {
 
     fn new_minor_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
         ChordDef {
             name: "Minor 7".to_string(),
             naming_convention: "m7".to_string(),
@@ -1624,22 +1549,10 @@ impl ChordDef {
 
     fn new_dominant_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
         ChordDef {
             name: "Dominant 7".to_string(),
             naming_convention: "7".to_string(),
@@ -1649,22 +1562,10 @@ impl ChordDef {
 
     fn new_minor_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, None));
         ChordDef {
             name: "Minor Major 7".to_string(),
             naming_convention: "m(Maj7)".to_string(),
@@ -1674,22 +1575,10 @@ impl ChordDef {
 
     fn new_six() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 6,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(6, None));
         ChordDef {
             name: "6".to_string(),
             naming_convention: "6".to_string(),
@@ -1699,22 +1588,10 @@ impl ChordDef {
 
     fn new_minor_six() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 6,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(6, None));
         ChordDef {
             name: "Minor 6".to_string(),
             naming_convention: "m6".to_string(),
@@ -1723,26 +1600,11 @@ impl ChordDef {
     }
     fn new_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 9,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
+        intervals.push(Interval::new(9, None));
         ChordDef {
             name: "9".to_string(),
             naming_convention: "9".to_string(),
@@ -1752,26 +1614,11 @@ impl ChordDef {
 
     fn new_minor_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 9,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
+        intervals.push(Interval::new(9, None));
         ChordDef {
             name: "Minor 9".to_string(),
             naming_convention: "m9".to_string(),
@@ -1781,22 +1628,10 @@ impl ChordDef {
 
     fn new_add_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 9,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(9, None));
         ChordDef {
             name: "Add 9".to_string(),
             naming_convention: "add9".to_string(),
@@ -1806,22 +1641,10 @@ impl ChordDef {
 
     fn new_seven_suspended_four() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 4,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(4, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
         ChordDef {
             name: "7 Suspended 4".to_string(),
             naming_convention: "7sus4".to_string(),
@@ -1831,22 +1654,10 @@ impl ChordDef {
 
     fn new_dimished_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 6,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, Some(Accidental::Flat)));
+        intervals.push(Interval::new(6, None));
         ChordDef {
             name: "Diminished 7".to_string(),
             naming_convention: "dim7".to_string(),
@@ -1856,22 +1667,10 @@ impl ChordDef {
 
     fn new_half_diminished() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, Some(Accidental::Flat)));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
         ChordDef {
             name: "Half Diminished".to_string(),
             naming_convention: "7♭5".to_string(),
@@ -1881,22 +1680,10 @@ impl ChordDef {
 
     fn new_plus_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Sharp),
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, Some(Accidental::Sharp)));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
         ChordDef {
             name: "Plus 7".to_string(),
             naming_convention: "+7".to_string(),
@@ -1906,30 +1693,12 @@ impl ChordDef {
 
     fn new_minor_eleven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 9,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 11,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, Some(Accidental::Flat)));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
+        intervals.push(Interval::new(9, None));
+        intervals.push(Interval::new(11, None));
         ChordDef {
             name: "Minor 11".to_string(),
             naming_convention: "m11".to_string(),
@@ -1939,22 +1708,10 @@ impl ChordDef {
 
     fn new_augmented_major_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Sharp),
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 7,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, Some(Accidental::Sharp)));
+        intervals.push(Interval::new(7, None));
         ChordDef {
             name: "Augmented Major 7".to_string(),
             naming_convention: "Maj7♯5".to_string(),
@@ -1964,26 +1721,11 @@ impl ChordDef {
 
     fn new_dominant_seven_flat_nine() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 9,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, None));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
+        intervals.push(Interval::new(9, Some(Accidental::Flat)));
         ChordDef {
             name: "Dominant 7 Flat 9".to_string(),
             naming_convention: "7♭9".to_string(),
@@ -1993,26 +1735,11 @@ impl ChordDef {
 
     fn new_altered_dominant_seven() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
-        intervals.push(Interval {
-            accidental: None,
-            interval: 1,
-        });
-        intervals.push(Interval {
-            accidental: None,
-            interval: 3,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Sharp),
-            interval: 5,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Flat),
-            interval: 7,
-        });
-        intervals.push(Interval {
-            accidental: Some(Accidental::Sharp),
-            interval: 9,
-        });
+        intervals.push(Interval::new(1, None));
+        intervals.push(Interval::new(3, None));
+        intervals.push(Interval::new(5, Some(Accidental::Sharp)));
+        intervals.push(Interval::new(7, Some(Accidental::Flat)));
+        intervals.push(Interval::new(9, Some(Accidental::Sharp)));
         ChordDef {
             name: "Altered Dominant 7".to_string(),
             naming_convention: "7♯5♯9".to_string(),

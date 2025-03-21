@@ -2142,8 +2142,8 @@ impl RunTime {
                 "4" => self.choose_scale().await,
                 "5" => self.add_notes().await,
                 "6" => self.remove_notes().await,
-                "7" => self.scale_discovery().await,
-                "8" => self.chord_discovery().await,
+                "7" => self.find_scales().await,
+                "8" => self.find_chords().await,
                 "9" => self.display_full_instrument().await,
                 "10" => self.show_details().await,
                 "11" => self.change_tuning().await,
@@ -2241,7 +2241,7 @@ impl RunTime {
         }
     }
 
-    async fn chord_discovery(&mut self) {
+    async fn find_chords(&mut self) {
         let mut results: Vec<Chord> = Vec::new();
         for i in 0..=11 {
             let key = NoteName::from_number(i);
@@ -2274,7 +2274,7 @@ impl RunTime {
             println!("{}", result);
         }
     }
-    async fn scale_discovery(&mut self) {
+    async fn find_scales(&mut self) {
         let mut results: Vec<Scale> = Vec::new();
         for i in 0..=11 {
             let key = NoteName::from_number(i);

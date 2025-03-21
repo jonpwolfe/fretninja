@@ -12,7 +12,7 @@ use tokio;
 async fn main() {
     // let audio_engine = AudioEngine::new();
     //  audio_engine.play_audio(vec![440.0], 2.0).await;
-    RunTime::start(&mut RunTime::new()).await;
+    Runtime::start(&mut Runtime::new()).await;
 }
 
 #[derive(Clone)]
@@ -1887,7 +1887,7 @@ impl Chord {
         }
     }
 }
-
+#[derive(Clone)]
 struct AudioEngine {
     device: Arc<Device>,
     config: StreamConfig,
@@ -2045,16 +2045,10 @@ struct EarTraining<T, U> {
 }
 
 impl<T, U> EarTraining<T, U> {
-    fn new_notepitch_from_instrument(instrument: &Instrument) -> EarTraining<NotePitch, NotePitch> {
-        let mut possible_notes: Vec<NotePitch> = Vec::new();
-        for string in &instrument.fretboard {
-            for note in string {
-                possible_notes.push(note.note_pitch.clone());
-            }
-        }
+    fn new_notepitch_notepitch(audio_engine: &AudioEngine, possible_notes: &Vec<NotePitch>) -> EarTraining<NotePitch, NotePitch> {
         EarTraining {
-            audio_engine: AudioEngine::new(),
-            game: Game::new(possible_notes, 1),
+            audio_engine: audio_engine.clone(),
+            game: Game::new(possible_notes.clone(), 1),
         }
     }
 }
@@ -2088,13 +2082,13 @@ impl DisplayGroup {
     }
 }
 
-struct RunTime {
+struct Runtime {
     displays: Vec<DisplayGroup>,
     display: DisplayGroup,
     audio_engine: AudioEngine,
 }
 
-impl RunTime {
+impl Runtime {
     fn new() -> Self {
         let mut displays: Vec<DisplayGroup> = Vec::new();
         for _i in 0..=3 {
@@ -2103,7 +2097,7 @@ impl RunTime {
         }
         let display = DisplayGroup::new();
         let audio_engine: AudioEngine = AudioEngine::new();
-        RunTime {
+        Runtime {
             displays,
             display,
             audio_engine,
@@ -2219,10 +2213,10 @@ impl RunTime {
             .read_line(&mut input)
             .expect("Failed to read input");
         let mut chords = Vec::new();
-        let input_splits = RunTime::split_input_advanced(input);
+        let input_splits = Runtime::split_input_advanced(input);
         let mut key_current = NoteName::new(&NaturalNote::C, &None);
         for input_split in input_splits {
-            let (key_string, input_mod) = RunTime::split_input(input_split);
+            let (key_string, input_mod) = Runtime::split_input(input_split);
             match key_string.as_str() {
                 "" => (),
                 _ => key_current = NoteName::from_string(key_string),
@@ -2328,7 +2322,7 @@ impl RunTime {
                 .read_line(&mut input)
                 .expect("Failed to read input");
             input = input.to_uppercase();
-            let (key_string, input_mod) = RunTime::split_input(input);
+            let (key_string, input_mod) = Runtime::split_input(input);
             match key_string.as_str() {
                 "" => (),
                 _ => self.display.key = NoteName::from_string(key_string),
@@ -2359,7 +2353,7 @@ impl RunTime {
                 .read_line(&mut input)
                 .expect("Failed to read input");
             input = input.to_uppercase();
-            let (key_string, input_mod) = RunTime::split_input(input);
+            let (key_string, input_mod) = Runtime::split_input(input);
             match key_string.as_str() {
                 "" => (),
                 _ => self.display.key = NoteName::from_string(key_string),
@@ -2387,7 +2381,7 @@ impl RunTime {
         io::stdin()
             .read_line(&mut input)
             .expect("Failed to read input");
-        let (key, input_mod) = RunTime::split_input(input);
+        let (key, input_mod) = Runtime::split_input(input);
         let tuning_type: TuningType = TuningType::from_string(input_mod.trim().to_string());
         self.display.instrument.tuning_type = tuning_type;
         let key = NoteName::from_string(key);

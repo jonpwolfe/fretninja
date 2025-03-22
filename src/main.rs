@@ -2019,15 +2019,15 @@ impl<T: Ord, U: Ord> Attempt<T, U> {
 
 struct Game<T, U> {
     game_number: u64,
-    possible_notes: Vec<T>,
-    attempted_notes: Vec<U>,
+    possible_notes: Vec<U>,
+    attempted_notes: Vec<T>,
     attempts: Vec<Attempt<T, U>>,
     start_time: NaiveDateTime,
     end_time: Option<NaiveDateTime>,
 }
 
 impl<T, U> Game<T, U> {
-    fn new(possible_notes: Vec<T>, game_number: u64) -> Self {
+    fn new(possible_notes: Vec<U>, game_number: u64) -> Self {
         Game {
             game_number,
             possible_notes,
@@ -2046,6 +2046,12 @@ struct EarTraining<T, U> {
 
 impl<T, U> EarTraining<T, U> {
     fn new_notepitch_notepitch(audio_engine: &AudioEngine, possible_notes: &Vec<NotePitch>) -> EarTraining<NotePitch, NotePitch> {
+        EarTraining {
+            audio_engine: audio_engine.clone(),
+            game: Game::new(possible_notes.clone(), 1),
+        }
+    }
+    fn new_notename_notepitch(audio_engine: &AudioEngine, possible_notes: &Vec<NotePitch>) -> EarTraining<NoteName, NotePitch> {
         EarTraining {
             audio_engine: audio_engine.clone(),
             game: Game::new(possible_notes.clone(), 1),

@@ -1,3 +1,4 @@
+use chrono::{NaiveDateTime, Utc};
 use core::fmt::{Display, Formatter, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, Device, OutputCallbackInfo, SampleRate, StreamConfig};
@@ -1952,8 +1953,6 @@ impl AudioEngine {
         .expect("Audio task failed");
     }
 }
-
-use chrono::{NaiveDateTime, Utc};
 
 struct Attempt<T, U> {
     correct_answer: U,

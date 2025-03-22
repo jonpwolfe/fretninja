@@ -1910,9 +1910,11 @@ impl AudioEngine {
 
     async fn play_audio(&self, frequencies: Vec<f32>, duration_secs: f32) {
         let device = self.device.clone();
+        let config = self.config.clone();
 
         tokio::task::spawn_blocking(move || {
             let sample_rate = config.sample_rate.0 as f32;
+            let channels = config.channels as usize;
             let mut phase = 0.0;
             let phase_increment: Vec<f32> = frequencies
                 .iter()
@@ -1954,8 +1956,8 @@ impl AudioEngine {
 use chrono::{NaiveDateTime, Utc};
 
 struct Attempt<T, U> {
-    correct_answer: T,
-    attempt_answer: U,
+    correct_answer: U,
+    attempt_answer: T,
     correct: bool,
     attempt_number: u64,
     time_since_last_attempt: Option<u64>,

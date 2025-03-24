@@ -675,54 +675,18 @@ impl NoteName {
     fn from_string(input: String) -> NoteName {
         let input: String = input.to_uppercase();
         match input.as_str() {
-            "A" => NoteName {
-                natural_note: NaturalNote::A,
-                accidental: None,
-            },
-            "A#" => NoteName {
-                natural_note: NaturalNote::A,
-                accidental: Some(Accidental::Sharp),
-            },
-            "B" => NoteName {
-                natural_note: NaturalNote::B,
-                accidental: None,
-            },
-            "C" => NoteName {
-                natural_note: NaturalNote::C,
-                accidental: None,
-            },
-            "C#" => NoteName {
-                natural_note: NaturalNote::C,
-                accidental: Some(Accidental::Sharp),
-            },
-            "D" => NoteName {
-                natural_note: NaturalNote::D,
-                accidental: None,
-            },
-            "D#" => NoteName {
-                natural_note: NaturalNote::D,
-                accidental: Some(Accidental::Sharp),
-            },
-            "E" => NoteName {
-                natural_note: NaturalNote::E,
-                accidental: None,
-            },
-            "F" => NoteName {
-                natural_note: NaturalNote::F,
-                accidental: None,
-            },
-            "F#" => NoteName {
-                natural_note: NaturalNote::F,
-                accidental: Some(Accidental::Sharp),
-            },
-            "G" => NoteName {
-                natural_note: NaturalNote::G,
-                accidental: None,
-            },
-            "G#" => NoteName {
-                natural_note: NaturalNote::G,
-                accidental: Some(Accidental::Sharp),
-            },
+            "A" => NoteName::new(&NaturalNote::A, &None),
+            "A#" => NoteName::new(&NaturalNote::A, &Some(Accidental::Sharp)),
+            "B" => NoteName::new(&NaturalNote::B, &None),
+            "C" => NoteName::new(&NaturalNote::C, &None),
+            "C#" => NoteName::new(&NaturalNote::C, &Some(Accidental::Sharp)),
+            "D" => NoteName::new(&NaturalNote::D, &None),
+            "D#" => NoteName::new(&NaturalNote::D, &Some(Accidental::Sharp)),
+            "E" => NoteName::new(&NaturalNote::E, &None),
+            "F" => NoteName::new(&NaturalNote::F, &None),
+            "F#" => NoteName::new(&NaturalNote::F, &Some(Accidental::Sharp)),
+            "G" => NoteName::new(&NaturalNote::G, &None),
+            "G#" => NoteName::new(&NaturalNote::G, &Some(Accidental::Sharp)),
             _ => {
                 println!("Enter a new key (e.g., C, D#, F#):");
                 let mut reinput = String::new();

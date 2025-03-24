@@ -269,10 +269,6 @@ impl NotePitch {
     fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
         let mut octave: i8 = note_pitch.octave;
         let mut number: i8 = NoteName::to_number(&note_pitch.note_name);
-        while number > 11 {
-            number = number - 11;
-            octave = octave + 1;
-        }
         (number, octave)
     }
 

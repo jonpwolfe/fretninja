@@ -209,7 +209,7 @@ impl Display for NoteDisplay {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self.is_displayed {
             true => {
-                let rgb = NoteName::to_rgb(&self.note_pitch.note_name);
+                let rgb = self.note_pitch.note_name.to_rgb();
                 write!(f, "{}", self.note_pitch.get_name().color(rgb))?;
                 Ok(())
             }
@@ -233,7 +233,7 @@ struct NotePitch {
 
 impl Display for NotePitch {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = NoteName::to_rgb(&self.note_name);
+        let rgb = self.note_name.to_rgb();
         match &self.note_name.accidental {
             Some(_accidental) => write!(f, "{}", self.get_name().color(rgb)),
             None => write!(f, "\u{2002}{}", self.get_name().color(rgb)),
@@ -324,7 +324,7 @@ struct NoteName {
 
 impl Display for NoteName {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        let rgb = NoteName::to_rgb(self);
+        let rgb = self.to_rgb();
         write!(f, "{}", self.get_name().color(rgb))?;
         Ok(())
     }
@@ -475,9 +475,9 @@ impl NoteName {
         number
     }
 
-    fn to_rgb(note_name: &NoteName) -> Rgb {
-        match note_name.natural_note {
-            NaturalNote::C => match note_name.accidental {
+    fn to_rgb(self: &Self) -> Rgb {
+        match self.natural_note {
+            NaturalNote::C => match self.accidental {
                 Some(Accidental::Flat) => panic!("unexpected accidental"),
                 Some(Accidental::Sharp) => Rgb {
                     0: 191,
@@ -486,7 +486,7 @@ impl NoteName {
                 },
                 None => Rgb { 0: 191, 1: 0, 2: 0 },
             },
-            NaturalNote::D => match note_name.accidental {
+            NaturalNote::D => match self.accidental {
                 Some(Accidental::Flat) => Rgb {
                     0: 191,
                     1: 64,
@@ -503,7 +503,7 @@ impl NoteName {
                     2: 64,
                 },
             },
-            NaturalNote::E => match note_name.accidental {
+            NaturalNote::E => match self.accidental {
                 Some(Accidental::Flat) => Rgb {
                     0: 198,
                     1: 255,
@@ -516,7 +516,7 @@ impl NoteName {
                     2: 54,
                 },
             },
-            NaturalNote::F => match note_name.accidental {
+            NaturalNote::F => match self.accidental {
                 Some(Accidental::Flat) => panic!("unexpected accidental"),
                 Some(Accidental::Sharp) => Rgb {
                     0: 255,
@@ -529,7 +529,7 @@ impl NoteName {
                     2: 255,
                 },
             },
-            NaturalNote::G => match note_name.accidental {
+            NaturalNote::G => match self.accidental {
                 Some(Accidental::Flat) => Rgb {
                     0: 255,
                     1: 0,
@@ -538,7 +538,7 @@ impl NoteName {
                 Some(Accidental::Sharp) => Rgb { 0: 0, 1: 191, 2: 0 },
                 None => Rgb { 0: 0, 1: 255, 2: 0 },
             },
-            NaturalNote::A => match note_name.accidental {
+            NaturalNote::A => match self.accidental {
                 Some(Accidental::Flat) => Rgb { 0: 0, 1: 191, 2: 0 },
                 Some(Accidental::Sharp) => Rgb {
                     0: 64,
@@ -551,7 +551,7 @@ impl NoteName {
                     2: 235,
                 },
             },
-            NaturalNote::B => match note_name.accidental {
+            NaturalNote::B => match self.accidental {
                 Some(Accidental::Flat) => Rgb {
                     0: 64,
                     1: 191,

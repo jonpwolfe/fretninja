@@ -268,57 +268,7 @@ impl NotePitch {
 
     fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
         let mut octave: i8 = note_pitch.octave;
-        let mut number: i8 = match note_pitch.note_name.natural_note {
-            NaturalNote::C => {
-                0 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => panic!("unexpected accidental"),
-                    Some(Accidental::Sharp) => 1,
-                    None => 0,
-                }
-            }
-            NaturalNote::D => {
-                2 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => 1,
-                    None => 0,
-                }
-            }
-            NaturalNote::E => {
-                4 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
-                    None => 0,
-                }
-            }
-            NaturalNote::F => {
-                5 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => panic!("unexpected accidental"),
-                    Some(Accidental::Sharp) => 1,
-                    None => 0,
-                }
-            }
-            NaturalNote::G => {
-                7 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => 1,
-                    None => 0,
-                }
-            }
-            NaturalNote::A => {
-                9 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => 1,
-                    None => 0,
-                }
-            }
-            NaturalNote::B => {
-                11 + match note_pitch.note_name.accidental {
-                    Some(Accidental::Flat) => -1,
-                    Some(Accidental::Sharp) => panic!("unexpected accidental"),
-                    None => 0,
-                }
-            }
-        };
+        let mut number: i8 = NoteName::to_number(&note_pitch.note_name);
         while number > 11 {
             number = number - 11;
             octave = octave + 1;

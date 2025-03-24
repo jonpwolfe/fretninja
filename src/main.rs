@@ -105,10 +105,10 @@ impl Instrument {
         for i in 0..self.string_count {
             let mut musical_string: Vec<NoteDisplay> = Vec::new();
             for j in 0..(self.fret_count + 1) {
-                musical_string.push(NoteDisplay {
-                    note_pitch: NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()),
-                    is_displayed: true,
-                });
+                musical_string.push(NoteDisplay::new(
+                    &NotePitch::find_note(&self.tuning[i], j.try_into().unwrap()),
+                    true,
+                ));
             }
             notes.push(musical_string.clone());
         }
@@ -198,11 +198,14 @@ struct NoteDisplay {
     is_displayed: bool,
 }
 
-/*
 impl NoteDisplay {
-
+    fn new(note_pitch: &NotePitch, is_displayed: bool) -> Self {
+        NoteDisplay {
+            note_pitch: note_pitch.clone(),
+            is_displayed,
+        }
+    }
 }
-*/
 
 impl Display for NoteDisplay {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
@@ -260,8 +263,8 @@ impl NotePitch {
     }
 
     fn from_number(note_number: i8, octave: i8) -> Self {
-        NotePitch { 
-            note_name: NoteName::from_number(note_number), 
+        NotePitch {
+            note_name: NoteName::from_number(note_number),
             octave,
         }
     }
@@ -1832,13 +1835,19 @@ struct EarTraining<T, U> {
 }
 
 impl<T, U> EarTraining<T, U> {
-    fn new_notepitch_notepitch(audio_engine: &AudioEngine, possible_notes: &Vec<NotePitch>) -> EarTraining<NotePitch, NotePitch> {
+    fn new_notepitch_notepitch(
+        audio_engine: &AudioEngine,
+        possible_notes: &Vec<NotePitch>,
+    ) -> EarTraining<NotePitch, NotePitch> {
         EarTraining {
             audio_engine: audio_engine.clone(),
             game: Game::new(possible_notes.clone(), 1),
         }
     }
-    fn new_notename_notepitch(audio_engine: &AudioEngine, possible_notes: &Vec<NotePitch>) -> EarTraining<NoteName, NotePitch> {
+    fn new_notename_notepitch(
+        audio_engine: &AudioEngine,
+        possible_notes: &Vec<NotePitch>,
+    ) -> EarTraining<NoteName, NotePitch> {
         EarTraining {
             audio_engine: audio_engine.clone(),
             game: Game::new(possible_notes.clone(), 1),

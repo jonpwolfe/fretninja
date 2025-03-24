@@ -181,9 +181,7 @@ impl Instrument {
         for note in notes {
             for i in 0..self.string_count {
                 for j in 0..self.fret_count {
-                    if NoteName::to_number(&note)
-                        == NoteName::to_number(&self.fretboard[i][j].note_pitch.note_name)
-                    {
+                    if note.to_number() == self.fretboard[i][j].note_pitch.note_name.to_number() {
                         self.fretboard[i][j].is_displayed = true;
                     }
                 }
@@ -269,10 +267,8 @@ impl NotePitch {
         }
     }
 
-    fn to_number(note_pitch: &NotePitch) -> (i8, i8) {
-        let mut octave: i8 = note_pitch.octave;
-        let mut number: i8 = NoteName::to_number(&note_pitch.note_name);
-        (number, octave)
+    fn to_number(self: &Self) -> (i8, i8) {
+        (self.note_name.to_number(), self.octave)
     }
 
     fn find_note(open_note: &NotePitch, distance: i8) -> Self {
@@ -286,19 +282,19 @@ impl NotePitch {
     }
 
     fn up_step(start_note: &NotePitch, step: &Step) -> Self {
-        let to_add = Step::to_number(step);
+        let to_add = step.to_number();
         let (number, octave) = NotePitch::add(start_note, to_add);
         NotePitch::from_number(number, octave)
     }
 
     fn down_step(start_note: &NotePitch, step: &Step) -> Self {
-        let to_subtract = Step::to_number(step);
+        let to_subtract = step.to_number();
         let (number, octave) = NotePitch::minus(start_note, to_subtract);
         NotePitch::from_number(number, octave)
     }
 
     fn add(start_note: &NotePitch, to_add: i8) -> (i8, i8) {
-        let (note_number, octave) = NotePitch::to_number(&start_note);
+        let (note_number, octave) = start_note.to_number();
         let mut octave = octave;
         let mut number = note_number + to_add;
         while number >= 12 {
@@ -309,7 +305,7 @@ impl NotePitch {
     }
 
     fn minus(start_note: &NotePitch, to_subtract: i8) -> (i8, i8) {
-        let (note_number, octave) = NotePitch::to_number(&start_note);
+        let (note_number, octave) = start_note.to_number();
         let mut octave = octave;
         let mut number: i8 = note_number - to_subtract;
         while number < 0 {
@@ -336,7 +332,7 @@ impl Display for NoteName {
 
 impl Ord for NoteName {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        NoteName::to_number(&self).cmp(&NoteName::to_number(&other))
+        self.to_number().cmp(&other.to_number())
     }
 }
 
@@ -391,52 +387,52 @@ impl NoteName {
         }
     }
 
-    fn to_number(note_name: &NoteName) -> i8 {
-        let mut number: i8 = match note_name.natural_note {
+    fn to_number(self: &Self) -> i8 {
+        let mut number: i8 = match self.natural_note {
             NaturalNote::C => {
-                0 + match note_name.accidental {
+                0 + match self.accidental {
                     Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::D => {
-                2 + match note_name.accidental {
+                2 + match self.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::E => {
-                4 + match note_name.accidental {
+                4 + match self.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
                 }
             }
             NaturalNote::F => {
-                5 + match note_name.accidental {
+                5 + match self.accidental {
                     Some(Accidental::Flat) => panic!("unexpected accidental"),
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::G => {
-                7 + match note_name.accidental {
+                7 + match self.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::A => {
-                9 + match note_name.accidental {
+                9 + match self.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => 1,
                     None => 0,
                 }
             }
             NaturalNote::B => {
-                11 + match note_name.accidental {
+                11 + match self.accidental {
                     Some(Accidental::Flat) => -1,
                     Some(Accidental::Sharp) => panic!("unexpected accidental"),
                     None => 0,
@@ -450,19 +446,19 @@ impl NoteName {
     }
 
     fn up_step(start_note: &NoteName, step: &Step) -> NoteName {
-        let to_add = Step::to_number(step);
+        let to_add = step.to_number();
         let number = NoteName::add(start_note, to_add);
         NoteName::from_number(number)
     }
 
     fn down_step(start_note: &NoteName, step: &Step) -> NoteName {
-        let to_subtract = Step::to_number(step);
+        let to_subtract = step.to_number();
         let number = NoteName::minus(start_note, to_subtract);
         NoteName::from_number(number)
     }
 
     fn add(start_note: &NoteName, to_add: i8) -> i8 {
-        let note_number = NoteName::to_number(&start_note);
+        let note_number = start_note.to_number();
         let mut number = note_number + to_add;
         while number >= 12 {
             number = number - 12;
@@ -471,7 +467,7 @@ impl NoteName {
     }
 
     fn minus(start_note: &NoteName, to_subtract: i8) -> i8 {
-        let note_number = NoteName::to_number(&start_note);
+        let note_number = start_note.to_number();
         let mut number: i8 = note_number - to_subtract;
         while number < 0 {
             number = number + 12;
@@ -612,7 +608,7 @@ enum NaturalNote {
 
 impl Ord for NaturalNote {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        NaturalNote::to_number(&self).cmp(&NaturalNote::to_number(&other))
+        self.to_number().cmp(&other.to_number())
     }
 }
 
@@ -1145,7 +1141,7 @@ enum Accidental {
 
 impl Ord for Accidental {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        Accidental::to_number(&self).cmp(&Accidental::to_number(&other))
+        self.to_number().cmp(&other.to_number())
     }
 }
 

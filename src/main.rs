@@ -243,10 +243,7 @@ impl Display for NotePitch {
 impl NotePitch {
     fn new(natural_note: &NaturalNote, accidental: &Option<Accidental>, octave: i8) -> Self {
         NotePitch {
-            note_name: NoteName {
-                natural_note: natural_note.clone(),
-                accidental: accidental.clone(),
-            },
+            note_name: NoteName::new(natural_note, accidental),
             octave,
         }
     }
@@ -263,56 +260,9 @@ impl NotePitch {
     }
 
     fn from_number(note_number: i8, octave: i8) -> Self {
-        match note_number {
-            0 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::C, &None),
-                octave,
-            },
-            1 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::C, &Some(Accidental::Sharp)),
-                octave,
-            },
-            2 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::D, &None),
-                octave,
-            },
-            3 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::D, &Some(Accidental::Sharp)),
-                octave,
-            },
-            4 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::E, &None),
-                octave,
-            },
-            5 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::F, &None),
-                octave,
-            },
-            6 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::F, &Some(Accidental::Sharp)),
-                octave,
-            },
-            7 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::G, &None),
-                octave,
-            },
-            8 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::G, &Some(Accidental::Sharp)),
-                octave,
-            },
-            9 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::A, &None),
-                octave,
-            },
-            10 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::A, &Some(Accidental::Sharp)),
-                octave,
-            },
-            11 => NotePitch {
-                note_name: NoteName::new(&NaturalNote::B, &None),
-                octave,
-            },
-            _ => panic!("unexpected note number"),
+        NotePitch { 
+            note_name: NoteName::from_number(note_number), 
+            octave,
         }
     }
 

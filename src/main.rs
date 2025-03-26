@@ -707,28 +707,12 @@ impl Display for InstrumentType {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Debug)]
-struct StepValue {
-    value: i8,
-}
-
-impl Ord for StepValue {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.value.cmp(&other.value)
-    }
-}
-
-impl PartialOrd for StepValue {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.cmp(other))
-    }
-}
 
 #[derive(PartialEq, Eq, Clone, Debug)]
 enum Step {
-    Whole(StepValue),
-    Half(StepValue),
-    OneAndAHalf(StepValue),
+    Whole,
+    Half,
+    OneAndAHalf,
 }
 
 impl Ord for Step {
@@ -745,22 +729,22 @@ impl PartialOrd for Step {
 
 impl Step {
     fn new_whole() -> Self {
-        Step::Whole(StepValue { value: 2 })
+        Step::Whole
     }
 
     fn new_half() -> Self {
-        Step::Half(StepValue { value: 1 })
+        Step::Half
     }
 
     fn new_one_and_a_half() -> Self {
-        Step::OneAndAHalf(StepValue { value: 3 })
+        Step::OneAndAHalf
     }
 
     fn to_number(self: &Self) -> i8 {
         match self {
-            Step::Whole(step_value) => step_value.value,
-            Step::Half(step_value) => step_value.value,
-            Step::OneAndAHalf(step_value) => step_value.value,
+            Step::Whole => 2,
+            Step::Half => 1,
+            Step::OneAndAHalf => 3,
         }
     }
 }
@@ -768,9 +752,9 @@ impl Step {
 impl Display for Step {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let display_character = match self {
-            Step::Whole(_step_value) => "W".to_string(),
-            Step::Half(_step_value) => "H".to_string(),
-            Step::OneAndAHalf(_step_value) => "3/2".to_string(),
+            Step::Whole => "W".to_string(),
+            Step::Half => "H".to_string(),
+            Step::OneAndAHalf => "3/2".to_string(),
         };
         write!(f, "{}", display_character)?;
         Ok(())

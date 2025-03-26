@@ -777,13 +777,13 @@ impl Display for Step {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
-struct ScaleDef {
+#[derive(PartialEq, Eq, Clone, Debug)]
+struct ScaleDefinition {
     name: String,
     steps: Vec<Step>,
 }
 
-impl ScaleDef {
+impl ScaleDefinition {
     fn new_major() -> Self {
         let mut steps: Vec<Step> = Vec::new();
         steps.push(Step::new_whole());
@@ -793,7 +793,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Major".to_string(),
             steps,
         }
@@ -808,7 +808,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Ionian".to_string(),
             steps,
         }
@@ -823,7 +823,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Dorian".to_string(),
             steps,
         }
@@ -838,7 +838,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Phrygian".to_string(),
             steps,
         }
@@ -853,7 +853,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Lydian".to_string(),
             steps,
         }
@@ -868,7 +868,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Mixolydian".to_string(),
             steps,
         }
@@ -883,7 +883,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Aeolian".to_string(),
             steps,
         }
@@ -898,7 +898,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Locrian".to_string(),
             steps,
         }
@@ -913,7 +913,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Natural Minor".to_string(),
             steps,
         }
@@ -928,7 +928,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_one_and_a_half());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Harmonic Minor".to_string(),
             steps,
         }
@@ -943,7 +943,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Melodic Minor Ascending".to_string(),
             steps,
         }
@@ -958,7 +958,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Melodic Minor Descending".to_string(),
             steps,
         }
@@ -978,7 +978,7 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_half());
         steps.push(Step::new_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Chromatic".to_string(),
             steps,
         }
@@ -992,7 +992,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Whole Tone".to_string(),
             steps,
         }
@@ -1005,7 +1005,7 @@ impl ScaleDef {
         steps.push(Step::new_one_and_a_half());
         steps.push(Step::new_whole());
         steps.push(Step::new_one_and_a_half());
-        ScaleDef {
+        ScaleDefinition {
             name: "Major Pentatonic".to_string(),
             steps,
         }
@@ -1018,7 +1018,7 @@ impl ScaleDef {
         steps.push(Step::new_whole());
         steps.push(Step::new_one_and_a_half());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Minor Pentatonic".to_string(),
             steps,
         }
@@ -1032,14 +1032,14 @@ impl ScaleDef {
         steps.push(Step::new_half());
         steps.push(Step::new_one_and_a_half());
         steps.push(Step::new_whole());
-        ScaleDef {
+        ScaleDefinition {
             name: "Blues".to_string(),
             steps,
         }
     }
 }
 
-impl Display for ScaleDef {
+impl Display for ScaleDefinition {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let white_rgb = Rgb {
             0: 255,
@@ -1063,13 +1063,13 @@ impl Display for ScaleDef {
 
 #[derive(PartialEq, Clone, Debug)]
 struct Scale {
-    definition: ScaleDef,
+    definition: ScaleDefinition,
     name: String,
     notes: Vec<NoteName>,
 }
 
 impl Scale {
-    fn new(root_note: &NoteName, definition: &ScaleDef) -> Self {
+    fn new(root_note: &NoteName, definition: &ScaleDefinition) -> Self {
         let mut notes: Vec<NoteName> = Vec::new();
         notes.push(root_note.clone());
         let mut count: usize = 0;
@@ -1086,23 +1086,23 @@ impl Scale {
 
     fn from_number(key: &NoteName, input: i8) -> Self {
         match input {
-            0 => Scale::new(&key, &ScaleDef::new_major()),
-            1 => Scale::new(&key, &ScaleDef::new_ionian()),
-            2 => Scale::new(&key, &ScaleDef::new_dorian()),
-            3 => Scale::new(&key, &ScaleDef::new_phrygian()),
-            4 => Scale::new(&key, &ScaleDef::new_lydian()),
-            5 => Scale::new(&key, &ScaleDef::new_mixolydian()),
-            6 => Scale::new(&key, &ScaleDef::new_aeolian()),
-            7 => Scale::new(&key, &ScaleDef::new_locrian()),
-            8 => Scale::new(&key, &ScaleDef::new_natural_minor()),
-            9 => Scale::new(&key, &ScaleDef::new_harmonic_minor()),
-            10 => Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()),
-            11 => Scale::new(&key, &ScaleDef::new_melodic_minor_descending()),
-            12 => Scale::new(&key, &ScaleDef::new_chromatic()),
-            13 => Scale::new(&key, &ScaleDef::new_whole_tone()),
-            14 => Scale::new(&key, &ScaleDef::new_major_pentatonic()),
-            15 => Scale::new(&key, &ScaleDef::new_minor_pentatonic()),
-            16 => Scale::new(&key, &ScaleDef::new_blues()),
+            0 => Scale::new(&key, &ScaleDefinition::new_major()),
+            1 => Scale::new(&key, &ScaleDefinition::new_ionian()),
+            2 => Scale::new(&key, &ScaleDefinition::new_dorian()),
+            3 => Scale::new(&key, &ScaleDefinition::new_phrygian()),
+            4 => Scale::new(&key, &ScaleDefinition::new_lydian()),
+            5 => Scale::new(&key, &ScaleDefinition::new_mixolydian()),
+            6 => Scale::new(&key, &ScaleDefinition::new_aeolian()),
+            7 => Scale::new(&key, &ScaleDefinition::new_locrian()),
+            8 => Scale::new(&key, &ScaleDefinition::new_natural_minor()),
+            9 => Scale::new(&key, &ScaleDefinition::new_harmonic_minor()),
+            10 => Scale::new(&key, &ScaleDefinition::new_melodic_minor_ascending()),
+            11 => Scale::new(&key, &ScaleDefinition::new_melodic_minor_descending()),
+            12 => Scale::new(&key, &ScaleDefinition::new_chromatic()),
+            13 => Scale::new(&key, &ScaleDefinition::new_whole_tone()),
+            14 => Scale::new(&key, &ScaleDefinition::new_major_pentatonic()),
+            15 => Scale::new(&key, &ScaleDefinition::new_minor_pentatonic()),
+            16 => Scale::new(&key, &ScaleDefinition::new_blues()),
             _ => panic!("unexpected"),
         }
     }
@@ -1110,27 +1110,27 @@ impl Scale {
     fn from_string(key: &NoteName, input: String) -> Option<Self> {
         let input: String = input.to_uppercase();
         match input.as_str() {
-            "MAJOR" => Some(Scale::new(&key, &ScaleDef::new_major())),
-            "IONIAN" => Some(Scale::new(&key, &ScaleDef::new_ionian())),
-            "DORIAN" => Some(Scale::new(&key, &ScaleDef::new_dorian())),
-            "PHRYGIAN" => Some(Scale::new(&key, &ScaleDef::new_phrygian())),
-            "LYDIAN" => Some(Scale::new(&key, &ScaleDef::new_lydian())),
-            "MIXOLYDIAN" => Some(Scale::new(&key, &ScaleDef::new_mixolydian())),
-            "AEOLIAN" => Some(Scale::new(&key, &ScaleDef::new_aeolian())),
-            "LOCRIAN" => Some(Scale::new(&key, &ScaleDef::new_locrian())),
-            "NATURAL MINOR" => Some(Scale::new(&key, &ScaleDef::new_natural_minor())),
-            "HARMONIC MINOR" => Some(Scale::new(&key, &ScaleDef::new_harmonic_minor())),
+            "MAJOR" => Some(Scale::new(&key, &ScaleDefinition::new_major())),
+            "IONIAN" => Some(Scale::new(&key, &ScaleDefinition::new_ionian())),
+            "DORIAN" => Some(Scale::new(&key, &ScaleDefinition::new_dorian())),
+            "PHRYGIAN" => Some(Scale::new(&key, &ScaleDefinition::new_phrygian())),
+            "LYDIAN" => Some(Scale::new(&key, &ScaleDefinition::new_lydian())),
+            "MIXOLYDIAN" => Some(Scale::new(&key, &ScaleDefinition::new_mixolydian())),
+            "AEOLIAN" => Some(Scale::new(&key, &ScaleDefinition::new_aeolian())),
+            "LOCRIAN" => Some(Scale::new(&key, &ScaleDefinition::new_locrian())),
+            "NATURAL MINOR" => Some(Scale::new(&key, &ScaleDefinition::new_natural_minor())),
+            "HARMONIC MINOR" => Some(Scale::new(&key, &ScaleDefinition::new_harmonic_minor())),
             "MELODIC MINOR ASCENDING" => {
-                Some(Scale::new(&key, &ScaleDef::new_melodic_minor_ascending()))
+                Some(Scale::new(&key, &ScaleDefinition::new_melodic_minor_ascending()))
             }
             "MELODIC MINOR DESCENDING" => {
-                Some(Scale::new(&key, &ScaleDef::new_melodic_minor_descending()))
+                Some(Scale::new(&key, &ScaleDefinition::new_melodic_minor_descending()))
             }
-            "CHROMATIC" => Some(Scale::new(&key, &ScaleDef::new_chromatic())),
-            "WHOLE TONE" => Some(Scale::new(&key, &ScaleDef::new_whole_tone())),
-            "MAJOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_major_pentatonic())),
-            "MINOR PENTATONIC" => Some(Scale::new(&key, &ScaleDef::new_minor_pentatonic())),
-            "BLUES" => Some(Scale::new(&key, &ScaleDef::new_blues())),
+            "CHROMATIC" => Some(Scale::new(&key, &ScaleDefinition::new_chromatic())),
+            "WHOLE TONE" => Some(Scale::new(&key, &ScaleDefinition::new_whole_tone())),
+            "MAJOR PENTATONIC" => Some(Scale::new(&key, &ScaleDefinition::new_major_pentatonic())),
+            "MINOR PENTATONIC" => Some(Scale::new(&key, &ScaleDefinition::new_minor_pentatonic())),
+            "BLUES" => Some(Scale::new(&key, &ScaleDefinition::new_blues())),
             _ => None,
         }
     }
@@ -1222,13 +1222,13 @@ impl Display for Interval {
 }
 
 #[derive(PartialEq, Clone, Debug)]
-struct ChordDef {
+struct ChordDefinition {
     name: String,
     naming_convention: String,
     intervals: Vec<Interval>,
 }
 
-impl Display for ChordDef {
+impl Display for ChordDefinition {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let white_rgb = Rgb {
             0: 255,
@@ -1250,13 +1250,13 @@ impl Display for ChordDef {
     }
 }
 
-impl ChordDef {
+impl ChordDefinition {
     fn new_major() -> Self {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, None));
-        ChordDef {
+        ChordDefinition {
             name: "Major".to_string(),
             naming_convention: "".to_string(),
             intervals,
@@ -1268,7 +1268,7 @@ impl ChordDef {
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, None));
-        ChordDef {
+        ChordDefinition {
             name: "Minor".to_string(),
             naming_convention: "m".to_string(),
             intervals,
@@ -1280,7 +1280,7 @@ impl ChordDef {
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Diminished".to_string(),
             naming_convention: "dim".to_string(),
             intervals,
@@ -1292,7 +1292,7 @@ impl ChordDef {
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, Some(Accidental::Sharp)));
-        ChordDef {
+        ChordDefinition {
             name: "Augmented".to_string(),
             naming_convention: "aug".to_string(),
             intervals,
@@ -1304,7 +1304,7 @@ impl ChordDef {
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(2, None));
         intervals.push(Interval::new(5, None));
-        ChordDef {
+        ChordDefinition {
             name: "Suspended 2".to_string(),
             naming_convention: "sus2".to_string(),
             intervals,
@@ -1316,7 +1316,7 @@ impl ChordDef {
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(4, None));
         intervals.push(Interval::new(5, None));
-        ChordDef {
+        ChordDefinition {
             name: "Suspended 4".to_string(),
             naming_convention: "sus4".to_string(),
             intervals,
@@ -1327,7 +1327,7 @@ impl ChordDef {
         let mut intervals: Vec<Interval> = Vec::new();
         intervals.push(Interval::new(1, None));
         intervals.push(Interval::new(5, None));
-        ChordDef {
+        ChordDefinition {
             name: "Power".to_string(),
             naming_convention: "5".to_string(),
             intervals,
@@ -1340,7 +1340,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, None));
-        ChordDef {
+        ChordDefinition {
             name: "Major 7".to_string(),
             naming_convention: "maj7".to_string(),
             intervals,
@@ -1353,7 +1353,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Minor 7".to_string(),
             naming_convention: "m7".to_string(),
             intervals,
@@ -1366,7 +1366,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Dominant 7".to_string(),
             naming_convention: "7".to_string(),
             intervals,
@@ -1379,7 +1379,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, None));
-        ChordDef {
+        ChordDefinition {
             name: "Minor Major 7".to_string(),
             naming_convention: "m(Maj7)".to_string(),
             intervals,
@@ -1392,7 +1392,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(6, None));
-        ChordDef {
+        ChordDefinition {
             name: "6".to_string(),
             naming_convention: "6".to_string(),
             intervals,
@@ -1405,7 +1405,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(6, None));
-        ChordDef {
+        ChordDefinition {
             name: "Minor 6".to_string(),
             naming_convention: "m6".to_string(),
             intervals,
@@ -1418,7 +1418,7 @@ impl ChordDef {
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
         intervals.push(Interval::new(9, None));
-        ChordDef {
+        ChordDefinition {
             name: "9".to_string(),
             naming_convention: "9".to_string(),
             intervals,
@@ -1432,7 +1432,7 @@ impl ChordDef {
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
         intervals.push(Interval::new(9, None));
-        ChordDef {
+        ChordDefinition {
             name: "Minor 9".to_string(),
             naming_convention: "m9".to_string(),
             intervals,
@@ -1445,7 +1445,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(9, None));
-        ChordDef {
+        ChordDefinition {
             name: "Add 9".to_string(),
             naming_convention: "add9".to_string(),
             intervals,
@@ -1458,7 +1458,7 @@ impl ChordDef {
         intervals.push(Interval::new(4, None));
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "7 Suspended 4".to_string(),
             naming_convention: "7sus4".to_string(),
             intervals,
@@ -1471,7 +1471,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, Some(Accidental::Flat)));
         intervals.push(Interval::new(6, None));
-        ChordDef {
+        ChordDefinition {
             name: "Diminished 7".to_string(),
             naming_convention: "dim7".to_string(),
             intervals,
@@ -1484,7 +1484,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, Some(Accidental::Flat)));
         intervals.push(Interval::new(5, Some(Accidental::Flat)));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Half Diminished".to_string(),
             naming_convention: "7♭5".to_string(),
             intervals,
@@ -1497,7 +1497,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, Some(Accidental::Sharp)));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Plus 7".to_string(),
             naming_convention: "+7".to_string(),
             intervals,
@@ -1512,7 +1512,7 @@ impl ChordDef {
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
         intervals.push(Interval::new(9, None));
         intervals.push(Interval::new(11, None));
-        ChordDef {
+        ChordDefinition {
             name: "Minor 11".to_string(),
             naming_convention: "m11".to_string(),
             intervals,
@@ -1525,7 +1525,7 @@ impl ChordDef {
         intervals.push(Interval::new(3, None));
         intervals.push(Interval::new(5, Some(Accidental::Sharp)));
         intervals.push(Interval::new(7, None));
-        ChordDef {
+        ChordDefinition {
             name: "Augmented Major 7".to_string(),
             naming_convention: "Maj7♯5".to_string(),
             intervals,
@@ -1539,7 +1539,7 @@ impl ChordDef {
         intervals.push(Interval::new(5, None));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
         intervals.push(Interval::new(9, Some(Accidental::Flat)));
-        ChordDef {
+        ChordDefinition {
             name: "Dominant 7 Flat 9".to_string(),
             naming_convention: "7♭9".to_string(),
             intervals,
@@ -1553,7 +1553,7 @@ impl ChordDef {
         intervals.push(Interval::new(5, Some(Accidental::Sharp)));
         intervals.push(Interval::new(7, Some(Accidental::Flat)));
         intervals.push(Interval::new(9, Some(Accidental::Sharp)));
-        ChordDef {
+        ChordDefinition {
             name: "Altered Dominant 7".to_string(),
             naming_convention: "7♯5♯9".to_string(),
             intervals,
@@ -1563,7 +1563,7 @@ impl ChordDef {
 
 #[derive(PartialEq, Clone, Debug)]
 struct Chord {
-    definition: ChordDef,
+    definition: ChordDefinition,
     notes: Vec<NoteName>,
     name: String,
     short_name: String,
@@ -1597,8 +1597,8 @@ impl Display for Chord {
 }
 
 impl Chord {
-    fn new(root_note: &NoteName, definition: &ChordDef) -> Self {
-        let scale = Scale::new(root_note, &ScaleDef::new_major());
+    fn new(root_note: &NoteName, definition: &ChordDefinition) -> Self {
+        let scale = Scale::new(root_note, &ScaleDefinition::new_major());
         let mut notes: Vec<NoteName> = Vec::new();
         let scale_length = scale.notes.len();
 
@@ -1636,35 +1636,35 @@ impl Chord {
     fn from_string(key: &NoteName, input: String) -> Option<Self> {
         let input_uppercase: String = input.to_uppercase();
         match input_uppercase.as_str() {
-            "MAJOR" => Some(Chord::new(&key, &ChordDef::new_major())),
-            "MINOR" => Some(Chord::new(&key, &ChordDef::new_minor())),
-            "DIMINISHED" => Some(Chord::new(&key, &ChordDef::new_diminished())),
-            "AUGMENTED" => Some(Chord::new(&key, &ChordDef::new_augmented())),
-            "SUSPENDED TWO" => Some(Chord::new(&key, &ChordDef::new_suspended_second())),
-            "SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDef::new_suspended_four())),
-            "POWER" => Some(Chord::new(&key, &ChordDef::new_power())),
-            "MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_major_seven())),
-            "MINOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_seven())),
-            "DOMINANT SEVEN" => Some(Chord::new(&key, &ChordDef::new_dominant_seven())),
-            "MINOR MAJOR SEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_major_seven())),
-            "SIX" => Some(Chord::new(&key, &ChordDef::new_six())),
-            "MINOR SIX" => Some(Chord::new(&key, &ChordDef::new_minor_six())),
-            "NINE" => Some(Chord::new(&key, &ChordDef::new_nine())),
-            "MINOR NINE" => Some(Chord::new(&key, &ChordDef::new_minor_nine())),
-            "ADD NINE" => Some(Chord::new(&key, &ChordDef::new_add_nine())),
-            "SEVEN SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDef::new_seven_suspended_four())),
-            "DIMINISHED SEVEN" => Some(Chord::new(&key, &ChordDef::new_dimished_seven())),
-            "HALF DIMINISHED" => Some(Chord::new(&key, &ChordDef::new_half_diminished())),
-            "PLUS SEVEN" => Some(Chord::new(&key, &ChordDef::new_plus_seven())),
-            "MINOR ELEVEN" => Some(Chord::new(&key, &ChordDef::new_minor_eleven())),
+            "MAJOR" => Some(Chord::new(&key, &ChordDefinition::new_major())),
+            "MINOR" => Some(Chord::new(&key, &ChordDefinition::new_minor())),
+            "DIMINISHED" => Some(Chord::new(&key, &ChordDefinition::new_diminished())),
+            "AUGMENTED" => Some(Chord::new(&key, &ChordDefinition::new_augmented())),
+            "SUSPENDED TWO" => Some(Chord::new(&key, &ChordDefinition::new_suspended_second())),
+            "SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDefinition::new_suspended_four())),
+            "POWER" => Some(Chord::new(&key, &ChordDefinition::new_power())),
+            "MAJOR SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_major_seven())),
+            "MINOR SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_minor_seven())),
+            "DOMINANT SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_dominant_seven())),
+            "MINOR MAJOR SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_minor_major_seven())),
+            "SIX" => Some(Chord::new(&key, &ChordDefinition::new_six())),
+            "MINOR SIX" => Some(Chord::new(&key, &ChordDefinition::new_minor_six())),
+            "NINE" => Some(Chord::new(&key, &ChordDefinition::new_nine())),
+            "MINOR NINE" => Some(Chord::new(&key, &ChordDefinition::new_minor_nine())),
+            "ADD NINE" => Some(Chord::new(&key, &ChordDefinition::new_add_nine())),
+            "SEVEN SUSPENDED FOUR" => Some(Chord::new(&key, &ChordDefinition::new_seven_suspended_four())),
+            "DIMINISHED SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_dimished_seven())),
+            "HALF DIMINISHED" => Some(Chord::new(&key, &ChordDefinition::new_half_diminished())),
+            "PLUS SEVEN" => Some(Chord::new(&key, &ChordDefinition::new_plus_seven())),
+            "MINOR ELEVEN" => Some(Chord::new(&key, &ChordDefinition::new_minor_eleven())),
             "AUGMENTED MAJOR SEVEN" => {
-                Some(Chord::new(&key, &ChordDef::new_augmented_major_seven()))
+                Some(Chord::new(&key, &ChordDefinition::new_augmented_major_seven()))
             }
             "DOMINANT SEVEN FLAT NINE" => {
-                Some(Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine()))
+                Some(Chord::new(&key, &ChordDefinition::new_dominant_seven_flat_nine()))
             }
             "ALTERED DOMINANT SEVEN" => {
-                Some(Chord::new(&key, &ChordDef::new_altered_dominant_seven()))
+                Some(Chord::new(&key, &ChordDefinition::new_altered_dominant_seven()))
             }
             _ => None,
         }
@@ -1672,30 +1672,30 @@ impl Chord {
 
     fn from_number(key: &NoteName, input: i8) -> Self {
         match input {
-            0 => Chord::new(&key, &ChordDef::new_major()),
-            1 => Chord::new(&key, &ChordDef::new_minor()),
-            2 => Chord::new(&key, &ChordDef::new_diminished()),
-            3 => Chord::new(&key, &ChordDef::new_augmented()),
-            4 => Chord::new(&key, &ChordDef::new_suspended_second()),
-            5 => Chord::new(&key, &ChordDef::new_suspended_four()),
-            6 => Chord::new(&key, &ChordDef::new_power()),
-            7 => Chord::new(&key, &ChordDef::new_major_seven()),
-            8 => Chord::new(&key, &ChordDef::new_minor_seven()),
-            9 => Chord::new(&key, &ChordDef::new_dominant_seven()),
-            10 => Chord::new(&key, &ChordDef::new_minor_major_seven()),
-            11 => Chord::new(&key, &ChordDef::new_six()),
-            12 => Chord::new(&key, &ChordDef::new_minor_six()),
-            13 => Chord::new(&key, &ChordDef::new_nine()),
-            14 => Chord::new(&key, &ChordDef::new_minor_nine()),
-            15 => Chord::new(&key, &ChordDef::new_add_nine()),
-            16 => Chord::new(&key, &ChordDef::new_seven_suspended_four()),
-            17 => Chord::new(&key, &ChordDef::new_dimished_seven()),
-            18 => Chord::new(&key, &ChordDef::new_half_diminished()),
-            19 => Chord::new(&key, &ChordDef::new_plus_seven()),
-            20 => Chord::new(&key, &ChordDef::new_minor_eleven()),
-            21 => Chord::new(&key, &ChordDef::new_augmented_major_seven()),
-            22 => Chord::new(&key, &ChordDef::new_dominant_seven_flat_nine()),
-            23 => Chord::new(&key, &ChordDef::new_altered_dominant_seven()),
+            0 => Chord::new(&key, &ChordDefinition::new_major()),
+            1 => Chord::new(&key, &ChordDefinition::new_minor()),
+            2 => Chord::new(&key, &ChordDefinition::new_diminished()),
+            3 => Chord::new(&key, &ChordDefinition::new_augmented()),
+            4 => Chord::new(&key, &ChordDefinition::new_suspended_second()),
+            5 => Chord::new(&key, &ChordDefinition::new_suspended_four()),
+            6 => Chord::new(&key, &ChordDefinition::new_power()),
+            7 => Chord::new(&key, &ChordDefinition::new_major_seven()),
+            8 => Chord::new(&key, &ChordDefinition::new_minor_seven()),
+            9 => Chord::new(&key, &ChordDefinition::new_dominant_seven()),
+            10 => Chord::new(&key, &ChordDefinition::new_minor_major_seven()),
+            11 => Chord::new(&key, &ChordDefinition::new_six()),
+            12 => Chord::new(&key, &ChordDefinition::new_minor_six()),
+            13 => Chord::new(&key, &ChordDefinition::new_nine()),
+            14 => Chord::new(&key, &ChordDefinition::new_minor_nine()),
+            15 => Chord::new(&key, &ChordDefinition::new_add_nine()),
+            16 => Chord::new(&key, &ChordDefinition::new_seven_suspended_four()),
+            17 => Chord::new(&key, &ChordDefinition::new_dimished_seven()),
+            18 => Chord::new(&key, &ChordDefinition::new_half_diminished()),
+            19 => Chord::new(&key, &ChordDefinition::new_plus_seven()),
+            20 => Chord::new(&key, &ChordDefinition::new_minor_eleven()),
+            21 => Chord::new(&key, &ChordDefinition::new_augmented_major_seven()),
+            22 => Chord::new(&key, &ChordDefinition::new_dominant_seven_flat_nine()),
+            23 => Chord::new(&key, &ChordDefinition::new_altered_dominant_seven()),
             _ => panic!("Unexpected"),
         }
     }

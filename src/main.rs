@@ -3,6 +3,7 @@ use core::fmt::{Display, Formatter, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, Device, OutputCallbackInfo, SampleRate, StreamConfig};
 use owo_colors::{OwoColorize, Rgb};
+use std::cmp::Ordering;
 use std::f32::consts::PI;
 use std::io;
 use std::sync::Arc;
@@ -331,13 +332,13 @@ impl Display for NoteName {
 }
 
 impl Ord for NoteName {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.to_number().cmp(&other.to_number())
     }
 }
 
 impl PartialOrd for NoteName {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -607,13 +608,13 @@ enum NaturalNote {
 }
 
 impl Ord for NaturalNote {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.to_number().cmp(&other.to_number())
     }
 }
 
 impl PartialOrd for NaturalNote {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
@@ -706,16 +707,40 @@ impl Display for InstrumentType {
     }
 }
 
-#[derive(PartialEq, Clone, Debug)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 struct StepValue {
     value: i8,
 }
 
-#[derive(PartialEq, Clone, Debug)]
+impl Ord for StepValue {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.value.cmp(&other.value)
+    }
+}
+
+impl PartialOrd for StepValue {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+#[derive(PartialEq, Eq, Clone, Debug)]
 enum Step {
     Whole(StepValue),
     Half(StepValue),
     OneAndAHalf(StepValue),
+}
+
+impl Ord for Step {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.to_number().cmp(&other.to_number())
+    }
+}
+
+impl PartialOrd for Step {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Step {
@@ -1140,13 +1165,13 @@ enum Accidental {
 }
 
 impl Ord for Accidental {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+    fn cmp(&self, other: &Self) -> Ordering {
         self.to_number().cmp(&other.to_number())
     }
 }
 
 impl PartialOrd for Accidental {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
